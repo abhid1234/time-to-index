@@ -51,7 +51,8 @@ _FRAMEWORKS: list[tuple[str, list[str]]] = [
 # Rendering posture.
 SSR = "server_rendered"      # substantive text in the HTML itself
 FLIGHT = "flight_payload"    # text only inside an RSC/hydration data stream
-SHELL = "client_shell"       # almost no text; a mount point and a bundle
+SHELL = "client_shell"       # almost no text and no metadata; a mount point
+METADATA = "metadata_only"   # body is a shell, but it ships JSON-LD/OG an agent reads
 STATIC = "static_html"       # text present and no framework markers at all
 UNKNOWN = "unknown"          # not classifiable — never a verdict about a site
 NO_BODY = "no_body"          # empty or near-empty response; nothing to judge
@@ -76,6 +77,46 @@ SHELL_TEXT_CHARS = 900
 
 
 @dataclass
+class Structured:
+    """Machine-readable metadata a page ships alongside its HTML.
+
+    This exists because the first version of the verdict was wrong in a way
+    that mattered. A page whose body is a client shell can still ship JSON-LD,
+    OpenGraph tags and a meta description -- and an agent reads those without
+    executing anything. Calling such a page "not readable" overstates the
+    problem and would be a bad claim to make in public about someone's site.
+
+    What it does *not* fix: metadata is a summary. A registry page that ships
+    a name and a description but renders its version table client-side has
+    told an agent what the package is and not what version it is on, which is
+    the fact that was actually being asked for. So this is a third state, not
+    a pardon.
+    """
+    jsonld_blocks: int = 0
+    jsonld_types: list[str] = field(default_factory=list)
+    jsonld_chars: int = 0
+    opengraph: int = 0
+    meta_description: str = ""
+    microdata_attrs: int = 0
+
+    @property
+    def substantive(self) -> bool:
+        """Enough machine-readable content to answer something.
+
+        A single og:title is not structured data in any useful sense; every
+        page has one. The bar is a real JSON-LD block, or a description plus
+        several OpenGraph tags, or genuine microdata markup.
+        """
+        return (self.jsonld_chars >= 200
+                or (len(self.meta_description) >= 50 and self.opengraph >= 3)
+                or self.microdata_attrs >= 8)
+
+    @property
+    def chars(self) -> int:
+        return self.jsonld_chars + len(self.meta_description)
+
+
+@dataclass
 class PageProfile:
     framework: str = "unknown"
     posture: str = UNKNOWN
@@ -83,6 +124,7 @@ class PageProfile:
     visible_chars: int = 0
     script_chars: int = 0
     evidence: list[str] = field(default_factory=list)
+    structured: Structured = field(default_factory=lambda: Structured())
 
     @property
     def text_ratio(self) -> float:
@@ -96,6 +138,35 @@ class PageProfile:
         return (f"{self.framework} · {self.posture} · "
                 f"{self.visible_chars:,} chars visible of {self.bytes_total:,} served "
                 f"({self.text_ratio*100:.1f}%)")
+
+
+_JSONLD = re.compile(
+    r'<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>',
+    re.IGNORECASE | re.DOTALL)
+_OG = re.compile(r'<meta[^>]+property=["\']og:[a-z:]+["\']', re.IGNORECASE)
+_DESC = re.compile(
+    r'<meta[^>]+name=["\']description["\'][^>]+content=["\']([^"\']{0,400})',
+    re.IGNORECASE)
+_MICRO = re.compile(r'itemscope|itemprop=', re.IGNORECASE)
+_LDTYPE = re.compile(r'"@type"\s*:\s*"([^"]{1,60})"')
+
+
+def extract_structured(html: str) -> Structured:
+    st = Structured()
+    blocks = _JSONLD.findall(html)
+    st.jsonld_blocks = len(blocks)
+    st.jsonld_chars = sum(len(b.strip()) for b in blocks)
+    seen: list[str] = []
+    for b in blocks:
+        for t in _LDTYPE.findall(b):
+            if t not in seen:
+                seen.append(t)
+    st.jsonld_types = seen[:8]
+    st.opengraph = len(_OG.findall(html))
+    m = _DESC.search(html)
+    st.meta_description = (m.group(1).strip() if m else "")
+    st.microdata_attrs = len(_MICRO.findall(html))
+    return st
 
 
 def visible_text(html: str) -> str:
@@ -123,8 +194,14 @@ def profile(html: str) -> PageProfile:
     vis = visible_text(html)
     p.visible_chars = len(vis)
     p.script_chars = len(script_text(html))
+    p.structured = extract_structured(html)
 
     thin = p.visible_chars < SHELL_TEXT_CHARS or p.text_ratio < SHELL_TEXT_RATIO
+    if thin and p.structured.substantive:
+        # Readable metadata on an unreadable body. A real third state: the
+        # agent learns what the page is about and not what it says.
+        p.posture = METADATA
+        return p
     if p.framework == "unknown":
         p.posture = STATIC if not thin else SHELL
     elif thin:
@@ -160,6 +237,10 @@ VERDICTS = {
                         "entirely on that agent's extractor."),
     SHELL: ("not readable", "The served HTML is a mount point and a bundle. An agent "
                             "that does not run JavaScript sees nothing."),
+    METADATA: ("partial", "The body is a client shell, but the page ships "
+                          "machine-readable metadata (JSON-LD or OpenGraph). An agent "
+                          "gets a summary without executing anything — it does not get "
+                          "the page's actual content."),
     UNKNOWN: ("unknown", "Could not classify."),
     NO_BODY: ("no verdict", "The response was empty or too small to be a page. "
                             "This says something about the fetch, not about the site."),

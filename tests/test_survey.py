@@ -4,16 +4,18 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-from tti.framework import NO_BODY, SHELL, SSR, STATIC, PageProfile
+from tti.framework import METADATA, NO_BODY, SHELL, SSR, STATIC, PageProfile
 from tti.survey import SiteResult, Survey, markdown
 
 
-def r(url, posture, category="x", status=200, blocked=None, checked=12, ratio=0.05):
+def r(url, posture, category="x", status=200, blocked=None, checked=12, ratio=0.05,
+      stable=True, seen=None):
     p = PageProfile(framework="next-app" if posture == SSR else "unknown",
                     posture=posture, bytes_total=10_000,
                     visible_chars=int(10_000 * ratio))
     return SiteResult(url=url, category=category, status=status, prof=p,
-                      robots_blocked=blocked or [], robots_checked=checked)
+                      robots_blocked=blocked or [], robots_checked=checked,
+                      stable=stable, postures_seen=seen or [posture])
 
 
 def test_unreachable_targets_are_excluded_from_every_rate():
@@ -63,3 +65,46 @@ def test_breakdowns_and_markdown():
     assert sv.by_category()["registry"] == (1, 1)
     md = markdown(sv)
     assert "2 of 3 pages" in md and "client_shell" in md
+
+
+def test_metadata_only_is_neither_readable_nor_counted_as_content():
+    """A page that ships JSON-LD over a shell tells an agent what it is and
+    not what it says. Counting it as readable would let a registry that hides
+    its version table behind hydration score as fine."""
+    sv = Survey([r("https://a", METADATA), r("https://b", STATIC)])
+    assert sv.readable_rate() == (1, 2)
+    assert [x.url for x in sv.metadata_only()] == ["https://a"]
+
+
+def test_open_and_empty_excludes_pages_that_ship_metadata():
+    """The strict headline claim. Overstating it by one site is how a survey
+    stops being believed."""
+    sv = Survey([
+        r("https://empty", SHELL, blocked=[]),
+        r("https://partial", METADATA, blocked=[]),
+        r("https://fine", STATIC, blocked=[]),
+    ])
+    assert [x.url for x in sv.open_and_empty()] == ["https://empty"]
+    assert {x.url for x in sv.open_but_unreadable()} == {"https://empty",
+                                                         "https://partial"}
+
+
+def test_a_site_that_answers_differently_across_fetches_is_excluded():
+    """Observed in development: the same URL returned 5,056 bytes of client
+    shell on one run and a zero-byte 404 on the next. A verdict about
+    somebody's site must not rest on one request."""
+    sv = Survey([
+        r("https://flaky", SHELL, stable=False, seen=["client_shell", "HTTP404"]),
+        r("https://solid", STATIC),
+    ])
+    assert sv.readable_rate() == (1, 1)
+    assert [x.url for x in sv.unstable] == ["https://flaky"]
+    assert sv.results[0].verdict == "unstable"
+    assert "disagreed" in sv.results[0].why_unusable
+
+
+def test_unstable_pages_cannot_reach_the_headline_claim():
+    sv = Survey([r("https://flaky", SHELL, blocked=[], stable=False,
+                   seen=["client_shell", "error"])])
+    assert sv.open_and_empty() == []
+    assert sv.open_but_unreadable() == []

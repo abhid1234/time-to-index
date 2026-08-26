@@ -78,11 +78,25 @@ pypi.org/project/httpx/      —           static_html      9,898 chars visible 
 pkg.go.dev/…/gin             —           static_html     93,012 chars visible of 429,377
 ```
 
-Same kind of site, same kind of fact, opposite outcomes. And the sharpest
+Same kind of site, same kind of fact, opposite outcomes. The sharpest
 category the survey reports is pages that **allow every AI crawler in
-robots.txt and still serve them nothing readable** — nobody chose that. It
-falls out of a rendering default, and the robots.txt records that the team
-wanted the opposite.
+robots.txt and ship them nothing at all** — no readable body and no metadata.
+Nobody chose that. It falls out of a rendering default, and the robots.txt
+records that the team wanted the opposite.
+
+Three things keep that claim honest, and each was added because the first
+version of it was overstated:
+
+- **A verdict needs repeat fetches to agree.** The same URL returned 5,056
+  bytes of client shell on one run and a zero-byte 404 on the next. A page
+  that answers differently across fetches is excluded, not judged.
+- **A response has to be big enough to be a page** before it can be called a
+  bad one. An early version reported a proxy error as "client shell, not
+  readable".
+- **Metadata counts.** A shell that ships JSON-LD or OpenGraph is
+  `metadata_only`, not unreadable: an agent learns what the page is without
+  executing anything. It still does not learn what the page says, so it is a
+  third state rather than a pardon.
 
 This half is deliberately vendor-neutral and framework-neutral. Posture
 predicts retrievability; framework only correlates with it, and the

@@ -418,7 +418,7 @@ def cmd_survey(args) -> int:
     targets = None
     if args.urls:
         targets = [(u, "cli") for u in args.urls]
-    sv = sv_mod.run(targets, workers=args.workers)
+    sv = sv_mod.run(targets, workers=args.workers, repeat=args.repeat)
 
     if args.json:
         print(_json.dumps([{
@@ -434,8 +434,12 @@ def cmd_survey(args) -> int:
         return 0
 
     hit, n = sv.readable_rate()
+    meta = sv.metadata_only()
     print(f"{hit} of {n} pages readable without executing JavaScript"
-          + (f" · {len(sv.unreachable)} unreachable" if sv.unreachable else ""))
+          + (f" · {len(meta)} metadata-only" if meta else "")
+          + (f" · {len(sv.unstable)} unstable" if sv.unstable else "")
+          + (f" · {len(sv.unreachable) - len(sv.unstable)} unreachable"
+             if len(sv.unreachable) > len(sv.unstable) else ""))
 
     if n:
         print()
@@ -450,20 +454,40 @@ def cmd_survey(args) -> int:
         for cat, (h, t) in sv.by_category().items():
             print(f"  {cat:20s} {h}/{t} readable")
 
-        exposed = sv.open_but_unreadable()
-        if exposed:
-            print(f"\n{len(exposed)} page(s) allow every AI crawler in robots.txt and "
-                  f"still serve them nothing readable:")
-            for r in exposed:
-                print(f"  {r.url}")
+        empty = sv.open_and_empty()
+        partial = [r for r in sv.open_but_unreadable() if r not in empty]
+        if empty:
+            print(f"\n{len(empty)} page(s) allow every AI crawler in robots.txt and "
+                  f"ship them nothing at all — no readable body, no metadata:")
+            for r in empty:
+                print(f"  {r.url}  ({r.prof.visible_chars} visible chars)")
             print("  Nobody chose this. It falls out of a rendering default, and the")
-            print("  robots.txt says the team wanted the opposite.")
+            print("  robots.txt records that the team wanted the opposite.")
+        if partial:
+            print(f"\n{len(partial)} more allow every AI crawler and ship metadata "
+                  f"only — a summary, not the content:")
+            for r in partial:
+                print(f"  {r.url}")
+
+    if meta:
+        print(f"\n{len(meta)} page(s) ship readable metadata over an unreadable body:")
+        for r in meta:
+            st = r.prof.structured
+            print(f"  {r.url[8:56]:50s} JSON-LD {st.jsonld_chars}c "
+                  f"{st.jsonld_types or ''}")
+        print("  An agent learns what the page is about. It does not learn what the")
+        print("  page says, which is usually the fact it was sent there for.")
+
+    if sv.unstable:
+        print(f"\n{len(sv.unstable)} target(s) gave different answers across repeat "
+              f"fetches and were excluded:")
+        for r in sv.unstable[:10]:
+            print(f"  {r.url[8:56]:50s} {' / '.join(r.postures_seen)}")
 
     if sv.unreachable and args.verbose:
-        print(f"\nunreachable ({len(sv.unreachable)}):")
-        for r in sv.unreachable[:20]:
-            why = r.error or f"HTTP {r.status}"
-            print(f"  {r.url[:60]:62s} {why[:50]}")
+        print(f"\nnot judged ({len(sv.unreachable)}):")
+        for r in sv.unreachable[:24]:
+            print(f"  {r.url[:58]:60s} {r.why_unusable[:52]}")
     return 0
 
 
@@ -640,6 +664,8 @@ def main(argv: list[str] | None = None) -> int:
                         help="how much of a corpus is readable without JavaScript?")
     sv.add_argument("urls", nargs="*", help="URLs to scan (default: data/corpus.yaml)")
     sv.add_argument("--workers", type=int, default=12)
+    sv.add_argument("--repeat", type=int, default=2,
+                    help="fetches per URL; a verdict needs them to agree (default 2)")
     sv.add_argument("--json", action="store_true")
     sv.add_argument("--verbose", action="store_true", help="list unreachable targets")
     sv.set_defaults(fn=cmd_survey)
