@@ -154,7 +154,11 @@ def render(run_dir: pathlib.Path, out: pathlib.Path, ladder: list[int]) -> str:
     html = html.replace("<title>Time to Index</title>",
                         "<title>Time to Index — synthetic demo</title>")
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(html, encoding="utf-8")
+    out.write_text(report.full_page(html, "Time to Index — synthetic demo"),
+                   encoding="utf-8")
+    # Fragment copy, for embedding somewhere that supplies its own document
+    # shell.
+    out.with_suffix(".fragment.html").write_text(html, encoding="utf-8")
 
     lines = []
     for sc in sorted(scores, key=lambda s: (s.median_ttl is None, s.median_ttl or 0)):

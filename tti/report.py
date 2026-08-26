@@ -217,6 +217,25 @@ footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);
 """
 
 
+def full_page(fragment: str, title: str = "Time to Index") -> str:
+    """Wrap the dashboard fragment as a standalone document.
+
+    Kept separate because the fragment is also embedded elsewhere. The page
+    is self-contained apart from one Google Fonts link, with a real fallback
+    stack behind it, so it renders correctly from a file:// URL and inside a
+    network that blocks font CDNs.
+    """
+    return (
+        "<!doctype html>\n<html lang=\"en\">\n<head>\n"
+        "<meta charset=\"utf-8\">\n"
+        "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n"
+        + fragment.split("<div class=\"wrap\">", 1)[0]
+        + "</head>\n<body>\n<div class=\"wrap\">"
+        + fragment.split("<div class=\"wrap\">", 1)[1]
+        + "\n</body>\n</html>\n"
+    )
+
+
 def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
                    results: list[ProbeResult], by_class: dict[str, list[ProviderScore]],
                    pairs: list[tuple[str, str, float]]) -> str:

@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Time to Index — synthetic demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,6 +55,8 @@ td.k{font-family:var(--mono);font-size:12.5px}
 footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);
        color:var(--muted);font-size:12.5px}
 </style>
+</head>
+<body>
 <div class="wrap">
 <h1>Time to Index</h1>
 <div style="background:#7a2530;color:#fff;padding:14px 18px;border-radius:8px;
@@ -64,13 +71,13 @@ nothing here is a finding about any product. Real runs are published at
 
 <p class="sub">How long a newly published fact takes to become retrievable through each
 web-search API, and how often the API confidently returns the answer it replaced.
-Generated 2026-08-26 04:11 UTC.</p>
+Generated 2026-08-26 04:12 UTC.</p>
 
 <div class="panel">
   <div class="scroll"><table>
     <thead><tr><th>arm</th><th>median TTI</th><th>p90</th><th>24h recall</th>
     <th>staleness</th><th>p50 latency</th><th>$/1k events</th><th>events</th></tr></thead>
-    <tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>15m–60m</td><td class='k'>99% (95–100)</td><td class='k bad'>59% (47–69)</td><td class='k'>2217ms</td><td class='k'>$9.25</td><td class='k'>106</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>60m–6.0h</td><td class='k'>6.0h–24.0h</td><td class='k'>92% (85–95)</td><td class='k bad'>70% (64–75)</td><td class='k'>1362ms</td><td class='k'>$20.24</td><td class='k'>106</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>24.0h–3.0d</td><td class='k'>>3.0d</td><td class='k'>40% (31–49)</td><td class='k bad'>46% (41–51)</td><td class='k'>1699ms</td><td class='k'>$27.31</td><td class='k'>106</td></tr></tbody></table></div>
+    <tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>15m–60m</td><td class='k'>99% (95–100)</td><td class='k bad'>59% (47–69)</td><td class='k'>1025ms</td><td class='k'>$9.25</td><td class='k'>106</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>60m–6.0h</td><td class='k'>6.0h–24.0h</td><td class='k'>92% (85–95)</td><td class='k bad'>70% (64–75)</td><td class='k'>1199ms</td><td class='k'>$20.24</td><td class='k'>106</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>24.0h–3.0d</td><td class='k'>>3.0d</td><td class='k'>40% (31–49)</td><td class='k bad'>46% (41–51)</td><td class='k'>1747ms</td><td class='k'>$27.31</td><td class='k'>106</td></tr></tbody></table></div>
   <p class="note">Median is a Kaplan&#8211;Meier estimate with right-censoring at 72 hours,
   reported as the interval between ladder rungs rather than a point. An arm first seen
   fresh at the 1h rung indexed somewhere in (15m, 1h]; printing "1h" would overstate it
@@ -150,3 +157,5 @@ Re-grade the raw payloads with different matching rules and you will get a diffe
 number out of the same evidence &#8212; which is the only reason to believe this one.
 </footer>
 </div>
+</body>
+</html>

@@ -237,7 +237,8 @@ def cmd_report(args) -> int:
 
     root = pathlib.Path(__file__).resolve().parent.parent
     (root / "docs").mkdir(exist_ok=True)
-    html = report.dashboard_html(scores, events, results, by_class, pairs)
+    html = report.full_page(
+        report.dashboard_html(scores, events, results, by_class, pairs))
     (root / "docs" / "index.html").write_text(html, encoding="utf-8")
     (root / "RESULTS.md").write_text(
         "# Results\n\n" + report.summary_md(scores, events, results) + "\n",
