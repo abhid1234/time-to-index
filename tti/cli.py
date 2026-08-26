@@ -47,8 +47,11 @@ def cmd_doctor(args) -> int:
               "    string and will refuse requests without one.\n")
     print("sources")
     bad = 0
+    from . import http as _http
+    _http.set_retry_ceiling(0)      # fail fast; this is a reachability check
     for name in config.settings().get("sources", []):
         src = sources.get(name)
+        src.max_subjects = args.subjects or None
         t0 = time.perf_counter()
         try:
             got = src.collect({})
@@ -59,7 +62,8 @@ def cmd_doctor(args) -> int:
                 bad += 1
             else:
                 note = f" [{len(src.errors)} subject errors]" if src.errors else ""
-                print(f"  ✓ {name:18s} {len(got):3d} subjects current  {ms:6.0f}ms{note}")
+                print(f"  ✓ {name:18s} {len(got):3d}/{src.attempted} subjects "
+                      f"reachable  {ms:6.0f}ms{note}")
         except Exception as exc:  # noqa: BLE001
             print(f"  ✗ {name:18s} {type(exc).__name__}: {exc}"[:110])
             bad += 1
@@ -95,6 +99,10 @@ def cmd_doctor(args) -> int:
     b = Budget(spent_today=led.spent_on(day))
     print(f"\nbudget  ${b.spent:.4f} of ${b.cap:.2f} spent on {day} "
           f"(${b.remaining():.2f} left)")
+    _http.set_retry_ceiling(None)
+    if bad:
+        print(f"\n{bad} check(s) failed. A run with unreachable sources is a partial")
+        print("run; its per-class numbers should not be read as complete.")
     return 1 if bad else 0
 
 
@@ -376,8 +384,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--run-dir", help="ledger directory (default: ./runs)")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
-    sub.add_parser("doctor", help="check sources and providers are reachable"
-                   ).set_defaults(fn=cmd_doctor)
+    doc = sub.add_parser("doctor", help="check sources and providers are reachable")
+    doc.add_argument("--subjects", type=int, default=2,
+                     help="subjects to poll per source (default 2; 0 for all)")
+    doc.set_defaults(fn=cmd_doctor)
 
     d = sub.add_parser("discover", help="poll sources and enqueue probes")
     d.add_argument("--sources", nargs="*", help="limit to these sources")

@@ -12,6 +12,17 @@ from . import config
 
 _session = requests.Session()
 
+# Global retry ceiling. `tti doctor` lowers it to zero: a reachability check
+# that spends four seconds of exponential backoff per unreachable host takes
+# minutes to tell you something it knew immediately, and a diagnostic nobody
+# waits for is a diagnostic nobody runs.
+_max_retries: int | None = None
+
+
+def set_retry_ceiling(n: int | None) -> None:
+    global _max_retries
+    _max_retries = n
+
 
 class HttpError(RuntimeError):
     pass
@@ -36,6 +47,8 @@ def post_json(url: str, *, json: dict, headers: dict | None = None,
 
 
 def _request(method: str, url: str, *, retries: int = 2, **kw) -> requests.Response:
+    if _max_retries is not None:
+        retries = min(retries, _max_retries)
     h = {"User-Agent": config.contact_ua(), "Accept": "application/json"}
     h.update(kw.pop("headers", None) or {})
     last: Exception | None = None

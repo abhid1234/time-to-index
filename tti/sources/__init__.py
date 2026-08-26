@@ -36,9 +36,15 @@ class BaseSource:
     def __init__(self) -> None:
         self.errors: list[str] = []
         self.attempted = 0
+        # Cap on subjects polled this call. `tti doctor` sets it low: a
+        # reachability check does not need the whole watchlist, and one that
+        # takes two minutes will not be run before the run that needed it.
+        self.max_subjects: int | None = None
 
     def fan_out(self, fn: Callable[[Any], list[Event]], items: Iterable[Any]) -> list[Event]:
         items = list(items)
+        if self.max_subjects is not None:
+            items = items[:self.max_subjects]
         self.attempted += len(items)
         out: list[Event] = []
         if not items:
