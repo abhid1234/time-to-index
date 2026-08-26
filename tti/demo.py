@@ -79,6 +79,10 @@ def generate(run_dir: pathlib.Path, ladder: list[int], seed: int = 7
         state = ("blocked" if roll < 0.14 else
                  "not_found" if roll < 0.20 else "found")
         origin_state[ev.event_id] = state
+        # Registries and filings are server-rendered; a slice of pages put the
+        # fact only in a data blob. Invented proportions, real shape.
+        rclass = rng.choices(
+            ["server_html", "embedded_json", "api_only"], weights=[62, 26, 12])[0]
         appears_at = rng.choice([0, 300, 300, 300, 900])
         for rung in ladder:
             if state == "blocked":
@@ -91,7 +95,8 @@ def generate(run_dir: pathlib.Path, ladder: list[int], seed: int = 7
                 continue
             if rung >= appears_at:
                 results.append(_r(ev, "origin", "direct", rung, FRESH, 0.0, now,
-                                  note="origin:found rank=0"))
+                                  note=f"origin:found rank=0 render={rclass}",
+                                  render=rclass))
                 break
             results.append(_r(ev, "origin", "direct", rung, ABSENT, 0.0, now,
                               note="origin:not_found"))
@@ -136,7 +141,7 @@ def true_median(latencies: list[float]) -> float:
 
 
 def _r(ev: Event, provider: str, mode: str, rung: int, verdict: str,
-       cost: float, now: float, note: str = "") -> ProbeResult:
+       cost: float, now: float, note: str = "", render: str = "") -> ProbeResult:
     return ProbeResult(
         probe_id=f"{ev.event_id}-{provider}-{rung}", event_id=ev.event_id,
         provider=provider, mode=mode, rung=rung,
@@ -144,7 +149,7 @@ def _r(ev: Event, provider: str, mode: str, rung: int, verdict: str,
         latency_ms=random.Random(hash((provider, rung)) & 0xFFFF).randint(300, 2400),
         matched_stale=[ev.predecessor] if verdict == STALE and ev.predecessor else [],
         matched_fresh=[ev.answer] if verdict == FRESH else [],
-        n_results=5, cost_usd=cost, raw_ref="", note=note)
+        n_results=5, cost_usd=cost, raw_ref="", note=note, render=render)
 
 
 BANNER = """
@@ -190,8 +195,13 @@ def render(run_dir: pathlib.Path, out: pathlib.Path, ladder: list[int]) -> str:
                      staleness_by_rung(events, results, sc.provider, sc.mode))
                     for sc in sorted(scores, key=lambda s: (s.median_ttl is None,
                                                             s.median_ttl or 0))]
+    from .metrics import recall_by_render
+    render_table = {f"{sc.provider}/{sc.mode}":
+                    recall_by_render(events, results, sc.provider, sc.mode)
+                    for sc in scores}
+    render_table = {k: v for k, v in render_table.items() if v}
     html = report.dashboard_html(scores, events, results, by_class, pairs, powers,
-                                 stale_series)
+                                 stale_series, (), render_table or None)
     html = html.replace("<h1>Time to Index</h1>", "<h1>Time to Index</h1>" + BANNER)
     html = html.replace("<title>Time to Index</title>",
                         "<title>Time to Index — synthetic demo</title>")

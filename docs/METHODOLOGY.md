@@ -265,6 +265,10 @@ marketing page.
   one of the highest-volume sources here — is one of those. The fallback to
   a registry document answers a weaker question, and events verified only at
   rank 1 should be read as such.
+- **Render classification is not a browser.** A fact placed by JavaScript at
+  runtime from data not present in the served bytes reads as `not_present`
+  here even though a rendering crawler would find it. The class is a
+  statement about the raw response, not about what is reachable in principle.
 - **The control shares our network.** If a CDN serves us differently than it
   serves a commercial crawler, the control measures our view of the origin,
   not the crawler's. It bounds the confound rather than eliminating it.

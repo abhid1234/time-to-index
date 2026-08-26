@@ -291,6 +291,53 @@ footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);
 """
 
 
+def placeholder_page() -> str:
+    """The page GitHub Pages serves before any real run.
+
+    A results URL that 404s reads as abandoned; a results URL that shows a
+    template reads as a finding. Neither is true here, so this says which it
+    is. `tti report` overwrites this file on the first real run.
+    """
+    return full_page(f"""<title>Time to Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>{_CSS}</style>
+<div class="wrap">
+<h1>Time to Index</h1>
+<p class="sub">How long a newly published fact takes to become retrievable through each
+web-search API, and how often the API confidently returns the answer it replaced.</p>
+
+<div class="panel">
+  <p style="margin-top:0"><b>No run has happened yet.</b> Nothing on this site is a
+  finding about any product. This page is replaced by measured results the first time
+  the harness runs against live provider APIs.</p>
+  <p class="note">Said plainly because the alternatives are worse. A results URL that
+  404s reads as abandoned. A results URL showing a populated template reads as a
+  finding. Neither is true.</p>
+</div>
+
+<h2>In the meantime</h2>
+<div class="panel">
+  <p style="margin-top:0"><a href="demo.html">The synthetic demo</a> &#8212; what the
+  instrument renders, with made-up providers whose latencies come from a seeded
+  generator. It exists to show the shape and to check that the estimator recovers
+  latencies it was never shown. It is labelled on the page itself.</p>
+  <p><a href="METHODOLOGY.md">Methodology</a> &#8212; ground truth, the probe ladder,
+  grading, the origin control, and the statistics. Including a section on everything
+  that could make the numbers wrong.</p>
+  <p><a href="INTEGRATION-NOTES.md">Integration notes</a> &#8212; the friction of wiring
+  up each source and provider, split into what was observed and what is still open.</p>
+</div>
+
+<footer>
+When results land they are published regardless of which provider wins, including if
+the one I find most interesting comes last, and including if the differences turn out
+to sit inside the noise. The raw payloads ship either way.
+</footer>
+</div>""")
+
+
 def full_page(fragment: str, title: str = "Time to Index") -> str:
     """Wrap the dashboard fragment as a standalone document.
 
@@ -328,7 +375,8 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
                    pairs: list[tuple[str, str, float]],
                    powers: list = (),
                    stale_series: list = (),
-                   sensitivity_rows: list = ()) -> str:
+                   sensitivity_rows: list = (),
+                   render_table: dict | None = None) -> str:
     e = html.escape
     gen = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     ordered = sorted(scores, key=lambda s: (s.median_ttl is None, s.median_ttl or 0))
@@ -442,6 +490,46 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
         for k, v in sorted(origin_counts.items(), key=lambda kv: -kv[1])
     ) or "<tr><td colspan='3'>control arm not run</td></tr>"
     n_confirmed = max((s.n_origin_confirmed for s in scores), default=0)
+    RENDER_MEANING = {
+        "server_html": "in the page's visible text — readable without executing anything",
+        "embedded_json": "only inside a script or data blob — needs a renderer to surface",
+        "api_only": "the crawler-facing page did not answer; an API fallback did",
+        "not_present": "not in the document at all",
+    }
+    if render_table:
+        classes = sorted({c for row in render_table.values() for c in row})
+        head = "".join(f"<th>{e(c.replace('_', ' '))}</th>" for c in classes)
+        body = "".join(
+            "<tr><td class='k'>" + e(arm) + "</td>" + "".join(
+                (lambda hv: f"<td class='k'>{hv[0]}/{hv[1]}"
+                            f" <span style='color:var(--muted)'>"
+                            f"({hv[0]/hv[1]*100:.0f}%)</span></td>"
+                 if hv and hv[1] else "<td class='k'>—</td>")(row.get(c))
+                for c in classes) + "</tr>"
+            for arm, row in sorted(render_table.items()))
+        legend_rows = "".join(
+            f"<tr><td class='k'>{e(c.replace('_', ' '))}</td>"
+            f"<td>{e(RENDER_MEANING.get(c, ''))}</td></tr>" for c in classes)
+        render_block = f"""
+<h2>Where the fact lived</h2>
+<div class="panel">
+  <div class="scroll"><table>
+    <thead><tr><th>arm</th>{head}</tr></thead><tbody>{body}</tbody></table></div>
+  <div class="scroll" style="margin-top:14px"><table>
+    <thead><tr><th>class</th><th>meaning</th></tr></thead>
+    <tbody>{legend_rows}</tbody></table></div>
+  <p class="note">24-hour recall split by where the answer sat in its own document.
+  The control arm already fetches every page, so this axis costs nothing, and it is the
+  one that turns "provider X missed it" into something a buyer can act on. A fact in an
+  <code>&lt;h1&gt;</code> and a fact buried in a <code>__NEXT_DATA__</code> blob are
+  different retrieval problems. An arm strong on the first and weak on the second is not
+  slow &#8212; it does not execute JavaScript, and that is a sourcing decision, not a
+  latency one. Denominators are events the control arm confirmed were on the web.</p>
+</div>
+"""
+    else:
+        render_block = ""
+
     stale_chart = staleness_svg(list(stale_series), RUNGS) if stale_series else ""
 
     if sensitivity_rows:
@@ -538,6 +626,7 @@ Generated {gen}.</p>
   denominator rather than guessed at.</p>
 </div>
 
+{render_block}
 <h2>Estimator check</h2>
 <div class="panel">
   <div class="scroll"><table>

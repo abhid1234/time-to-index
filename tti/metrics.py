@@ -291,6 +291,53 @@ def intervals(
 ORIGIN = "origin"
 
 
+def recall_by_render(
+    events: dict[str, Event],
+    results: list[ProbeResult],
+    provider: str,
+    mode: str,
+    horizon: float = 86_400.0,
+) -> dict[str, tuple[int, int]]:
+    """Recall split by where the fact sat in its own document.
+
+    A fact in an <h1> and a fact buried in a __NEXT_DATA__ blob are different
+    retrieval problems, and pooling them hides the only actionable thing the
+    control arm knows. A provider strong on server-rendered pages and weak on
+    script-embedded ones is not "slow" -- it does not execute JavaScript, and
+    that is a sourcing decision a buyer can reason about.
+
+    Only events the control arm confirmed are counted, so the denominator is
+    always documents that were demonstrably on the web.
+    """
+    render_of: dict[str, str] = {}
+    for r in results:
+        if r.provider == ORIGIN and r.verdict == FRESH and not r.phrasing \
+                and r.lag <= horizon and r.render:
+            render_of.setdefault(r.event_id, r.render)
+
+    first_fresh: dict[str, float] = {}
+    seen: set[str] = set()
+    for r in results:
+        if r.provider != provider or r.mode != mode or r.phrasing:
+            continue
+        if r.event_id not in render_of or r.verdict in (ERROR, SKIPPED):
+            continue
+        seen.add(r.event_id)
+        if r.verdict == FRESH:
+            prev = first_fresh.get(r.event_id)
+            if prev is None or r.lag < prev:
+                first_fresh[r.event_id] = r.lag
+
+    out: dict[str, list[int]] = {}
+    for eid in seen:
+        cls = render_of[eid]
+        cell = out.setdefault(cls, [0, 0])
+        cell[1] += 1
+        if first_fresh.get(eid, float("inf")) <= horizon:
+            cell[0] += 1
+    return {k: (v[0], v[1]) for k, v in out.items()}
+
+
 def phrasing_agreement(
     events: dict[str, Event],
     results: list[ProbeResult],

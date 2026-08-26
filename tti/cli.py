@@ -30,6 +30,7 @@ from .metrics import (
     fmt_duration,
     logrank,
     observations,
+    recall_by_render,
     score,
     staleness_by_rung,
 )
@@ -313,6 +314,15 @@ def cmd_sensitivity(args) -> int:
     return 0
 
 
+def cmd_placeholder(args) -> int:
+    root = pathlib.Path(__file__).resolve().parent.parent
+    out = root / "docs" / "index.html"
+    out.parent.mkdir(exist_ok=True)
+    out.write_text(report.placeholder_page(), encoding="utf-8")
+    print(f"wrote {out.relative_to(root)} — replaced by `tti report` on the first run")
+    return 0
+
+
 def cmd_demo(args) -> int:
     """Render docs/demo.html from a synthetic run.
 
@@ -374,9 +384,14 @@ def cmd_report(args) -> int:
         print(f"  ! sensitivity pass skipped: {exc}")
         sens_rows = []
 
+    render_table = {f"{sc.provider}/{sc.mode}":
+                    recall_by_render(events, results, sc.provider, sc.mode)
+                    for sc in scores}
+    render_table = {k: v for k, v in render_table.items() if v}
+
     html = report.full_page(
         report.dashboard_html(scores, events, results, by_class, pairs, powers,
-                              stale_series, sens_rows))
+                              stale_series, sens_rows, render_table or None))
     (root / "docs" / "index.html").write_text(html, encoding="utf-8")
     (root / "RESULTS.md").write_text(
         "# Results\n\n" + report.summary_md(scores, events, results) + "\n",
@@ -411,6 +426,8 @@ def main(argv: list[str] | None = None) -> int:
                    ).set_defaults(fn=cmd_report)
     sub.add_parser("demo", help="render docs/demo.html from a synthetic run"
                    ).set_defaults(fn=cmd_demo)
+    sub.add_parser("placeholder", help="write the pre-run docs/index.html"
+                   ).set_defaults(fn=cmd_placeholder)
     sub.add_parser("power", help="can this run support the claim it invites?"
                    ).set_defaults(fn=cmd_power)
     sub.add_parser("sensitivity", help="how much does the ranking depend on grading rules?"

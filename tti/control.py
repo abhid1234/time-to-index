@@ -53,6 +53,16 @@ BLOCKED = "blocked"      # origin refused us (403/429); fetchability unknown
 DISALLOWED = "disallowed"  # robots.txt says do not crawl this
 ERROR = "error"          # network or protocol failure
 
+# Where in the document the fact actually lives. The control arm already
+# fetches the page, so this axis is free -- and it is the one that turns
+# "provider X missed it" into something actionable, because a fact that
+# exists only inside a __NEXT_DATA__ blob is a different retrieval problem
+# from one sitting in an <h1>.
+RENDER_HTML = "server_html"      # in the visible text after scripts are stripped
+RENDER_JSON = "embedded_json"    # only inside a script/JSON blob on the page
+RENDER_API = "api_only"          # only via an API fallback origin, not the page
+RENDER_NONE = "not_present"
+
 EXCERPT_RADIUS = 400
 NO_MATCH_HEAD = 3000
 MAX_BODY = 2_000_000        # refuse to scan an unbounded stream
@@ -95,7 +105,42 @@ def robots_allows(url: str, agent: str = "*") -> bool | None:
 
 
 def _boundary(token: str) -> re.Pattern[str]:
-    return re.compile(rf"(?<![\w.]){re.escape(token)}(?![\w.])", re.IGNORECASE)
+    core = re.escape(token)
+    if token[:1].isdigit():
+        core = "[vV]?" + core        # same rule as the grader; see grader._pattern
+    return re.compile(rf"(?<![\w.]){core}(?![\w.])", re.IGNORECASE)
+
+
+_SCRIPTY = re.compile(r"<(script|style|template|noscript)\b[^>]*>.*?</\1>",
+                      re.IGNORECASE | re.DOTALL)
+_TAG = re.compile(r"<[^>]+>")
+
+
+def visible_text(html: str) -> str:
+    """Roughly what a crawler that does not execute JavaScript would read.
+
+    Script, style and template blocks go first, then the remaining tags. This
+    is deliberately crude: the question is not "what would a browser paint"
+    but "is this fact in the served bytes as text, or is it only in a data
+    blob a renderer would have to run to surface". A regex answers that;
+    a parser would answer it more slowly and no more usefully.
+    """
+    return _TAG.sub(" ", _SCRIPTY.sub(" ", html))
+
+
+def classify_render(body: str, tokens: list[str], origin_rank: int) -> str:
+    """Where the answer token sits in the document that carried it."""
+    pats = [_boundary(t) for t in tokens if len(t) >= 3]
+    if not pats:
+        return RENDER_NONE
+    if not any(p.search(body) for p in pats):
+        return RENDER_NONE
+    if origin_rank > 0:
+        # It came from an API fallback, so the crawler-facing page is not
+        # what answered and we cannot claim anything about its rendering.
+        return RENDER_API
+    text = visible_text(body)
+    return RENDER_HTML if any(p.search(text) for p in pats) else RENDER_JSON
 
 
 def _attempt(url: str, event: Event) -> dict[str, Any]:
@@ -103,7 +148,7 @@ def _attempt(url: str, event: Event) -> dict[str, Any]:
     rec: dict[str, Any] = {
         "url": url, "state": ERROR, "robots_allowed": None, "status": None,
         "bytes": 0, "sha256": "", "elapsed_ms": 0, "matched": [],
-        "truncated": False, "error": "", "excerpt": "",
+        "truncated": False, "error": "", "excerpt": "", "body": None,
     }
     allowed = robots_allows(url, config.contact_ua().split("/")[0])
     rec["robots_allowed"] = allowed
@@ -146,6 +191,7 @@ def _attempt(url: str, event: Event) -> dict[str, Any]:
             if hit_at is None:
                 hit_at = m.start()
 
+    rec["body"] = body      # dropped before storage; only classify_render needs it
     if hit_at is not None:
         rec["state"] = FOUND
         lo = max(0, hit_at - EXCERPT_RADIUS)
@@ -182,6 +228,7 @@ def probe_origin(event: Event) -> dict[str, Any]:
         "origin_used": "",
         "origin_rank": -1,      # 0 = the canonical crawler-facing page
         "attempts": [],
+        "render": RENDER_NONE,
         "content": "",          # the only key the grader reads
         "error": "",
     }
@@ -198,11 +245,17 @@ def probe_origin(event: Event) -> dict[str, Any]:
             out["origin_used"] = url
             out["origin_rank"] = rank
             out["content"] = rec["excerpt"]
+            out["render"] = classify_render(rec.pop("body") or "",
+                                            event.answer_aliases, rank)
+            for a in out["attempts"]:
+                a.pop("body", None)     # bodies never reach the ledger
             return out
 
     # Nothing answered. Report the strongest thing we learned, preferring
     # BLOCKED over ERROR because it is a statement about the origin's policy
     # rather than about our network.
+    for a in out["attempts"]:
+        a.pop("body", None)
     states = [a["state"] for a in out["attempts"]]
     for preferred in (DISALLOWED, BLOCKED, ERROR):
         if preferred in states:

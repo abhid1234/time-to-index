@@ -132,6 +132,9 @@ class ProbeResult:
     lag: float                 # requested_at - event.published_at, the x-axis
     verdict: str
     phrasing: int = 0          # which wording was asked; see tti/phrasing.py
+    # Origin-control only: where in the document the fact was found. Empty
+    # for provider arms. See control.classify_render.
+    render: str = ""
     latency_ms: int = 0
     matched_fresh: list[str] = field(default_factory=list)
     matched_stale: list[str] = field(default_factory=list)

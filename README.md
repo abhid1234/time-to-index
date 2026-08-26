@@ -28,7 +28,10 @@ it is wrong.
    metadata — never from any provider's output.
 3. **Ask every provider at t+5m, +15m, +1h, +6h, +24h, +72h** — and at every
    rung, fetch the canonical URL directly as a control, so "the provider was
-   slow" is never confused with "the document was not on the web yet".
+   slow" is never confused with "the document was not on the web yet". The
+   control also records *where* the fact sat: visible HTML, a script-embedded
+   data blob, or only an API fallback. An arm strong on the first and weak on
+   the second is not slow — it does not execute JavaScript.
 4. **Grade FRESH / STALE / ABSENT** against the new answer token and the one
    it replaced.
 5. **Estimate with Turnbull's NPMLE for interval-censored data.** An arm seen
@@ -173,7 +176,7 @@ pip install -e ".[dev]"
 pytest -q && ruff check tti tests
 ```
 
-95 tests, on Python 3.10 through 3.13, no network calls. The ones that
+107 tests, on Python 3.10 through 3.13, no network calls. The ones that
 matter:
 
 - **Turnbull reduces to Kaplan–Meier** on right-censored data — a theorem, so
@@ -189,6 +192,9 @@ matter:
   freshness on exactly the packages that ship most often — and its twin, the
   `v15.4.2` prefix, which a strict word boundary rejects even though the
   answer is plainly there. Both directions are pinned.
+- **Page bodies never reach the ledger.** They are used to classify where the
+  fact lived and dropped; only an excerpt and a SHA-256 are kept, because a
+  full body per event per rung is tens of megabytes a day.
 - **403 is `blocked`, not `absent`.** An origin refusing our client says
   nothing about whether a crawler can reach it, and scoring it as "not on the
   web" would let a bot-walled page make every provider look slow.

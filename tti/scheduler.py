@@ -243,21 +243,24 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
         latency = int((time.perf_counter() - t0) * 1000)
         verdict, fresh_hits, stale_hits, chars = grade(event, payload)
         note = ""
+        render = ""
         if is_control:
             state = payload.get("state", "")
             rank = payload.get("origin_rank", -1)
+            render = payload.get("render", "")
             # A control probe that could not fetch anything is an ERROR, not
             # an ABSENT. Scoring it as ABSENT would assert the fact was not on
             # the web, which is exactly what we failed to establish.
             if state in (control.BLOCKED, control.DISALLOWED, control.ERROR):
                 verdict = ERROR
-            note = f"origin:{state}" + (f" rank={rank}" if rank >= 0 else "")
+            note = (f"origin:{state}" + (f" rank={rank}" if rank >= 0 else "")
+                    + (f" render={render}" if render else ""))
         raw_ref = ledger.store_raw(probe.provider, probe.probe_id, payload)
 
         out.append(ProbeResult(
             probe_id=probe.probe_id, event_id=event.event_id,
             provider=probe.provider, mode=probe.mode, rung=probe.rung,
-            phrasing=probe.phrasing,
+            phrasing=probe.phrasing, render=render,
             requested_at=now, lag=lag, verdict=verdict, latency_ms=latency,
             matched_fresh=fresh_hits, matched_stale=stale_hits,
             n_results=_count_results(payload), chars=chars,
