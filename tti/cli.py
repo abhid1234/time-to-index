@@ -21,6 +21,7 @@ import datetime as dt
 import pathlib
 import sys
 import time
+import urllib.parse
 
 from . import config, providers, report, sources
 from .budget import Budget, unit_cost, utc_day
@@ -421,6 +422,57 @@ def cmd_crawlability(args) -> int:
     return 0
 
 
+def cmd_routes(args) -> int:
+    """Sample a site's own sitemap and profile the routes it declares.
+
+    One page is enough to prove a failure exists and not enough to describe a
+    site. Marketing pages are almost always server-rendered; the interesting
+    failures are on detail pages.
+    """
+    from . import routes as rt
+    from . import survey as sv_mod
+
+    for site in args.sites:
+        rs = rt.sample(site, args.sample)
+        print(f"\n{rs.site}")
+        if not rs.ok:
+            print(f"  {rs.note or 'no routes discovered'}")
+            continue
+        print(f"  {rs.discovered:,} routes declared in "
+              f"{len(rs.sitemap_urls)} sitemap(s); sampling {len(rs.sampled)} "
+              f"evenly across the sorted list")
+
+        sv = sv_mod.run([(u, "route") for u in rs.sampled],
+                        workers=args.workers, repeat=args.repeat)
+        if sv.intercepted:
+            print(f"  ! {len(sv.intercepted)} of {len(rs.sampled)} sampled routes "
+                  f"returned a body identical to another route's.")
+            print("    One page served for many is a challenge, block or proxy —")
+            print("    not a rendering posture. Those routes are excluded.")
+        hit, n = sv.readable_rate()
+        if not n:
+            print("  no route could be judged — fetches failed, disagreed, or all")
+            print("  returned the same intercepted body")
+            continue
+        for r in sorted(sv.usable, key=lambda r: r.prof.text_ratio):
+            mark = " " if r.readable else "!"
+            path = urllib.parse.urlsplit(r.url).path or "/"
+            print(f"   {mark} {r.prof.text_ratio*100:5.2f}%  "
+                  f"{r.prof.visible_chars:>7,}c  {r.prof.posture:15s} {path[:52]}")
+        share = hit / n
+        print(f"  {hit}/{n} sampled routes readable ({share*100:.0f}%)")
+        if share == 1.0:
+            print("  Uniformly readable across the sample.")
+        elif share == 0.0:
+            print("  No sampled route was readable. This is a site-wide posture,")
+            print("  not one bad page.")
+        else:
+            print("  Mixed. A site-level claim either way would be wrong — the")
+            print("  readable routes and the unreadable ones are different pages,")
+            print("  and only the second kind is actionable.")
+    return 0
+
+
 def cmd_survey(args) -> int:
     """Scan a corpus of pages and report how much of it an agent can read.
 
@@ -453,6 +505,7 @@ def cmd_survey(args) -> int:
     meta = sv.metadata_only()
     print(f"{hit} of {n} pages readable without executing JavaScript"
           + (f" · {len(meta)} metadata-only" if meta else "")
+          + (f" · {len(sv.intercepted)} intercepted" if sv.intercepted else "")
           + (f" · {len(sv.unstable)} unstable" if sv.unstable else "")
           + (f" · {len(sv.unreachable) - len(sv.unstable)} unreachable"
              if len(sv.unreachable) > len(sv.unstable) else ""))
@@ -677,6 +730,15 @@ def main(argv: list[str] | None = None) -> int:
     cw.add_argument("--find", help="check whether this exact string is agent-visible")
     cw.add_argument("--json", action="store_true", help="machine-readable output")
     cw.set_defaults(fn=cmd_crawlability)
+
+    rt = sub.add_parser("routes",
+                        help="sample a site's sitemap and profile its routes")
+    rt.add_argument("sites", nargs="+", help="site root, e.g. https://example.com")
+    rt.add_argument("--sample", type=int, default=8, help="routes to sample (default 8)")
+    rt.add_argument("--repeat", type=int, default=2,
+                    help="fetches per route; a verdict needs them to agree")
+    rt.add_argument("--workers", type=int, default=6)
+    rt.set_defaults(fn=cmd_routes)
 
     sv = sub.add_parser("survey",
                         help="how much of a corpus is readable without JavaScript?")

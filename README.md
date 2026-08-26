@@ -65,7 +65,8 @@ ledger required, measure the corpus rather than the providers:
 
 ```bash
 tti crawlability https://yoursite.com --find "the fact you care about"
-tti survey                # scan data/corpus.yaml
+tti routes https://yoursite.com --sample 8    # sample the site's own sitemap
+tti survey                                     # scan data/corpus.yaml
 ```
 
 `crawlability` answers the two questions that decide whether a page enters an
@@ -84,8 +85,15 @@ robots.txt and ship them nothing at all** — no readable body and no metadata.
 Nobody chose that. It falls out of a rendering default, and the robots.txt
 records that the team wanted the opposite.
 
-Three things keep that claim honest, and each was added because the first
-version of it was overstated:
+`tti routes` exists because one page is enough to prove a failure and not
+enough to describe a site. Marketing pages are almost always server-rendered;
+the interesting failures are on detail pages. It reads the site's own sitemap,
+samples evenly across the sorted route list (deterministically, so two runs
+examine the same routes and a site that changed is distinguishable from a
+sample that moved), and reports the spread.
+
+Four things keep these claims honest, and each was added because an earlier
+version of one was wrong:
 
 - **A verdict needs repeat fetches to agree.** The same URL returned 5,056
   bytes of client shell on one run and a zero-byte 404 on the next. A page
@@ -97,6 +105,14 @@ version of it was overstated:
   `metadata_only`, not unreadable: an agent learns what the page is without
   executing anything. It still does not learn what the page says, so it is a
   third state rather than a pardon.
+- **Identical bodies across distinct URLs are interception, not a posture.**
+  Six different PyPI project pages returned byte-identical 3,036-byte bodies
+  with HTTP 200, and the first version of `tti routes` duly reported that PyPI
+  is entirely client-rendered. It is not. CDN challenges, WAF blocks and
+  soft-404s all answer 200 and all classify cleanly as a client shell. Every
+  member of an identical group is now excluded — not all-but-one, because
+  keeping a representative assumes one of them is the real page and in the
+  interception case none of them is.
 
 This half is deliberately vendor-neutral and framework-neutral. Posture
 predicts retrievability; framework only correlates with it, and the

@@ -147,6 +147,25 @@ Templates that cannot be filled from an event's metadata are skipped rather
 than rendered with an empty slot: a question with a hole in it measures the
 hole.
 
+## Refusing to answer
+
+A recurring shape in this repo: the failure that looks most like a finding is
+an infrastructure failure. Four guards exist because four different versions
+of that mistake were actually made here.
+
+| what it looked like | what it was | guard |
+|---|---|---|
+| "client shell, not readable" | a zero-byte proxy error | a response must exceed a minimum size before it can be judged |
+| a confident render verdict | a URL that answered differently on the next fetch | repeat fetches must agree |
+| "this whole registry is client-rendered" | one challenge page served for six routes | byte-identical bodies across distinct URLs are excluded |
+| "0 new events" | an unreachable host | collectors track per-subject errors; an all-failed source is reported broken |
+
+The pattern is the same every time: something that is not a measurement
+classifies perfectly as one. Each guard costs data — dropped events, excluded
+routes, a smaller denominator — and the trade is deliberate. A benchmark that
+publishes an artifact of its own network has not measured anything and cannot
+tell that it has not.
+
 ## Statistics
 
 **Time to index is a survival problem.** Most events are still un-indexed at

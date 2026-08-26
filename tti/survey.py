@@ -65,6 +65,10 @@ class SiteResult:
     attempts: int = 1
     postures_seen: list[str] = field(default_factory=list)
     stable: bool = True
+    body_sha: str = ""
+    # Set when another distinct URL in the same batch returned a
+    # byte-identical body. See Survey.mark_identical_bodies.
+    duplicate_of: str = ""
 
     @property
     def usable(self) -> bool:
@@ -74,7 +78,8 @@ class SiteResult:
         enough to classify, and agreement across repeats.
         """
         return (self.status == 200 and self.prof is not None
-                and self.prof.posture != NO_BODY and self.stable)
+                and self.prof.posture != NO_BODY and self.stable
+                and not self.duplicate_of)
 
     @property
     def readable(self) -> bool:
@@ -82,6 +87,8 @@ class SiteResult:
 
     @property
     def verdict(self) -> str:
+        if self.duplicate_of:
+            return "intercepted"
         if not self.stable:
             return "unstable"
         if not self.usable:
@@ -90,6 +97,8 @@ class SiteResult:
 
     @property
     def why_unusable(self) -> str:
+        if self.duplicate_of:
+            return f"byte-identical body to {self.duplicate_of}"
         if self.error:
             return self.error
         if not self.stable:
@@ -116,6 +125,45 @@ class Survey:
     @property
     def unstable(self) -> list[SiteResult]:
         return [r for r in self.results if not r.stable]
+
+    @property
+    def intercepted(self) -> list[SiteResult]:
+        return [r for r in self.results if r.duplicate_of]
+
+    def mark_identical_bodies(self) -> int:
+        """Flag distinct URLs that returned byte-identical responses.
+
+        Six different project pages returning the same 3,036 bytes with HTTP
+        200 is not a site that renders client-side. It is one page served for
+        all of them: a CDN challenge, a WAF block, a soft-404, or an
+        intercepting proxy. Every one of those answers 200 and every one
+        classifies cleanly as a client shell, which is how a survey ends up
+        reporting that a whole registry is unreadable when one of its pages
+        plainly is not.
+
+        Every member of an identical group is excluded, not all-but-one.
+        Keeping a representative assumes one of them is the real page, and in
+        the interception case none of them is. The cost is discarding a
+        legitimately duplicated page now and then, which is rare and harmless
+        next to asserting a rendering verdict from a challenge screen.
+
+        Returns the number flagged.
+        """
+        by_sha: dict[str, list[SiteResult]] = {}
+        for r in self.results:
+            if r.body_sha and r.status == 200:
+                by_sha.setdefault(r.body_sha, []).append(r)
+        flagged = 0
+        for group in by_sha.values():
+            urls = {g.url for g in group}
+            if len(urls) < 2:
+                continue
+            others = sorted(urls)
+            for g in group:
+                peer = next((u for u in others if u != g.url), others[0])
+                g.duplicate_of = peer
+                flagged += 1
+        return flagged
 
     def metadata_only(self) -> list[SiteResult]:
         """Pages whose body is a shell but which ship readable metadata.
@@ -208,7 +256,9 @@ def _fetch(url: str, category: str, timeout: float, repeat: int = 2,
     # Keep the richest observation -- a truncated response classifies as a
     # worse posture than the site deserves, and the goal is never to be
     # unfairly harsh about somebody's page.
-    res.prof = max(profs, key=lambda p: p.bytes_total)
+    best = max(profs, key=lambda p: p.bytes_total)
+    res.prof = best
+    res.body_sha = best.body_sha
     res.stable = len(set(res.postures_seen)) == 1
     if not res.stable:
         return res
@@ -235,6 +285,7 @@ def run(targets: list[tuple[str, str]] | None = None, workers: int = 12,
         futs = [pool.submit(_fetch, u, c, timeout, repeat) for u, c in targets]
         for f in cf.as_completed(futs):
             sv.results.append(f.result())
+    sv.mark_identical_bodies()
     return sv
 
 

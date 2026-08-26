@@ -29,6 +29,7 @@ article and an empty shell with a fetch in a useEffect.
 
 from __future__ import annotations
 
+import hashlib
 import re
 from dataclasses import dataclass, field
 
@@ -123,6 +124,7 @@ class PageProfile:
     bytes_total: int = 0
     visible_chars: int = 0
     script_chars: int = 0
+    body_sha: str = ""
     evidence: list[str] = field(default_factory=list)
     structured: Structured = field(default_factory=lambda: Structured())
 
@@ -187,6 +189,7 @@ def detect_framework(html: str) -> tuple[str, list[str]]:
 
 def profile(html: str) -> PageProfile:
     p = PageProfile(bytes_total=len(html))
+    p.body_sha = hashlib.sha256(html.encode("utf-8", "replace")).hexdigest()
     if len(html) < MIN_BODY_BYTES:
         p.posture = NO_BODY
         return p
