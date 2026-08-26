@@ -314,6 +314,54 @@ def cmd_sensitivity(args) -> int:
     return 0
 
 
+def cmd_forecast(args) -> int:
+    """Days-to-signal, from how often the watchlist has actually shipped."""
+    from . import forecast as fc_mod
+
+    fc = fc_mod.run(args.sources or None)
+    ok, bad = fc.readable, [r for r in fc.rows if r.error]
+    print(f"{len(ok)} subjects readable over the last {fc.window_days} days"
+          + (f" · {len(bad)} unreachable" if bad else ""))
+    print(f"observed rate   {fc.per_day:6.1f} events/day")
+    print(f"  of which can measure staleness "
+          f"{fc.superseding_per_day:.1f}/day (npm, pypi, releases, filings)")
+    top, eff = fc.concentration()
+    if top == top:
+        flag = "  <-- one subject dominates the corpus" if top > 0.10 else ""
+        print(f"concentration   top subject {top:5.1%} · "
+              f"{eff:.0f} effective subjects{flag}")
+
+    for name, why in fc_mod.UNBOUNDED.items():
+        if name in (args.sources or config.settings().get("sources", [])):
+            print(f"  + {name}: {why}")
+
+    print(f"\n{'to detect a hazard ratio of':32s} {'events':>7s} {'days':>7s}")
+    for hr in (2.0, 1.5, 1.2):
+        d = fc.days_for(hr)
+        need = fc_mod.events_for_power(hr)
+        print(f"{'  ' + str(hr):32s} {need:7.0f} {('—' if d is None else f'{d:.0f}'):>7s}")
+
+    quiet = fc.quiet()
+    if quiet:
+        print(f"\n{len(quiet)} subjects shipped nothing in {fc.window_days} days and are "
+              f"pure cost:")
+        print("  " + ", ".join(f"{r.subject}" for r in quiet[:16]))
+        print("  Each still costs one poll per cycle. Drop them or accept the noise.")
+
+    busiest = sorted(ok, key=lambda r: -r.releases)[:8]
+    if busiest and busiest[0].releases:
+        print("\nbusiest subjects:")
+        for r in busiest:
+            print(f"  {r.source:14s} {r.subject:22s} {r.releases:3d}  "
+                  f"({r.per_day*7:.1f}/wk)")
+
+    if bad:
+        print(f"\n{len(bad)} unreachable — this forecast is a lower bound:")
+        for r in bad[:5]:
+            print(f"  {r.source:14s} {r.subject:22s} {r.error[:60]}")
+    return 0
+
+
 def cmd_placeholder(args) -> int:
     root = pathlib.Path(__file__).resolve().parent.parent
     out = root / "docs" / "index.html"
@@ -428,6 +476,9 @@ def main(argv: list[str] | None = None) -> int:
                    ).set_defaults(fn=cmd_demo)
     sub.add_parser("placeholder", help="write the pre-run docs/index.html"
                    ).set_defaults(fn=cmd_placeholder)
+    fx = sub.add_parser("forecast", help="days until this run can support a claim")
+    fx.add_argument("--sources", nargs="*", help="limit to these sources")
+    fx.set_defaults(fn=cmd_forecast)
     sub.add_parser("power", help="can this run support the claim it invites?"
                    ).set_defaults(fn=cmd_power)
     sub.add_parser("sensitivity", help="how much does the ranking depend on grading rules?"

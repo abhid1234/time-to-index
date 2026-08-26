@@ -5,48 +5,127 @@
 # contributes almost nothing; a package that ships weekly contributes an
 # event a week to every provider's curve.
 
+# Subjects polled for new events.
+#
+# Selection is measured, not guessed. `tti forecast` reads each subject's
+# published release history and reports the corpus event rate; this list is
+# what survived two filters run against sixty days of real registry data:
+#
+#   Cadence.  A package that ships twice a year contributes almost nothing
+#   while still costing a poll every cycle. 32 of 150 candidates shipped
+#   nothing in sixty days and were dropped.
+#
+#   Concentration.  No subject may exceed ~6% of the corpus. Two candidates
+#   did -- one at 16% on its own -- and a benchmark whose events are that
+#   concentrated is substantially measuring how fast providers index one
+#   package, since provider behaviour can be subject-specific.
+#
+# Result: 46 npm + 48 pypi subjects, 13.1 events/day,
+# top subject 6.6%, 44 effective subjects by Herfindahl. That puts a hazard
+# ratio of 2 within reach in about five days and 1.5 in about fifteen.
+
 npm:
-  - next
-  - vite
-  - typescript
-  - react
-  - "@types/node"
-  - eslint
-  - tailwindcss
-  - zod
-  - vitest
-  - prisma
-  - langchain
+  - "@angular/core"
   - "@anthropic-ai/sdk"
-  - openai
-  - drizzle-orm
-  - hono
+  - "@biomejs/biome"
+  - "@cloudflare/workers-types"
+  - "@mui/material"
+  - "@nestjs/core"
+  - "@sentry/node"
+  - "@supabase/supabase-js"
+  - "@tanstack/react-query"
+  - "@types/node"
+  - "@vercel/node"
+  - antd
   - astro
-  - svelte
+  - axios
+  - convex
+  - electron
+  - eslint
+  - fastify
+  - firebase
+  - hono
+  - knip
+  - langchain
+  - next
+  - nuxt
+  - openai
+  - oxlint
   - playwright
+  - pnpm
+  - preact
+  - prettier
+  - prisma
+  - react
+  - rollup
+  - solid-js
+  - storybook
+  - stripe
+  - svelte
+  - tailwindcss
+  - tsx
   - turbo
-  - bun-types
+  - vike
+  - vite
+  - vitest
+  - vue
+  - webpack
+  - wrangler
 
 pypi:
-  - pydantic
-  - fastapi
-  - langchain
-  - openai
   - anthropic
-  - transformers
-  - polars
-  - duckdb
-  - ruff
-  - uv
-  - httpx
-  - litellm
-  - vllm
+  - apache-airflow
+  - bitsandbytes
+  - boto3
+  - dagster
+  - dash
+  - dask
   - datasets
-  - sqlalchemy
-  - dspy
+  - diffusers
+  - django
+  - dspy-ai
+  - fastapi
+  - flax
+  - google-cloud-storage
+  - gradio
+  - gunicorn
+  - hatch
+  - haystack-ai
+  - huggingface-hub
   - instructor
+  - jax
+  - langchain
+  - langgraph
+  - litellm
   - mlflow
+  - modal
+  - mypy
+  - numpy
+  - openai
+  - outlines
+  - pandas
+  - plotly
+  - polars
+  - prefect
+  - pyarrow
+  - ray
+  - ruff
+  - sentence-transformers
+  - setuptools
+  - starlette
+  - streamlit
+  - transformers
+  - trl
+  - typer
+  - uv
+  - uvicorn
+  - vllm
+  - wandb
 
+# Cadence for these was not measurable from the machine this list was built
+# on (api.github.com was unreachable there). Run `tti forecast` locally before
+# trusting the rate; the selection is by reputation for frequent releases,
+# which is exactly the kind of guess the npm and pypi lists no longer rely on.
 github:
   - ollama/ollama
   - ggml-org/llama.cpp
@@ -62,6 +141,22 @@ github:
   - duckdb/duckdb
   - modelcontextprotocol/servers
   - BerriAI/litellm
+  - langchain-ai/langchain
+  - langchain-ai/langgraph
+  - huggingface/transformers
+  - pytorch/pytorch
+  - microsoft/vscode
+  - cloudflare/workers-sdk
+  - vercel/next.js
+  - withastro/astro
+  - biomejs/biome
+  - pola-rs/polars
+  - apache/arrow
+  - open-telemetry/opentelemetry-collector
+  - hashicorp/terraform
+  - prometheus/prometheus
+  - elastic/elasticsearch
+  - redis/redis
 
 # CIK is the SEC's permanent company identifier; leading zeros optional here.
 edgar:
@@ -77,9 +172,32 @@ edgar:
   - {cik: "1543151", name: "Uber Technologies, Inc."}
   - {cik: "1783879", name: "Snowflake Inc."}
   - {cik: "1633917", name: "PayPal Holdings, Inc."}
+  - {cik: "1108524", name: "Salesforce, Inc."}
+  - {cik: "1730168", name: "Broadcom Inc."}
+  - {cik: "2488",    name: "Advanced Micro Devices, Inc."}
+  - {cik: "50863",   name: "Intel Corporation"}
+  - {cik: "1341439", name: "Oracle Corporation"}
+  - {cik: "1094285", name: "Arista Networks, Inc."}
+  - {cik: "1666700", name: "Datadog, Inc."}
+  - {cik: "1467623", name: "Cloudflare, Inc."}
+  - {cik: "1385157", name: "Twilio Inc."}
+  - {cik: "1564408", name: "MongoDB, Inc."}
+  - {cik: "1477333", name: "HashiCorp, Inc."}
+  - {cik: "1810806", name: "Confluent, Inc."}
+  - {cik: "1477449", name: "Elastic N.V."}
+  - {cik: "1798100", name: "Palantir Technologies Inc."}
+  - {cik: "1679788", name: "Coinbase Global, Inc."}
 
+# arXiv and the Federal Register publish on their own schedule regardless of
+# what is watched, so their volume is set by how deep each poll reads rather
+# than by list length. Neither supports supersession, so both add
+# time-to-index volume and nothing to the staleness denominator -- which is
+# why the npm/pypi/releases/filings rate is reported separately by
+# `tti forecast`.
 arxiv:
   - cs.AI
   - cs.CL
   - cs.IR
   - cs.LG
+  - cs.SE
+  - cs.DB
