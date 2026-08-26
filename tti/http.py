@@ -46,7 +46,20 @@ def post_json(url: str, *, json: dict, headers: dict | None = None,
                     retries=retries).json()
 
 
-def _request(method: str, url: str, *, retries: int = 2, **kw) -> requests.Response:
+def raw_get(url: str, *, headers: dict | None = None, timeout: float = 25.0,
+            retries: int = 1) -> requests.Response:
+    """A GET whose status code the caller inspects.
+
+    `get_text` raises on a non-200, which is right for collectors and wrong
+    for `tti crawlability`: there, a 404 or a proxy error must be reported as
+    a failed fetch rather than turned into a judgement about the page.
+    """
+    return _request("GET", url, headers=headers, timeout=timeout, retries=retries,
+                    allow_error_status=True)
+
+
+def _request(method: str, url: str, *, retries: int = 2,
+             allow_error_status: bool = False, **kw) -> requests.Response:
     if _max_retries is not None:
         retries = min(retries, _max_retries)
     h = {"User-Agent": config.contact_ua(), "Accept": "application/json"}
@@ -55,9 +68,10 @@ def _request(method: str, url: str, *, retries: int = 2, **kw) -> requests.Respo
     for attempt in range(retries + 1):
         try:
             r = _session.request(method, url, headers=h, **kw)
-            if r.status_code == 429 or 500 <= r.status_code < 600:
+            if not allow_error_status and (r.status_code == 429
+                                           or 500 <= r.status_code < 600):
                 raise HttpError(f"{r.status_code} {r.text[:200]}")
-            if r.status_code >= 400:
+            if r.status_code >= 400 and not allow_error_status:
                 raise HttpError(f"{r.status_code} {r.text[:400]}")
             return r
         except Exception as exc:  # noqa: BLE001

@@ -58,6 +58,36 @@ that turn. Off by default and rung-limited when on; see `phrasing_probe` in
 Full design, and everything that could make the numbers wrong, in
 [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md).
 
+## The other half: can an agent read the page at all?
+
+A provider can only return what it could read. Two commands, no keys and no
+ledger required, measure the corpus rather than the providers:
+
+```bash
+tti crawlability https://yoursite.com --find "the fact you care about"
+tti survey                # scan data/corpus.yaml
+```
+
+`crawlability` answers the two questions that decide whether a page enters an
+AI system: is the content in the served bytes as text, and is the crawler
+allowed to fetch it. Run against three package registries:
+
+```
+crates.io/crates/serde       sveltekit   client_shell        32 chars visible of 5,056
+pypi.org/project/httpx/      —           static_html      9,898 chars visible of 141,336
+pkg.go.dev/…/gin             —           static_html     93,012 chars visible of 429,377
+```
+
+Same kind of site, same kind of fact, opposite outcomes. And the sharpest
+category the survey reports is pages that **allow every AI crawler in
+robots.txt and still serve them nothing readable** — nobody chose that. It
+falls out of a rendering default, and the robots.txt records that the team
+wanted the opposite.
+
+This half is deliberately vendor-neutral and framework-neutral. Posture
+predicts retrievability; framework only correlates with it, and the
+aggregation says so.
+
 ## Look at it without paying for it
 
 ```bash

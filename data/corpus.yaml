@@ -1,0 +1,70 @@
+# Pages an agent would plausibly need to read, grouped by what kind of answer
+# they carry. Deliberately not a popularity list: the question is not which
+# sites get traffic, it is which pages an agent gets sent to when someone asks
+# a factual question and expects a citation.
+#
+# Every entry is a deep page, not a homepage. Homepages are marketing and are
+# almost always server-rendered; the interesting failures are on the detail
+# pages where the actual fact lives.
+
+package_registry:
+  - https://pypi.org/project/httpx/
+  - https://crates.io/crates/serde
+  - https://pkg.go.dev/github.com/gin-gonic/gin
+  - https://rubygems.org/gems/rails
+  - https://packagist.org/packages/laravel/laravel
+  - https://hex.pm/packages/phoenix
+  - https://www.nuget.org/packages/Newtonsoft.Json
+  - https://hackage.haskell.org/package/aeson
+  - https://metacpan.org/pod/Mojolicious
+  - https://www.npmjs.com/package/next
+  - https://mvnrepository.com/artifact/com.google.guava/guava
+  - https://pub.dev/packages/http
+  - https://cocoapods.org/pods/Alamofire
+  - https://conda-forge.org/packages/
+
+documentation:
+  - https://docs.rs/serde/latest/serde/
+  - https://react.dev/reference/react/useState
+  - https://nextjs.org/docs/app/api-reference/functions/fetch
+  - https://docs.astral.sh/ruff/rules/
+  - https://docs.pydantic.dev/latest/api/base_model/
+  - https://vitejs.dev/config/
+  - https://svelte.dev/docs/svelte/what-are-runes
+  - https://developer.mozilla.org/en-US/docs/Web/API/fetch
+  - https://kubernetes.io/docs/concepts/workloads/pods/
+  - https://docs.docker.com/reference/dockerfile/
+  - https://www.postgresql.org/docs/current/sql-select.html
+  - https://redis.io/docs/latest/commands/set/
+
+code_host:
+  - https://gitlab.com/gitlab-org/gitlab
+  - https://codeberg.org/forgejo/forgejo
+  - https://bitbucket.org/atlassian/atlassian-frontend-mirror/src/master/
+  - https://sourceforge.net/projects/sevenzip/
+  - https://hub.docker.com/_/nginx
+
+reference:
+  - https://en.wikipedia.org/wiki/Rust_(programming_language)
+  - https://datatracker.ietf.org/doc/html/rfc9110
+  - https://www.w3.org/TR/html52/
+  - https://man7.org/linux/man-pages/man1/ls.1.html
+  - https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+  - https://openlibrary.org/books/OL7353617M
+
+science:
+  - https://arxiv.org/abs/2301.00001
+  - https://clinicaltrials.gov/study/NCT00000102
+  - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3339580/
+  - https://zenodo.org/records/10000000
+
+regulatory:
+  - https://www.federalregister.gov/documents/current
+  - https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000320193&type=10-Q
+  - https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679
+
+community:
+  - https://stackoverflow.com/questions/11227809
+  - https://news.ycombinator.com/item?id=1
+  - https://lobste.rs/
+  - https://discuss.python.org/c/help/7

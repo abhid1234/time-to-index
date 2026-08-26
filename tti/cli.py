@@ -16,6 +16,7 @@ a probe run is in flight.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import datetime as dt
 import pathlib
 import sys
@@ -314,6 +315,158 @@ def cmd_sensitivity(args) -> int:
     return 0
 
 
+def cmd_crawlability(args) -> int:
+    """Can an AI agent read this page?
+
+    Standalone: it needs no ledger, no keys, and no run. Point it at a URL
+    and it answers the two questions that decide whether a page enters an AI
+    system at all -- is the content in the served HTML, and is the crawler
+    allowed to fetch it.
+    """
+    import json as _json
+    import urllib.parse
+
+    from . import framework as fw
+    from . import http as _http
+
+    _http.set_retry_ceiling(1)
+    out_rows = []
+    for url in args.urls:
+        row = {"url": url}
+        try:
+            resp = _http.raw_get(url, timeout=25, headers={
+                "Accept": "text/html,application/xhtml+xml"})
+            html = resp.text
+            if resp.status_code != 200:
+                raise _http.HttpError(
+                    f"HTTP {resp.status_code} — a non-200 is not a verdict about "
+                    f"the site's rendering")
+        except Exception as exc:  # noqa: BLE001
+            row["error"] = str(exc)[:200]
+            out_rows.append(row)
+            if not args.json:
+                print(f"\n{url}\n  could not fetch: {row['error'][:100]}")
+            continue
+
+        prof = fw.profile(html)
+        verdict, why = fw.VERDICTS[prof.posture]
+        row.update({"framework": prof.framework, "posture": prof.posture,
+                    "verdict": verdict, "bytes": prof.bytes_total,
+                    "visible_chars": prof.visible_chars,
+                    "text_ratio": round(prof.text_ratio, 5),
+                    "evidence": prof.evidence})
+
+        parts = urllib.parse.urlsplit(url)
+        robots = ""
+        with contextlib.suppress(Exception):
+            robots = _http.get_text(f"{parts.scheme}://{parts.netloc}/robots.txt",
+                                    timeout=15, retries=0)
+        matrix = fw.robots_matrix(robots, url) if robots else {}
+        row["robots"] = matrix
+        blocked = [a for a, ok in matrix.items() if ok is False]
+
+        if args.find:
+            in_bytes, in_text = fw.finds_token(html, args.find)
+            row["find"] = {"token": args.find, "in_bytes": in_bytes,
+                           "in_visible_text": in_text}
+
+        out_rows.append(row)
+        if args.json:
+            continue
+
+        print(f"\n{url}")
+        print(f"  {prof.summary()}")
+        if prof.evidence:
+            print(f"  detected by: {', '.join(prof.evidence[:3])}")
+        print(f"  verdict: {verdict.upper()} — {why}")
+        if args.find:
+            f = row["find"]
+            if f["in_visible_text"]:
+                print(f"  '{args.find}' is in the readable HTML.")
+            elif f["in_bytes"]:
+                print(f"  '{args.find}' is in the served bytes but NOT in the "
+                      f"readable HTML — it is inside a script or data payload. "
+                      f"Whether an agent finds it depends on that agent's extractor.")
+            else:
+                print(f"  '{args.find}' is not in the served bytes at all. "
+                      f"Nothing that does not run JavaScript can find it here.")
+        if not robots:
+            print("  robots.txt: not readable — no crawler policy could be checked")
+        elif blocked:
+            print(f"  robots.txt blocks {len(blocked)} of {len(matrix)} AI agents:")
+            for a in blocked:
+                print(f"      {a:22s} {fw.AI_AGENTS[a]}")
+        else:
+            print(f"  robots.txt allows all {len(matrix)} AI agents checked")
+
+    if args.json:
+        print(_json.dumps(out_rows, indent=2))
+    _http.set_retry_ceiling(None)
+    return 0
+
+
+def cmd_survey(args) -> int:
+    """Scan a corpus of pages and report how much of it an agent can read.
+
+    Needs no keys and no ledger. The output is about the web, not about any
+    provider, which is the half of this project a site owner can act on.
+    """
+    import json as _json
+
+    from . import survey as sv_mod
+
+    targets = None
+    if args.urls:
+        targets = [(u, "cli") for u in args.urls]
+    sv = sv_mod.run(targets, workers=args.workers)
+
+    if args.json:
+        print(_json.dumps([{
+            "url": r.url, "category": r.category, "status": r.status,
+            "usable": r.usable, "readable": r.readable, "verdict": r.verdict,
+            "framework": r.prof.framework if r.prof else None,
+            "posture": r.prof.posture if r.prof else None,
+            "visible_chars": r.prof.visible_chars if r.prof else 0,
+            "bytes": r.prof.bytes_total if r.prof else 0,
+            "text_ratio": round(r.prof.text_ratio, 5) if r.prof else 0,
+            "robots_blocked": r.robots_blocked, "error": r.error,
+        } for r in sorted(sv.results, key=lambda r: r.url)], indent=2))
+        return 0
+
+    hit, n = sv.readable_rate()
+    print(f"{hit} of {n} pages readable without executing JavaScript"
+          + (f" · {len(sv.unreachable)} unreachable" if sv.unreachable else ""))
+
+    if n:
+        print()
+        for r in sorted(sv.usable, key=lambda r: r.prof.text_ratio):
+            mark = " " if r.readable else "!"
+            blocked = f"  robots blocks {len(r.robots_blocked)}" if r.robots_blocked else ""
+            print(f" {mark} {r.prof.text_ratio*100:5.2f}%  "
+                  f"{r.prof.visible_chars:>7,}c  {r.prof.framework:11s} "
+                  f"{r.prof.posture:15s} {r.url[8:58]}{blocked}")
+
+        print("\nby category")
+        for cat, (h, t) in sv.by_category().items():
+            print(f"  {cat:20s} {h}/{t} readable")
+
+        exposed = sv.open_but_unreadable()
+        if exposed:
+            print(f"\n{len(exposed)} page(s) allow every AI crawler in robots.txt and "
+                  f"still serve them nothing readable:")
+            for r in exposed:
+                print(f"  {r.url}")
+            print("  Nobody chose this. It falls out of a rendering default, and the")
+            print("  robots.txt says the team wanted the opposite.")
+
+    if sv.unreachable and args.verbose:
+        print(f"\nunreachable ({len(sv.unreachable)}):")
+        for r in sv.unreachable[:20]:
+            why = r.error or f"HTTP {r.status}"
+            print(f"  {r.url[:60]:62s} {why[:50]}")
+    return 0
+
+
 def cmd_forecast(args) -> int:
     """Days-to-signal, from how often the watchlist has actually shipped."""
     from . import forecast as fc_mod
@@ -476,6 +629,21 @@ def main(argv: list[str] | None = None) -> int:
                    ).set_defaults(fn=cmd_demo)
     sub.add_parser("placeholder", help="write the pre-run docs/index.html"
                    ).set_defaults(fn=cmd_placeholder)
+    cw = sub.add_parser("crawlability",
+                        help="can an AI agent read this page? (no keys, no ledger)")
+    cw.add_argument("urls", nargs="+", help="one or more page URLs")
+    cw.add_argument("--find", help="check whether this exact string is agent-visible")
+    cw.add_argument("--json", action="store_true", help="machine-readable output")
+    cw.set_defaults(fn=cmd_crawlability)
+
+    sv = sub.add_parser("survey",
+                        help="how much of a corpus is readable without JavaScript?")
+    sv.add_argument("urls", nargs="*", help="URLs to scan (default: data/corpus.yaml)")
+    sv.add_argument("--workers", type=int, default=12)
+    sv.add_argument("--json", action="store_true")
+    sv.add_argument("--verbose", action="store_true", help="list unreachable targets")
+    sv.set_defaults(fn=cmd_survey)
+
     fx = sub.add_parser("forecast", help="days until this run can support a claim")
     fx.add_argument("--sources", nargs="*", help="limit to these sources")
     fx.set_defaults(fn=cmd_forecast)
