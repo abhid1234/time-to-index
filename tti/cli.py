@@ -43,6 +43,22 @@ def _ledger(args) -> Ledger:
     return Ledger(pathlib.Path(args.run_dir) if args.run_dir else None)
 
 
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+
+
+def _out_dir(args) -> pathlib.Path:
+    """Where rendered pages go.
+
+    Defaults to the repo's docs/ so `tti report` publishes where GitHub Pages
+    looks. Overridable because a command that can only write into its own
+    source tree is a command the test suite has to either skip or let dirty
+    the working copy, and both are worse than a flag.
+    """
+    d = pathlib.Path(getattr(args, "out_dir", None) or (ROOT / "docs"))
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+
 # ---------------------------------------------------------------------------
 
 def cmd_doctor(args) -> int:
@@ -540,11 +556,9 @@ def cmd_forecast(args) -> int:
 
 
 def cmd_placeholder(args) -> int:
-    root = pathlib.Path(__file__).resolve().parent.parent
-    out = root / "docs" / "index.html"
-    out.parent.mkdir(exist_ok=True)
+    out = _out_dir(args) / "index.html"
     out.write_text(report.placeholder_page(), encoding="utf-8")
-    print(f"wrote {out.relative_to(root)} — replaced by `tti report` on the first run")
+    print(f"wrote {out} — replaced by `tti report` on the first run")
     return 0
 
 
@@ -559,10 +573,9 @@ def cmd_demo(args) -> int:
     import tempfile
 
     from . import demo as demo_mod
-    root = pathlib.Path(__file__).resolve().parent.parent
-    out = root / "docs" / "demo.html"
+    out = _out_dir(args) / "demo.html"
     lines = demo_mod.render(pathlib.Path(tempfile.mkdtemp()), out, config.ladder())
-    print(f"wrote {out.relative_to(root)}  (synthetic — not a result about any product)")
+    print(f"wrote {out}  (synthetic — not a result about any product)")
     print("estimator recovery against the generator's own draws:")
     print(lines)
     return 0 if "MISS" not in lines else 1
@@ -596,8 +609,7 @@ def cmd_report(args) -> int:
                 pairs.append((na, nb, p))
             powers.append(analyse(na, a, nb, b, p, rate))
 
-    root = pathlib.Path(__file__).resolve().parent.parent
-    (root / "docs").mkdir(exist_ok=True)
+    out_dir = _out_dir(args)
     stale_series = [(f"{sc.provider}/{sc.mode}",
                      staleness_by_rung(events, results, sc.provider, sc.mode))
                     for sc in sorted(scores, key=lambda s: (s.median_ttl is None,
@@ -617,11 +629,13 @@ def cmd_report(args) -> int:
     html = report.full_page(
         report.dashboard_html(scores, events, results, by_class, pairs, powers,
                               stale_series, sens_rows, render_table or None))
-    (root / "docs" / "index.html").write_text(html, encoding="utf-8")
-    (root / "RESULTS.md").write_text(
+    (out_dir / "index.html").write_text(html, encoding="utf-8")
+    results_md = (out_dir.parent / "RESULTS.md" if out_dir.name == "docs"
+                  else out_dir / "RESULTS.md")
+    results_md.write_text(
         "# Results\n\n" + report.summary_md(scores, events, results) + "\n",
         encoding="utf-8")
-    print(f"wrote docs/index.html ({len(html)//1024}KB) and RESULTS.md")
+    print(f"wrote {out_dir / 'index.html'} ({len(html)//1024}KB) and {results_md}")
     return 0
 
 
@@ -647,12 +661,16 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("score", help="print the leaderboard").set_defaults(fn=cmd_score)
     sub.add_parser("status", help="queue and budget state").set_defaults(fn=cmd_status)
-    sub.add_parser("report", help="write RESULTS.md and docs/index.html"
-                   ).set_defaults(fn=cmd_report)
-    sub.add_parser("demo", help="render docs/demo.html from a synthetic run"
-                   ).set_defaults(fn=cmd_demo)
-    sub.add_parser("placeholder", help="write the pre-run docs/index.html"
-                   ).set_defaults(fn=cmd_placeholder)
+    rp = sub.add_parser("report", help="write RESULTS.md and docs/index.html")
+    rp.add_argument("--out-dir", help="where to write rendered pages "
+                    "(default: the repo's docs/)")
+    rp.set_defaults(fn=cmd_report)
+    dm = sub.add_parser("demo", help="render docs/demo.html from a synthetic run")
+    dm.add_argument("--out-dir", help="where to write the page")
+    dm.set_defaults(fn=cmd_demo)
+    ph = sub.add_parser("placeholder", help="write the pre-run docs/index.html")
+    ph.add_argument("--out-dir", help="where to write the page")
+    ph.set_defaults(fn=cmd_placeholder)
     cw = sub.add_parser("crawlability",
                         help="can an AI agent read this page? (no keys, no ledger)")
     cw.add_argument("urls", nargs="+", help="one or more page URLs")

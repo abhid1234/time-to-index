@@ -20,6 +20,7 @@ import math
 import pathlib
 import random
 import time
+import zlib
 
 from . import report
 from .ledger import Ledger
@@ -146,7 +147,11 @@ def _r(ev: Event, provider: str, mode: str, rung: int, verdict: str,
         probe_id=f"{ev.event_id}-{provider}-{rung}", event_id=ev.event_id,
         provider=provider, mode=mode, rung=rung,
         requested_at=ev.published_at + rung, lag=float(rung), verdict=verdict,
-        latency_ms=random.Random(hash((provider, rung)) & 0xFFFF).randint(300, 2400),
+        # zlib.crc32, not hash(): Python randomises string hashing per
+        # process, so the previous version produced different latencies on
+        # every run of a demo that advertises itself as seeded.
+        latency_ms=random.Random(
+            zlib.crc32(f"{provider}:{mode}:{rung}".encode())).randint(300, 2400),
         matched_stale=[ev.predecessor] if verdict == STALE and ev.predecessor else [],
         matched_fresh=[ev.answer] if verdict == FRESH else [],
         n_results=5, cost_usd=cost, raw_ref="", note=note, render=render)

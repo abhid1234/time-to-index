@@ -219,3 +219,31 @@ def test_bracket_never_claims_more_precision_than_the_ladder():
     assert bracket(rungs, None) == (3600.0, None)      # never crossed 50%
     assert fmt_bracket(rungs, 300.0).startswith("≤")
     assert fmt_bracket(rungs, None).startswith(">")
+
+
+def test_the_demo_is_deterministic_across_processes(tmp_path):
+    """A demo that advertises a seeded generator must produce the same page
+    twice.
+
+    It did not. Per-probe latency was derived from `hash((provider, rung))`,
+    and Python randomises string hashing per process, so every run produced
+    different numbers on a page whose whole claim is reproducibility. Caught
+    only because the test suite started dirtying `docs/demo.html` on every
+    run for no visible reason.
+    """
+    import hashlib
+    import os
+    import subprocess
+
+    def render(seed: str) -> str:
+        d = tmp_path / f"out{seed}"
+        subprocess.run([sys.executable, "-m", "tti", "demo", "--out-dir", str(d)],
+                       cwd=str(pathlib.Path(__file__).resolve().parent.parent),
+                       env={**os.environ, "PYTHONHASHSEED": seed},
+                       capture_output=True, check=True)
+        text = (d / "demo.html").read_text()
+        # The generation timestamp is expected to differ; nothing else may.
+        body = "\n".join(x for x in text.split("\n") if "Generated" not in x)
+        return hashlib.sha256(body.encode()).hexdigest()
+
+    assert render("0") == render("12345")
