@@ -1,0 +1,85 @@
+# Subjects polled for new events.
+#
+# Selection rule: high release cadence, unambiguous names, and a real chance
+# an agent gets asked about them. A package that ships twice a year
+# contributes almost nothing; a package that ships weekly contributes an
+# event a week to every provider's curve.
+
+npm:
+  - next
+  - vite
+  - typescript
+  - react
+  - "@types/node"
+  - eslint
+  - tailwindcss
+  - zod
+  - vitest
+  - prisma
+  - langchain
+  - "@anthropic-ai/sdk"
+  - openai
+  - drizzle-orm
+  - hono
+  - astro
+  - svelte
+  - playwright
+  - turbo
+  - bun-types
+
+pypi:
+  - pydantic
+  - fastapi
+  - langchain
+  - openai
+  - anthropic
+  - transformers
+  - polars
+  - duckdb
+  - ruff
+  - uv
+  - httpx
+  - litellm
+  - vllm
+  - datasets
+  - sqlalchemy
+  - dspy
+  - instructor
+  - mlflow
+
+github:
+  - ollama/ollama
+  - ggml-org/llama.cpp
+  - vllm-project/vllm
+  - astral-sh/ruff
+  - astral-sh/uv
+  - denoland/deno
+  - oven-sh/bun
+  - rust-lang/rust
+  - golang/go
+  - kubernetes/kubernetes
+  - grafana/grafana
+  - duckdb/duckdb
+  - modelcontextprotocol/servers
+  - BerriAI/litellm
+
+# CIK is the SEC's permanent company identifier; leading zeros optional here.
+edgar:
+  - {cik: "320193",  name: "Apple Inc."}
+  - {cik: "789019",  name: "Microsoft Corporation"}
+  - {cik: "1045810", name: "NVIDIA Corporation"}
+  - {cik: "1652044", name: "Alphabet Inc."}
+  - {cik: "1018724", name: "Amazon.com, Inc."}
+  - {cik: "1326801", name: "Meta Platforms, Inc."}
+  - {cik: "1318605", name: "Tesla, Inc."}
+  - {cik: "1341439", name: "Oracle Corporation"}
+  - {cik: "796343",  name: "Adobe Inc."}
+  - {cik: "1543151", name: "Uber Technologies, Inc."}
+  - {cik: "1783879", name: "Snowflake Inc."}
+  - {cik: "1633917", name: "PayPal Holdings, Inc."}
+
+arxiv:
+  - cs.AI
+  - cs.CL
+  - cs.IR
+  - cs.LG

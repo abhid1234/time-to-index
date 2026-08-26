@@ -1,0 +1,13 @@
+[Unit]
+Description=Poll sources every 5 minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+# Detection lag over 10 minutes disqualifies an event, so the poll interval
+# is the hard ceiling on how much of the corpus is usable at all.
+AccuracySec=30s
+Persistent=true
+
+[Install]
+WantedBy=timers.target

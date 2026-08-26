@@ -1,0 +1,250 @@
+"""Discovery and probe execution.
+
+Two entry points, both idempotent and both safe to run from cron every five
+minutes:
+
+    discover()  poll sources, drop events we found too late, enqueue the
+                full ladder of probes for every configured arm.
+    run_due()   execute probes whose due time has arrived, grade them, write
+                results and raw payloads.
+
+Idempotency is what makes this survivable as an unattended job. Probe ids are
+a hash of (event, provider, mode, rung), the ledger records which ids have
+completed, and a re-run skips them. A crashed run loses at most the probes
+in flight.
+
+Three rules keep the numbers honest, and each one costs us data:
+
+    Detection lag.  An event our collector noticed 40 minutes after
+    publication cannot be probed at the t+5m rung, because that rung has
+    already passed. Rather than record it at the wrong lag, the event is
+    dropped entirely.
+
+    Rung slip.  If the runner was down and a probe fires 90 minutes past its
+    t+15m due time, recording it as a 15-minute observation is a lie and
+    recording it as a 105-minute observation biases the ladder. It is
+    dropped, and the drop is written to the ledger.
+
+    Carry-forward.  Once an arm answers FRESH for an event, its remaining
+    rungs are skipped. Indexing is not observed to reverse, the later rungs
+    would cost money to confirm something already established, and the
+    survival estimator only needs the first FRESH.
+"""
+
+from __future__ import annotations
+
+import time
+from dataclasses import dataclass
+
+from . import config, providers, sources
+from .budget import Budget, BudgetExceeded, unit_cost, utc_day
+from .grader import grade
+from .ledger import Ledger
+from .models import ERROR, FRESH, SKIPPED, STALE, Event, Probe, ProbeResult
+
+
+@dataclass
+class DiscoverReport:
+    collected: int = 0
+    new_events: int = 0
+    dropped_late: int = 0
+    probes_queued: int = 0
+    per_source: dict = None
+    source_errors: dict = None
+    broken_sources: list = None
+
+    def __post_init__(self):
+        self.per_source = self.per_source or {}
+        self.source_errors = self.source_errors or {}
+        self.broken_sources = self.broken_sources or []
+
+
+def discover(ledger: Ledger, source_names: list[str] | None = None,
+             verbose: bool = True) -> DiscoverReport:
+    s = config.settings()
+    names = source_names or s.get("sources", [])
+    max_lag = float(s.get("max_detection_lag_seconds", config.MAX_DETECTION_LAG))
+    seen = ledger.seen_subjects()
+    rep = DiscoverReport()
+
+    candidates: list[Event] = []
+    for name in names:
+        src = sources.get(name)
+        try:
+            got = src.collect(seen)
+        except Exception as exc:  # a broken collector must not stop the others
+            rep.source_errors[name] = [f"{type(exc).__name__}: {exc}"[:200]]
+            rep.broken_sources.append(name)
+            if verbose:
+                print(f"  ! {name}: {exc}")
+            continue
+        rep.per_source[name] = len(got)
+        if src.errors:
+            rep.source_errors[name] = src.errors
+            if verbose:
+                print(f"  ! {name}: {len(src.errors)}/{src.attempted} subjects failed "
+                      f"-- {src.errors[0][:120]}")
+        if src.all_failed:
+            # Every subject failed: the source is unreachable, not quiet. These
+            # look identical in the event count, and conflating them is how a
+            # benchmark ends up publishing a gap in its own collection as a
+            # finding about somebody else's index.
+            rep.broken_sources.append(name)
+        candidates.extend(got)
+    rep.collected = len(candidates)
+
+    fresh_enough = []
+    for e in candidates:
+        if e.published_at <= 0:
+            rep.dropped_late += 1
+            continue
+        if e.detection_lag > max_lag:
+            # Not a failure. The watchlist is polled every five minutes, so
+            # anything older than that was published before we started
+            # watching this subject, and its ladder cannot be honoured.
+            rep.dropped_late += 1
+            continue
+        fresh_enough.append(e)
+
+    added = ledger.add_events(fresh_enough)
+    rep.new_events = len(added)
+
+    arms = providers.available_arms()
+    ladder = config.ladder()
+    queued = [
+        Probe(event_id=e.event_id, provider=p, mode=m, rung=r,
+              due_at=e.published_at + r)
+        for e in added for (p, m) in arms for r in ladder
+    ]
+    rep.probes_queued = len(ledger.add_probes(queued))
+    return rep
+
+
+@dataclass
+class RunReport:
+    dispatched: int = 0
+    fresh: int = 0
+    stale: int = 0
+    absent: int = 0
+    errors: int = 0
+    skipped_carry: int = 0
+    skipped_budget: int = 0
+    dropped_slip: int = 0
+    spend_usd: float = 0.0
+    cap_usd: float = 0.0
+
+
+def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
+            dry_run: bool = False, verbose: bool = True) -> RunReport:
+    now = now or time.time()
+    s = config.settings()
+    max_results = int(s.get("max_results", 5))
+    max_chars = int(s.get("max_chars_per_result", 1500))
+    slip = float(s.get("max_rung_slip_seconds", config.MAX_RUNG_SLIP))
+
+    events = ledger.events()
+    done = ledger.completed_probe_ids()
+    resolved = ledger.resolved_fresh()
+    day = utc_day(now)
+    budget = Budget(spent_today=ledger.spent_on(day), day=day)
+    rep = RunReport(cap_usd=budget.cap)
+
+    due = [p for p in ledger.probes().values()
+           if p.probe_id not in done and p.due_at <= now and p.event_id in events]
+    due.sort(key=lambda p: p.due_at)
+    if limit:
+        due = due[:limit]
+
+    out: list[ProbeResult] = []
+    for probe in due:
+        event = events[probe.event_id]
+        lag = now - event.published_at
+
+        if (probe.event_id, probe.provider, probe.mode) in resolved:
+            out.append(_skip(probe, event, now, lag, "carry-forward: already FRESH"))
+            rep.skipped_carry += 1
+            continue
+
+        if now - probe.due_at > slip:
+            out.append(_skip(probe, event, now, lag,
+                             f"rung slip {now - probe.due_at:.0f}s exceeds {slip:.0f}s"))
+            rep.dropped_slip += 1
+            continue
+
+        cost = unit_cost(probe.provider, probe.mode, max_results)
+        try:
+            budget.charge(cost)
+        except BudgetExceeded as exc:
+            out.append(_skip(probe, event, now, lag, f"budget: {exc}"))
+            rep.skipped_budget += 1
+            continue
+
+        if dry_run:
+            print(f"  would probe {probe.provider}/{probe.mode} @{probe.rung}s "
+                  f"${cost:.4f} :: {event.question[:70]}")
+            rep.dispatched += 1
+            continue
+
+        t0 = time.perf_counter()
+        try:
+            payload = providers.get(probe.provider).search(
+                event.question, probe.mode,
+                max_results=max_results, max_chars=max_chars)
+        except Exception as exc:  # noqa: BLE001
+            out.append(ProbeResult(
+                probe_id=probe.probe_id, event_id=event.event_id,
+                provider=probe.provider, mode=probe.mode, rung=probe.rung,
+                requested_at=now, lag=lag, verdict=ERROR, cost_usd=0.0,
+                latency_ms=int((time.perf_counter() - t0) * 1000),
+                note=str(exc)[:400]))
+            rep.errors += 1
+            continue
+
+        latency = int((time.perf_counter() - t0) * 1000)
+        verdict, fresh_hits, stale_hits, chars = grade(event, payload)
+        raw_ref = ledger.store_raw(probe.provider, probe.probe_id, payload)
+
+        out.append(ProbeResult(
+            probe_id=probe.probe_id, event_id=event.event_id,
+            provider=probe.provider, mode=probe.mode, rung=probe.rung,
+            requested_at=now, lag=lag, verdict=verdict, latency_ms=latency,
+            matched_fresh=fresh_hits, matched_stale=stale_hits,
+            n_results=_count_results(payload), chars=chars,
+            cost_usd=cost, raw_ref=raw_ref))
+
+        rep.dispatched += 1
+        rep.spend_usd += cost
+        if verdict == FRESH:
+            rep.fresh += 1
+            resolved.add((probe.event_id, probe.provider, probe.mode))
+        elif verdict == STALE:
+            rep.stale += 1
+            if verbose:
+                print(f"  STALE {probe.provider}/{probe.mode} @{probe.rung}s "
+                      f"returned {stale_hits} for {event.subject}")
+        else:
+            rep.absent += 1
+
+    if not dry_run:
+        ledger.add_results(out)
+    return rep
+
+
+def _skip(probe: Probe, event: Event, now: float, lag: float, note: str) -> ProbeResult:
+    return ProbeResult(
+        probe_id=probe.probe_id, event_id=event.event_id, provider=probe.provider,
+        mode=probe.mode, rung=probe.rung, requested_at=now, lag=lag,
+        verdict=SKIPPED, cost_usd=0.0, note=note)
+
+
+def _count_results(payload) -> int:
+    if not isinstance(payload, dict):
+        return 0
+    for k in ("results", "data", "organic", "items"):
+        v = payload.get(k)
+        if isinstance(v, list):
+            return len(v)
+    web = payload.get("web")
+    if isinstance(web, dict) and isinstance(web.get("results"), list):
+        return len(web["results"])
+    return 0

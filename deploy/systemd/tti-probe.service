@@ -1,0 +1,10 @@
+[Unit]
+Description=time-to-index: run probes that are due
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/time-to-index
+EnvironmentFile=/opt/time-to-index/.env
+ExecStart=/opt/time-to-index/.venv/bin/tti probe

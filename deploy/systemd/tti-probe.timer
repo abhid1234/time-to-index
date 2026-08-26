@@ -1,0 +1,13 @@
+[Unit]
+Description=Fire due probes every 2 minutes
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=2min
+# Tighter than the shortest rung: a probe fired more than 10 minutes late is
+# dropped, so the margin here is what protects the 5-minute rung.
+AccuracySec=15s
+Persistent=true
+
+[Install]
+WantedBy=timers.target

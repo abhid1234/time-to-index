@@ -1,0 +1,48 @@
+# Published list prices and endpoints. Every price carries the page it came
+# from so a reader can check it against the vendor rather than trusting this
+# repo; `pricing_checked` is the date it was last verified by hand.
+#
+# Cost is reported alongside every result because a freshness win bought at
+# 5x the price is a different product decision than a freshness win at parity,
+# and a leaderboard that hides the denominator is advertising.
+
+providers:
+  parallel:
+    docs: https://docs.parallel.ai/getting-started/pricing
+    pricing_checked: "2026-08-26"
+    env: PARALLEL_API_KEY
+    modes:
+      turbo:    {usd_per_1k_requests: 1.0, usd_per_1k_extra_results: 1.0, results_included: 5}
+      fast:     {usd_per_1k_requests: 1.0, usd_per_1k_extra_results: 1.0, results_included: 5}
+      base:     {usd_per_1k_requests: 5.0, usd_per_1k_extra_results: 1.0, results_included: 5}
+      pro:      {usd_per_1k_requests: 5.0, usd_per_1k_extra_results: 1.0, results_included: 5}
+
+  exa:
+    docs: https://docs.exa.ai/reference/pricing
+    pricing_checked: "2026-08-26"
+    env: EXA_API_KEY
+    modes:
+      auto:     {usd_per_1k_requests: 5.0, results_included: 25}
+      keyword:  {usd_per_1k_requests: 2.5, results_included: 25}
+
+  tavily:
+    docs: https://tavily.com/pricing
+    pricing_checked: "2026-08-26"
+    env: TAVILY_API_KEY
+    modes:
+      basic:    {usd_per_1k_requests: 8.0, results_included: 10}
+      advanced: {usd_per_1k_requests: 16.0, results_included: 10}
+
+  brave:
+    docs: https://brave.com/search/api/
+    pricing_checked: "2026-08-26"
+    env: BRAVE_API_KEY
+    modes:
+      web:      {usd_per_1k_requests: 5.0, results_included: 20}
+
+  serper:
+    docs: https://serper.dev/pricing
+    pricing_checked: "2026-08-26"
+    env: SERPER_API_KEY
+    modes:
+      search:   {usd_per_1k_requests: 1.0, results_included: 10}

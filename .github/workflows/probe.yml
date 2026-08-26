@@ -1,0 +1,75 @@
+name: probe
+
+# Cron here has minutes-to-tens-of-minutes of jitter, which is fine for the
+# 1h/6h/24h/72h rungs and not fine for 5m/15m. Probes that fire too late are
+# dropped rather than misrecorded, so a jittery runner costs the short rungs
+# instead of corrupting them -- see deploy/systemd for the full ladder.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: probe
+  cancel-in-progress: false      # never interrupt a run mid-ledger-write
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - run: pip install -e .
+
+      - name: Restore ledger
+        run: |
+          mkdir -p runs
+          if [ -d ledger ]; then cp -r ledger/* runs/ 2>/dev/null || true; fi
+
+      - name: Discover and probe
+        env:
+          PARALLEL_API_KEY: ${{ secrets.PARALLEL_API_KEY }}
+          EXA_API_KEY:      ${{ secrets.EXA_API_KEY }}
+          TAVILY_API_KEY:   ${{ secrets.TAVILY_API_KEY }}
+          BRAVE_API_KEY:    ${{ secrets.BRAVE_API_KEY }}
+          SERPER_API_KEY:   ${{ secrets.SERPER_API_KEY }}
+          GITHUB_TOKEN:     ${{ secrets.GITHUB_TOKEN }}
+          TTI_USER_AGENT:   ${{ vars.TTI_USER_AGENT }}
+        run: |
+          # A source being unreachable exits 2. That is a partial run, not a
+          # failed one: probe anyway, and let the report say what was missing.
+          tti discover || true
+          tti probe
+          tti status
+
+      - name: Report
+        run: tti report
+
+      - name: Persist ledger
+        run: |
+          mkdir -p ledger/raw
+          cp runs/*.jsonl ledger/ 2>/dev/null || true
+          # Raw payloads are the evidence, so they ship -- but one file per
+          # probe would put six figures of tiny blobs in git history. One
+          # gzipped archive per UTC day keeps them auditable and the repo
+          # clonable.
+          DAY=$(date -u +%F)
+          if [ -n "$(ls -A runs/raw 2>/dev/null)" ]; then
+            tar -czf "ledger/raw/${DAY}.tar.gz" -C runs raw
+          fi
+
+      - name: Commit
+        run: |
+          git config user.name  "tti-runner"
+          git config user.email "tti-runner@users.noreply.github.com"
+          git add -f ledger docs/index.html RESULTS.md
+          git diff --staged --quiet || git commit -m "probe: $(date -u +'%F %H:%M')"
+          git push

@@ -1,0 +1,36 @@
+# Probe ladder: seconds after publication at which each provider is asked.
+# Geometric spacing, because indexing latency spans four orders of magnitude
+# and a linear ladder spends its whole budget resolving the tail.
+ladder: [300, 900, 3600, 21600, 86400, 259200]
+
+# Hard ceiling on paid API spend per UTC day, across all providers.
+# A probe that would cross this is refused and written to the ledger as
+# SKIPPED with reason "budget", never silently dropped.
+daily_usd_cap: 6.00
+
+# Results requested per query. Kept low and identical across providers:
+# freshness is about whether the document is in the index at all, and a
+# 20-result window would let a provider pass on recall it does not have.
+max_results: 5
+max_chars_per_result: 1500
+
+# Events whose collector-detection lag exceeds this are discarded rather than
+# probed. We do not charge our own polling delay to a provider.
+max_detection_lag_seconds: 600
+
+# A probe that fires this far past its due time is dropped rather than
+# recorded at a rung it did not actually observe.
+max_rung_slip_seconds: 600
+
+# Sources enabled for collection.
+sources: [npm, pypi, github_release, edgar, arxiv, federal_register]
+
+# Provider/mode pairs probed on every rung. Each added pair multiplies the
+# call volume by one, so this list is where cost is actually decided.
+arms:
+  - {provider: parallel, mode: base}
+  - {provider: parallel, mode: pro}
+  - {provider: exa,      mode: auto}
+  - {provider: tavily,   mode: basic}
+  - {provider: brave,    mode: web}
+  - {provider: serper,   mode: search}

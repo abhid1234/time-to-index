@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "time-to-index"
+version = "0.1.0"
+description = "A freshness and staleness benchmark for web-search APIs"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+# Two runtime dependencies on purpose. A benchmark nobody can install is a
+# blog post; every extra dep is another reason a fork does not happen.
+dependencies = ["requests>=2.31", "PyYAML>=6.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4"]
+
+[project.scripts]
+tti = "tti.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["tti*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
