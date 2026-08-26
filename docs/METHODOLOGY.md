@@ -225,6 +225,45 @@ marketing page.
   serves a commercial crawler, the control measures our view of the origin,
   not the crawler's. It bounds the confound rather than eliminating it.
 
+**Medians carry a bootstrap interval.** A median printed without one is the
+most common way a short run gets over-read: at forty events a bracket can
+land a rung either side on luck alone, and the ordering of the table is
+exactly what that luck moves. The interval is a nonparametric bootstrap on
+the bracket's upper edge, seeded so it does not change when the page is
+re-rendered. Where the median is not reached inside the window in some
+resamples, that share is printed instead of hidden — for a slow arm it is the
+finding, not a caveat.
+
+## Does the ranking survive the rules that produced it
+
+Every grading rule above is a judgement call. Match on token boundaries or
+not. Count a `v` prefix. Trust aliases. Read titles only. Treat a URL as
+evidence. Each is defensible; none is forced.
+
+A benchmark published by one person should be able to say how much of its
+ranking survives those calls being made differently, so `tti sensitivity`
+re-grades every stored payload under deliberately worse rule sets and reports
+what moved. It makes no API calls — this is what the verbatim payloads are
+for.
+
+Three numbers, because the first two are not enough:
+
+- **Verdict churn** — the share of individual probe verdicts that change.
+- **Kendall's tau** — rank correlation against the reported ordering.
+- **Arms lost** — how many arms stopped being measurable at all.
+
+That third one exists because the harness caught a flaw in itself. A variant
+that reads no content collapses every arm identically: the ordering never
+changes, tau comes back a perfect 1.00, and the table has stopped meaning
+anything. Rank correlation alone would have called that robustness. High
+churn with a stable tau is the *good* case — the rule matters locally and
+washes out in aggregate. A high arms-lost count with a stable tau is the
+trap.
+
+A variant that reorders the top of the table is not a bug to be suppressed.
+It is the most important thing on the page, and it belongs beside the ranking
+rather than in a footnote.
+
 ## Reproducing
 
 Every provider response is stored verbatim under `runs/raw/`. `tti regrade`

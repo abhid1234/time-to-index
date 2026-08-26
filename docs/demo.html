@@ -71,16 +71,25 @@ nothing here is a finding about any product. Real runs are published at
 
 <p class="sub">How long a newly published fact takes to become retrievable through each
 web-search API, and how often the API confidently returns the answer it replaced.
-Generated 2026-08-26 04:34 UTC.</p>
+Generated 2026-08-26 04:40 UTC.</p>
 
 <div class="panel">
   <div class="scroll"><table>
-    <thead><tr><th>arm</th><th>median TTI</th><th>p90</th><th>24h recall</th>
+    <thead><tr><th>arm</th><th>median TTI</th>
+    <th>95% CI<br><span style="text-transform:none;letter-spacing:0">on the median</span></th>
+    <th>p90</th><th>24h recall</th>
     <th>24h recall<br><span style="text-transform:none;letter-spacing:0">vs origin</span></th>
     <th>staleness</th><th>p50 latency</th><th>$/1k events</th>
     <th>$/1k fresh<br><span style="text-transform:none;letter-spacing:0">answers</span></th>
     <th>events</th></tr></thead>
-    <tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>15m–1.0h</td><td class='k'>99% (95–100)</td><td class='k'>99% (94–100)</td><td class='k bad'>66% (56–75)</td><td class='k'>2129ms</td><td class='k'>$10.14</td><td class='k'>$10.24</td><td class='k'>106</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>1.0h–6.0h</td><td class='k'>6.0h–24.0h</td><td class='k'>91% (83–95)</td><td class='k'>91% (83–95)</td><td class='k bad'>73% (67–78)</td><td class='k'>792ms</td><td class='k'>$19.15</td><td class='k'>$21.15</td><td class='k'>106</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>6.0h–24.0h</td><td class='k'>>3.0d</td><td class='k'>55% (45–64)</td><td class='k'>56% (46–67)</td><td class='k bad'>44% (39–50)</td><td class='k'>1244ms</td><td class='k'>$26.04</td><td class='k'>$47.59</td><td class='k'>106</td></tr></tbody></table></div>
+    <tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>15m</td><td class='k'>15m–1.0h</td><td class='k'>99% (95–100)</td><td class='k'>99% (94–100)</td><td class='k bad'>66% (56–75)</td><td class='k'>1719ms</td><td class='k'>$10.14</td><td class='k'>$10.24</td><td class='k'>106</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>1.0h–6.0h</td><td class='k'>6.0h</td><td class='k'>6.0h–24.0h</td><td class='k'>91% (83–95)</td><td class='k'>91% (83–95)</td><td class='k bad'>73% (67–78)</td><td class='k'>1910ms</td><td class='k'>$19.15</td><td class='k'>$21.15</td><td class='k'>106</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>6.0h–24.0h</td><td class='k'>24.0h–3.0d</td><td class='k'>>3.0d</td><td class='k'>55% (45–64)</td><td class='k'>56% (46–67)</td><td class='k bad'>44% (39–50)</td><td class='k'>1515ms</td><td class='k'>$26.04</td><td class='k'>$47.59</td><td class='k'>106</td></tr></tbody></table></div>
+  <p class="note">The CI column is a nonparametric bootstrap on the median bracket's
+  upper edge. It is here because a median printed without one is the most common way a
+  short run gets over-read: at forty events, a bracket can land a rung either side on
+  luck alone, and the ordering of this table is exactly what that luck moves. Where an
+  arm's median is not reached inside the 72-hour window in some resamples, the share is
+  printed rather than hidden &#8212; for a slow arm that number, not the point estimate, is
+  the finding.</p>
   <p class="note">Two cost columns, because they can disagree and the disagreement is
   the point. Cost per <i>event</i> is what you pay to ask; cost per <i>fresh answer</i>
   is what you pay to get one, and a provider that returns nothing does it very cheaply.
@@ -234,6 +243,23 @@ Generated 2026-08-26 04:34 UTC.</p>
 
 <h2>By source class</h2>
 <div class='panel'><h2 style='margin-top:0'>code release</h2><div class='scroll'><table><thead><tr><th>arm</th><th>median</th><th>24h recall</th><th>staleness</th><th>n</th></tr></thead><tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>100% (85–100)</td><td class='k'>70% (49–84)</td><td class='k'>22</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>1.0h–6.0h</td><td class='k'>95% (78–99)</td><td class='k'>71% (59–81)</td><td class='k'>22</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>6.0h–24.0h</td><td class='k'>64% (43–80)</td><td class='k'>40% (31–50)</td><td class='k'>22</td></tr></tbody></table></div></div><div class='panel'><h2 style='margin-top:0'>gov publication</h2><div class='scroll'><table><thead><tr><th>arm</th><th>median</th><th>24h recall</th><th>staleness</th><th>n</th></tr></thead><tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>100% (76–100)</td><td class='k'>—</td><td class='k'>12</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>15m–1.0h</td><td class='k'>100% (76–100)</td><td class='k'>—</td><td class='k'>12</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>6.0h–24.0h</td><td class='k'>58% (32–81)</td><td class='k'>—</td><td class='k'>12</td></tr></tbody></table></div></div><div class='panel'><h2 style='margin-top:0'>package registry</h2><div class='scroll'><table><thead><tr><th>arm</th><th>median</th><th>24h recall</th><th>staleness</th><th>n</th></tr></thead><tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>98% (87–100)</td><td class='k'>65% (50–78)</td><td class='k'>40</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>1.0h–6.0h</td><td class='k'>88% (74–95)</td><td class='k'>74% (66–81)</td><td class='k'>40</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>24.0h–3.0d</td><td class='k'>48% (33–63)</td><td class='k'>43% (37–51)</td><td class='k'>40</td></tr></tbody></table></div></div><div class='panel'><h2 style='margin-top:0'>preprint</h2><div class='scroll'><table><thead><tr><th>arm</th><th>median</th><th>24h recall</th><th>staleness</th><th>n</th></tr></thead><tbody><tr><td class='k'>provider-a/fast</td><td class='k'>≤5m</td><td class='k'>100% (82–100)</td><td class='k'>—</td><td class='k'>18</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>1.0h–6.0h</td><td class='k'>100% (82–100)</td><td class='k'>—</td><td class='k'>18</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>6.0h–24.0h</td><td class='k'>56% (34–75)</td><td class='k'>—</td><td class='k'>18</td></tr></tbody></table></div></div><div class='panel'><h2 style='margin-top:0'>regulatory filing</h2><div class='scroll'><table><thead><tr><th>arm</th><th>median</th><th>24h recall</th><th>staleness</th><th>n</th></tr></thead><tbody><tr><td class='k'>provider-a/fast</td><td class='k'>15m–1.0h</td><td class='k'>100% (78–100)</td><td class='k'>65% (43–82)</td><td class='k'>14</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>6.0h–24.0h</td><td class='k'>71% (45–88)</td><td class='k'>71% (58–81)</td><td class='k'>14</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>6.0h–24.0h</td><td class='k'>57% (33–79)</td><td class='k'>54% (42–65)</td><td class='k'>14</td></tr></tbody></table></div></div>
+
+<h2>Does the ranking survive the rules that produced it</h2>
+<div class="panel">
+  <div class="scroll"><table>
+    <thead><tr><th>rule variant</th><th>verdict churn</th><th>rank correlation</th>
+    <th>medians moved</th><th>arms lost</th></tr></thead>
+    <tbody><tr><td colspan='5'>not evaluated &#8212; needs stored raw payloads from a real run</td></tr></tbody></table></div>
+  <p class="note">This panel fills in once probes have run against live providers and their responses are on disk.</p>
+  <p class="note" style="border-color:var(--muted)">Every grading rule here is a
+  judgement call: match on token boundaries or not, count a <code>v</code> prefix,
+  trust aliases, treat a URL as evidence. Each variant re-grades the stored payloads
+  under one of those calls made differently &#8212; no API calls, which is why the raw
+  responses are kept. Rank correlation alone is not enough, and this harness caught
+  that about itself: a variant that reads no content collapses every arm equally, so
+  the order never changes and the correlation comes back perfect for a table that has
+  stopped meaning anything. <b>Arms lost</b> is the column that catches it.</p>
+</div>
 
 <h2>Are the differences real</h2>
 <div class="panel">

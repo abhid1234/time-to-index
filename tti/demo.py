@@ -165,7 +165,7 @@ def render(run_dir: pathlib.Path, out: pathlib.Path, ladder: list[int]) -> str:
     led, truth = generate(run_dir, ladder)
     events, results = led.events(), led.results()
     arms = sorted({(r.provider, r.mode) for r in results if r.provider != "origin"})
-    scores = [score(events, results, p, m) for p, m in arms]
+    scores = [score(events, results, p, m, bootstrap=400) for p, m in arms]
     classes = sorted({e.source_class for e in events.values()})
     by_class = {c: [score(events, results, p, m, c) for p, m in arms] for c in classes}
 

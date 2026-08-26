@@ -25,6 +25,7 @@ from dataclasses import dataclass, field
 
 from .models import ABSENT, ERROR, FRESH, SKIPPED, STALE, Event, ProbeResult
 from .survival import INF, Interval, NPMLE
+from .survival import bootstrap_quantile
 from .survival import fit as turnbull_fit
 from .survival import intervals_from_ladder
 
@@ -187,6 +188,10 @@ class ProviderScore:
     # which is a standing check that the ladder is fine enough to matter.
     npmle: NPMLE = field(default_factory=NPMLE)
     median_bracket: tuple[float | None, float | None] = (None, None)
+    # Bootstrap CI on the median bracket's upper edge, and the share of
+    # resamples in which the median was never reached inside the window.
+    median_ci: tuple[float | None, float | None] = (None, None)
+    median_unreached: float = 0.0
     p90_bracket: tuple[float | None, float | None] = (None, None)
     median_ttl: float | None = None
     p90_ttl: float | None = None
@@ -312,6 +317,7 @@ def score(
     provider: str,
     mode: str,
     source_class: str | None = None,
+    bootstrap: int = 0,
 ) -> ProviderScore:
     sc = ProviderScore(provider=provider, mode=mode)
     obs = observations(events, results, provider, mode, source_class)
@@ -325,6 +331,10 @@ def score(
     sc.npmle = turnbull_fit(ivs)
     sc.median_bracket = sc.npmle.quantile_bracket(0.5)
     sc.p90_bracket = sc.npmle.quantile_bracket(0.9)
+    if bootstrap and len(ivs) >= 8:
+        lo, hi, unreached = bootstrap_quantile(ivs, 0.5, resamples=bootstrap)
+        sc.median_ci = (lo, hi)
+        sc.median_unreached = unreached
 
     for horizon, attr in ((86_400, "recall_24h"), (259_200, "recall_72h")):
         hit = sum(1 for o in obs if o.indexed and o.time <= horizon)

@@ -39,6 +39,10 @@ it is wrong.
 6. **Say when the numbers can't carry a claim.** `tti power` reports the
    hazard ratio, the achieved power, and how many more days of collection a
    real comparison would take.
+7. **Re-grade under worse rules and report what moved.** `tti sensitivity`
+   re-scores every stored payload under deliberately different grading
+   choices, at zero API cost, and says whether the ranking is a finding or an
+   artefact of the grader.
 
 Full design, and everything that could make the numbers wrong, in
 [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md).
@@ -74,6 +78,7 @@ tti discover              # poll sources, enqueue the ladder
 tti probe                 # run whatever is due
 tti status                # queue depth and today's spend
 tti power                 # can this run support the claim it invites?
+tti sensitivity           # does the ranking survive the rules that produced it?
 tti report                # write RESULTS.md and docs/index.html
 ```
 
@@ -119,11 +124,28 @@ Every provider response is stored verbatim under `runs/raw/`.
 ```bash
 tti regrade               # re-score stored payloads, no API calls
 tti regrade --write       # apply the new verdicts
+tti sensitivity           # re-grade under seven rule variants and diff the ranking
 ```
 
-Change the matching rules in `tti/grader.py`, re-grade, and see how much the
-leaderboard actually moves. That is the only reason to believe a benchmark
-published by one person.
+`tti sensitivity` is the one to run first. It re-scores everything under
+deliberately worse rules — plain substring matching, no `v` prefix, no
+aliases, titles only — and reports verdict churn, Kendall rank correlation
+against the reported ordering, and how many arms stopped being measurable.
+
+```
+rule variant                  churn    tau  medians  lost  ranking
+strict  (reported)                —   1.00      0/2     0  pv/base pw/base
+no-v-prefix                   33.3%   1.00      1/2     1  pv/base pw/base
+titles-only                  100.0%   1.00      2/2     2  pv/base pw/base
+
+'titles-only' makes 2 of 2 arms unmeasurable rather than reordering them —
+the ranking looks stable under it only because there is nothing left to rank
+```
+
+That last line is there because rank correlation alone was not enough, and
+the harness caught it about itself: a variant that reads no content collapses
+every arm equally, so the order never changes and tau reports a perfect 1.00
+for a table that has stopped meaning anything.
 
 ## Pre-commitment
 

@@ -129,7 +129,12 @@ def cmd_probe(args) -> int:
 def _all_scores(led: Ledger, source_class: str | None = None) -> list[ProviderScore]:
     events, results = led.events(), led.results()
     arms = sorted({(r.provider, r.mode) for r in results})
-    return [score(events, results, p, m, source_class) for p, m in arms]
+    # Bootstrap only the top-level table; the per-source-class panels have
+    # too few events per cell for a resample to mean much, and computing it
+    # anyway would print an interval that looks authoritative and is not.
+    boot = 0 if source_class else 400
+    return [score(events, results, p, m, source_class, bootstrap=boot)
+            for p, m in arms]
 
 
 def cmd_score(args) -> int:
@@ -248,6 +253,52 @@ def cmd_power(args) -> int:
     return 0
 
 
+def cmd_sensitivity(args) -> int:
+    """Re-grade stored payloads under deliberately worse rules.
+
+    Zero API calls. If the ranking holds under every variant, say so; if a
+    variant reorders it, that belongs next to the leaderboard rather than in
+    a footnote.
+    """
+    from . import sensitivity
+
+    led = _ledger(args)
+    rows = sensitivity.run(led)
+    if not rows:
+        print("no results to re-grade — run `tti probe` first")
+        return 1
+
+    hdr = (f"{'rule variant':26s} {'churn':>8s} {'tau':>6s} {'medians':>8s} "
+           f"{'lost':>5s}  ranking")
+    print(hdr)
+    print("-" * max(len(hdr), 74))
+    for r in rows:
+        if not r.regraded and r.name != "strict":
+            print(f"{r.name:26s} {'—':>8s} {'—':>6s} {'—':>8s} {'—':>5s}  {r.note}")
+            continue
+        churn = f"{r.churn*100:.1f}%" if r.verdicts_total else "—"
+        tau = f"{r.tau:.2f}"
+        moved = " ".join(
+            f"{n}{'' if r.rank_moves.get(n, 0) == 0 else f'({r.rank_moves[n]:+d})'}"
+            for n in r.order)
+        label = r.name + ("  (reported)" if r.name == "strict" else "")
+        meds = f"{r.median_changes}/{r.n_arms}" if r.n_arms else "—"
+        lost = str(r.arms_lost) if r.n_arms else "—"
+        print(f"{label:26s} {churn:>8s} {tau:>6s} {meds:>8s} {lost:>5s}  {moved}")
+
+    print()
+    print(sensitivity.verdict(rows))
+    print()
+    print("churn = share of probe verdicts that change. tau = Kendall rank")
+    print("correlation against the reported ordering. medians = arms whose median")
+    print("bracket moved. lost = arms that stopped being measurable at all.")
+    print()
+    print("High churn with tau near 1 is the good case: the rule matters locally and")
+    print("washes out in aggregate. A high `lost` count with tau near 1 is the trap —")
+    print("the order survives because there is nothing left to order.")
+    return 0
+
+
 def cmd_demo(args) -> int:
     """Render docs/demo.html from a synthetic run.
 
@@ -301,9 +352,16 @@ def cmd_report(args) -> int:
                      staleness_by_rung(events, results, sc.provider, sc.mode))
                     for sc in sorted(scores, key=lambda s: (s.median_ttl is None,
                                                             s.median_ttl or 0))]
+    from . import sensitivity as _sens
+    try:
+        sens_rows = _sens.run(led)
+    except Exception as exc:  # noqa: BLE001
+        print(f"  ! sensitivity pass skipped: {exc}")
+        sens_rows = []
+
     html = report.full_page(
         report.dashboard_html(scores, events, results, by_class, pairs, powers,
-                              stale_series))
+                              stale_series, sens_rows))
     (root / "docs" / "index.html").write_text(html, encoding="utf-8")
     (root / "RESULTS.md").write_text(
         "# Results\n\n" + report.summary_md(scores, events, results) + "\n",
@@ -338,6 +396,8 @@ def main(argv: list[str] | None = None) -> int:
                    ).set_defaults(fn=cmd_demo)
     sub.add_parser("power", help="can this run support the claim it invites?"
                    ).set_defaults(fn=cmd_power)
+    sub.add_parser("sensitivity", help="how much does the ranking depend on grading rules?"
+                   ).set_defaults(fn=cmd_sensitivity)
 
     rg = sub.add_parser("regrade", help="re-grade stored payloads, no API calls")
     rg.add_argument("--write", action="store_true", help="apply the new verdicts")

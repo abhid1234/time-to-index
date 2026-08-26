@@ -116,3 +116,34 @@ def test_builder_handles_out_of_order_and_missing_probes():
     # A FRESH at a later rung does not override the first one.
     assert intervals_from_ladder(
         [(300, False), (900, True), (3600, True)]) == Interval(300, 900)
+
+
+def test_bootstrap_is_deterministic_and_straddles_a_rung_when_it_should():
+    """A confidence interval that moves when you re-render the page is not a
+    confidence interval."""
+    from tti.survival import bootstrap_quantile
+    obs = [Interval(300, 900)] * 18 + [Interval(900, 3600)] * 14 + [Interval(3600, INF)] * 8
+    a = bootstrap_quantile(obs, 0.5, resamples=200)
+    b = bootstrap_quantile(obs, 0.5, resamples=200)
+    assert a == b
+    lo, hi, unreached = a
+    # The median sits near the 900s boundary, so the interval must not claim
+    # to pin it to one rung.
+    assert lo == 900.0 and hi == 3600.0 and unreached == 0.0
+
+
+def test_bootstrap_reports_unreached_rather_than_inventing_a_median():
+    from tti.survival import bootstrap_quantile
+    obs = [Interval(300, 900)] * 5 + [Interval(259200, INF)] * 35
+    lo, hi, unreached = bootstrap_quantile(obs, 0.5, resamples=200)
+    assert lo is None and hi is None and unreached == 1.0
+
+
+def test_bootstrap_interval_tightens_as_n_grows():
+    from tti.survival import bootstrap_quantile
+    base = [Interval(300, 900)] * 9 + [Interval(900, 3600)] * 11
+    small = bootstrap_quantile(base, 0.5, resamples=200)
+    large = bootstrap_quantile(base * 20, 0.5, resamples=200)
+    small_w = (small[1] or 0) - (small[0] or 0)
+    large_w = (large[1] or 0) - (large[0] or 0)
+    assert large_w <= small_w

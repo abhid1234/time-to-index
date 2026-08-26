@@ -30,42 +30,65 @@ Matching rules, in order of how much trouble they save:
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass, field
 from typing import Any, Iterable
 
 from .models import ABSENT, FRESH, STALE, Event
 
 # Fields we treat as retrieved content. Anything not listed is ignored, which
 # keeps a provider from scoring on its own echo of our query.
-_TEXT_KEYS = {
+_TEXT_KEYS = frozenset({
     "title", "snippet", "description", "text", "content", "excerpt", "excerpts",
     "summary", "highlight", "highlights", "extract", "raw_content", "body",
     "page_content", "chunk",
-}
-_SKIP_KEYS = {"url", "link", "id", "source_url", "request_id", "query", "objective"}
+})
+_SKIP_KEYS = frozenset({"url", "link", "id", "source_url", "request_id", "query", "objective"})
 
 
-def flatten_text(payload: Any, _depth: int = 0) -> str:
+@dataclass(frozen=True)
+class Rules:
+    """The grading rules, as data.
+
+    Every one of these is a judgement call, and a benchmark whose conclusion
+    depends on an author's judgement calls should be able to say by how much.
+    Making them a parameter is what lets `tti sensitivity` re-grade the stored
+    payloads under deliberately worse rules and report how far the leaderboard
+    moves. If it barely moves, the choices did not matter. If it reorders, the
+    honest thing is to publish that alongside the ranking.
+    """
+    name: str = "strict"
+    text_keys: frozenset = field(default_factory=lambda: _TEXT_KEYS)
+    skip_keys: frozenset = field(default_factory=lambda: _SKIP_KEYS)
+    boundary: bool = True        # False = plain substring, the classic trap
+    allow_v_prefix: bool = True
+    use_aliases: bool = True
+    min_token_len: int = 3
+    max_depth: int = 12
+
+
+def flatten_text(payload: Any, _depth: int = 0, rules: "Rules | None" = None) -> str:
     """Collect provider-returned content into one string.
 
     Deliberately conservative: it walks the response tree and keeps values
     only under known content keys, so a change in a provider's envelope
     cannot accidentally start feeding query echo into the grader.
     """
-    if _depth > 12:
+    rules = rules or DEFAULT
+    if _depth > rules.max_depth:
         return ""
     out: list[str] = []
     if isinstance(payload, dict):
         for k, v in payload.items():
             lk = str(k).lower()
-            if lk in _SKIP_KEYS:
+            if lk in rules.skip_keys:
                 continue
-            if lk in _TEXT_KEYS:
+            if lk in rules.text_keys:
                 out.append(_stringify(v, _depth + 1))
             elif isinstance(v, (dict, list)):
-                out.append(flatten_text(v, _depth + 1))
+                out.append(flatten_text(v, _depth + 1, rules))
     elif isinstance(payload, list):
         for v in payload:
-            out.append(flatten_text(v, _depth + 1))
+            out.append(flatten_text(v, _depth + 1, rules))
     return "\n".join(s for s in out if s)
 
 
@@ -85,7 +108,8 @@ def _stringify(v: Any, _depth: int = 0) -> str:
     return ""
 
 
-def _pattern(token: str) -> re.Pattern[str]:
+def _pattern(token: str, boundary: bool = True,
+             allow_v: bool = True) -> re.Pattern[str]:
     """Boundary-safe matcher for one answer token.
 
     The lookarounds exclude word characters and dots on both sides, so
@@ -102,35 +126,59 @@ def _pattern(token: str) -> re.Pattern[str]:
     that happens to begin with a letter.
     """
     core = re.escape(token)
-    if token[:1].isdigit():
+    if not boundary:
+        return re.compile(core, re.IGNORECASE)
+    if allow_v and token[:1].isdigit():
         core = "[vV]?" + core
     return re.compile(rf"(?<![\w.]){core}(?![\w.])", re.IGNORECASE)
 
 
-_PATTERN_CACHE: dict[str, re.Pattern[str]] = {}
+_PATTERN_CACHE: dict[tuple[str, bool, bool], re.Pattern[str]] = {}
 
 
-def _match(text: str, tokens: Iterable[str]) -> list[str]:
+def _match(text: str, tokens: Iterable[str], rules: "Rules") -> list[str]:
     hits = []
     for t in tokens:
         t = (t or "").strip()
-        if len(t) < 3:          # too short to be evidence of anything
+        if len(t) < rules.min_token_len:   # too short to be evidence
             continue
-        pat = _PATTERN_CACHE.get(t)
+        key = (t, rules.boundary, rules.allow_v_prefix)
+        pat = _PATTERN_CACHE.get(key)
         if pat is None:
-            pat = _PATTERN_CACHE[t] = _pattern(t)
+            pat = _PATTERN_CACHE[key] = _pattern(t, rules.boundary,
+                                                 rules.allow_v_prefix)
         if pat.search(text):
             hits.append(t)
     return hits
 
 
-def grade(event: Event, payload: Any) -> tuple[str, list[str], list[str], int]:
+def grade(event: Event, payload: Any,
+          rules: "Rules | None" = None) -> tuple[str, list[str], list[str], int]:
     """Return (verdict, fresh_hits, stale_hits, chars_scanned)."""
-    text = flatten_text(payload)
-    fresh_hits = _match(text, event.answer_aliases)
-    stale_hits = _match(text, event.predecessor_aliases) if event.predecessor else []
+    rules = rules or DEFAULT
+    text = flatten_text(payload, rules=rules)
+    fresh_tokens = event.answer_aliases if rules.use_aliases else [event.answer]
+    stale_tokens = (event.predecessor_aliases if rules.use_aliases
+                    else ([event.predecessor] if event.predecessor else []))
+    fresh_hits = _match(text, fresh_tokens, rules)
+    stale_hits = _match(text, stale_tokens, rules) if event.predecessor else []
     if fresh_hits:
         return FRESH, fresh_hits, stale_hits, len(text)
     if stale_hits:
         return STALE, [], stale_hits, len(text)
     return ABSENT, [], [], len(text)
+
+
+DEFAULT = Rules()
+
+# Deliberately worse rules, for `tti sensitivity`. Each isolates one judgement
+# call so its effect on the leaderboard can be measured rather than argued.
+VARIANTS = [
+    DEFAULT,
+    Rules(name="naive-substring", boundary=False),
+    Rules(name="no-v-prefix", allow_v_prefix=False),
+    Rules(name="canonical-token-only", use_aliases=False),
+    Rules(name="urls-count-as-evidence", skip_keys=frozenset({"query", "objective"})),
+    Rules(name="titles-only", text_keys=frozenset({"title"})),
+    Rules(name="shallow-walk", max_depth=2),
+]

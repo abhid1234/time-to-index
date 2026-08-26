@@ -169,6 +169,17 @@ def staleness_svg(series: list[tuple[str, list[tuple[int, float, int]]]],
 # Markdown
 # ---------------------------------------------------------------------------
 
+def _ci(sc: ProviderScore) -> str:
+    lo, hi = sc.median_ci
+    if lo is None or hi is None:
+        return f"never reached in {sc.median_unreached*100:.0f}% of resamples" \
+            if sc.median_unreached >= 0.999 else "—"
+    span = fmt_duration(lo) if lo == hi else f"{fmt_duration(lo)}–{fmt_duration(hi)}"
+    if sc.median_unreached > 0.02:
+        span += f" · unreached in {sc.median_unreached*100:.0f}%"
+    return span
+
+
 def _cpf(v: float) -> str:
     if v != v:
         return "—"
@@ -310,7 +321,8 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
                    results: list[ProbeResult], by_class: dict[str, list[ProviderScore]],
                    pairs: list[tuple[str, str, float]],
                    powers: list = (),
-                   stale_series: list = ()) -> str:
+                   stale_series: list = (),
+                   sensitivity_rows: list = ()) -> str:
     e = html.escape
     gen = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     ordered = sorted(scores, key=lambda s: (s.median_ttl is None, s.median_ttl or 0))
@@ -323,6 +335,7 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
     rows = "".join(
         f"<tr><td class='k'>{e(sc.provider)}/{e(sc.mode)}</td>"
         f"<td class='k'>{fmt_pair(sc.median_bracket)}</td>"
+        f"<td class='k'>{_ci(sc)}</td>"
         f"<td class='k'>{fmt_pair(sc.p90_bracket)}</td>"
         f"<td class='k'>{_pct(sc.recall_24h)}</td>"
         f"<td class='k'>{_pct(sc.conditional_recall_24h)}</td>"
@@ -403,6 +416,27 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
     n_confirmed = max((s.n_origin_confirmed for s in scores), default=0)
     stale_chart = staleness_svg(list(stale_series), RUNGS) if stale_series else ""
 
+    if sensitivity_rows:
+        sens_rows = "".join(
+            f"<tr><td class='k'>{e(r.name)}"
+            + ("<span style='color:var(--muted)'> (reported)</span>"
+               if r.name == "strict" else "")
+            + "</td>"
+            + (f"<td colspan='4'>{e(r.note)}</td>" if not r.regraded else
+               f"<td class='k'>{r.churn*100:.1f}%</td>"
+               f"<td class='k'>{r.tau:.2f}</td>"
+               f"<td class='k'>{r.median_changes}/{r.n_arms}</td>"
+               f"<td class='k{' bad' if r.arms_lost else ''}'>{r.arms_lost}</td>")
+            + "</tr>"
+            for r in sensitivity_rows)
+        from .sensitivity import verdict as _sv
+        sens_verdict = e(_sv(list(sensitivity_rows)))
+    else:
+        sens_rows = ("<tr><td colspan='5'>not evaluated &#8212; needs stored raw "
+                     "payloads from a real run</td></tr>")
+        sens_verdict = ("This panel fills in once probes have run against live "
+                        "providers and their responses are on disk.")
+
     stale_total = sum(s.n_stale for s in scores)
     stale_elig = sum(s.n_stale_eligible for s in scores)
     stale_pct = f"{stale_total / stale_elig * 100:.0f}%" if stale_elig else "—"
@@ -420,12 +454,21 @@ Generated {gen}.</p>
 
 <div class="panel">
   <div class="scroll"><table>
-    <thead><tr><th>arm</th><th>median TTI</th><th>p90</th><th>24h recall</th>
+    <thead><tr><th>arm</th><th>median TTI</th>
+    <th>95% CI<br><span style="text-transform:none;letter-spacing:0">on the median</span></th>
+    <th>p90</th><th>24h recall</th>
     <th>24h recall<br><span style="text-transform:none;letter-spacing:0">vs origin</span></th>
     <th>staleness</th><th>p50 latency</th><th>$/1k events</th>
     <th>$/1k fresh<br><span style="text-transform:none;letter-spacing:0">answers</span></th>
     <th>events</th></tr></thead>
     <tbody>{rows}</tbody></table></div>
+  <p class="note">The CI column is a nonparametric bootstrap on the median bracket's
+  upper edge. It is here because a median printed without one is the most common way a
+  short run gets over-read: at forty events, a bracket can land a rung either side on
+  luck alone, and the ordering of this table is exactly what that luck moves. Where an
+  arm's median is not reached inside the 72-hour window in some resamples, the share is
+  printed rather than hidden &#8212; for a slow arm that number, not the point estimate, is
+  the finding.</p>
   <p class="note">Two cost columns, because they can disagree and the disagreement is
   the point. Cost per <i>event</i> is what you pay to ask; cost per <i>fresh answer</i>
   is what you pay to get one, and a provider that returns nothing does it very cheaply.
@@ -502,6 +545,23 @@ Generated {gen}.</p>
 
 <h2>By source class</h2>
 {class_blocks}
+
+<h2>Does the ranking survive the rules that produced it</h2>
+<div class="panel">
+  <div class="scroll"><table>
+    <thead><tr><th>rule variant</th><th>verdict churn</th><th>rank correlation</th>
+    <th>medians moved</th><th>arms lost</th></tr></thead>
+    <tbody>{sens_rows}</tbody></table></div>
+  <p class="note">{sens_verdict}</p>
+  <p class="note" style="border-color:var(--muted)">Every grading rule here is a
+  judgement call: match on token boundaries or not, count a <code>v</code> prefix,
+  trust aliases, treat a URL as evidence. Each variant re-grades the stored payloads
+  under one of those calls made differently &#8212; no API calls, which is why the raw
+  responses are kept. Rank correlation alone is not enough, and this harness caught
+  that about itself: a variant that reads no content collapses every arm equally, so
+  the order never changes and the correlation comes back perfect for a table that has
+  stopped meaning anything. <b>Arms lost</b> is the column that catches it.</p>
+</div>
 
 <h2>Are the differences real</h2>
 <div class="panel">

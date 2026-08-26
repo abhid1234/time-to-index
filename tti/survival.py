@@ -196,6 +196,51 @@ def fit(obs: list[Interval], tol: float = 1e-10, max_iter: int = 10_000) -> NPML
     return est
 
 
+def bootstrap_quantile(
+    obs: list[Interval],
+    q: float = 0.5,
+    resamples: int = 400,
+    seed: int = 20260826,
+) -> tuple[float | None, float | None, float]:
+    """Nonparametric bootstrap CI for a quantile bracket's upper edge.
+
+    A median printed without an interval is the most common way a small run
+    gets over-read. With forty events, a bracket of (15m, 1h] can land a rung
+    either side on luck alone, and the leaderboard's ordering is exactly what
+    that luck moves.
+
+    Resamples the observations with replacement, refits, and reports the
+    2.5th and 97.5th percentiles of the bracket's upper edge, plus the share
+    of resamples in which the quantile was never reached at all. That last
+    number is the honest one for a slow arm: if 30% of resamples never get
+    there, the point estimate is not the story.
+
+    Deterministic by default -- a confidence interval that moves when you
+    re-render the page is not a confidence interval.
+    """
+    import random
+
+    if not obs:
+        return None, None, 1.0
+    rng = random.Random(seed)
+    n = len(obs)
+    uppers: list[float] = []
+    unreached = 0
+    for _ in range(resamples):
+        sample = [obs[rng.randrange(n)] for _ in range(n)]
+        _, hi = fit(sample).quantile_bracket(q)
+        if hi is None:
+            unreached += 1
+        else:
+            uppers.append(hi)
+    if not uppers:
+        return None, None, 1.0
+    uppers.sort()
+    lo_i = max(0, int(0.025 * len(uppers)) - 1)
+    hi_i = min(len(uppers) - 1, int(math.ceil(0.975 * len(uppers))) - 1)
+    return uppers[lo_i], uppers[hi_i], unreached / resamples
+
+
 def intervals_from_ladder(
     probed: list[tuple[float, bool]],
 ) -> Interval | None:
