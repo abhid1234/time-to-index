@@ -14,7 +14,7 @@ license = {text = "MIT"}
 dependencies = ["requests>=2.31", "PyYAML>=6.0"]
 
 [project.optional-dependencies]
-dev = ["pytest>=7.4"]
+dev = ["pytest>=7.4", "ruff>=0.6"]
 
 [project.scripts]
 tti = "tti.cli:main"
@@ -24,3 +24,21 @@ include = ["tti*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 96
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4", "SIM"]
+ignore = [
+  "E501",    # line length is enforced by the formatter, not the linter
+  "B008",    # false positives on dataclass field(default_factory=...)
+  "SIM108",  # ternaries are not always clearer than the if/else they replace
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Collectors are written as one over-indented method body each, converted from
+# a loop; the shape keeps the diff against the original readable.
+"tti/sources/*.py" = ["E117"]
+"tests/*.py" = ["E402"]  # sys.path insert before imports is the point

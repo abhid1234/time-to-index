@@ -4,15 +4,18 @@ Runs against a scripted provider that indexes on a known schedule, so the
 test can assert that the pipeline recovers a latency it was never told.
 No network, no keys.
 """
-import pathlib, sys, time
+import pathlib
+import sys
+import time
+
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 import pytest
 
-from tti import config, providers, scheduler
+from tti import config, scheduler
 from tti.ledger import Ledger
 from tti.metrics import score
-from tti.models import Event, FRESH, SKIPPED, STALE
+from tti.models import FRESH, SKIPPED, STALE, Event
 
 
 class Clock:

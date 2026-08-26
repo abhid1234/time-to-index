@@ -30,8 +30,9 @@ Matching rules, in order of how much trouble they save:
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass, field
-from typing import Any, Iterable
+from typing import Any
 
 from .models import ABSENT, FRESH, STALE, Event
 
@@ -66,7 +67,7 @@ class Rules:
     max_depth: int = 12
 
 
-def flatten_text(payload: Any, _depth: int = 0, rules: "Rules | None" = None) -> str:
+def flatten_text(payload: Any, _depth: int = 0, rules: Rules | None = None) -> str:
     """Collect provider-returned content into one string.
 
     Deliberately conservative: it walks the response tree and keeps values
@@ -136,7 +137,7 @@ def _pattern(token: str, boundary: bool = True,
 _PATTERN_CACHE: dict[tuple[str, bool, bool], re.Pattern[str]] = {}
 
 
-def _match(text: str, tokens: Iterable[str], rules: "Rules") -> list[str]:
+def _match(text: str, tokens: Iterable[str], rules: Rules) -> list[str]:
     hits = []
     for t in tokens:
         t = (t or "").strip()
@@ -153,7 +154,7 @@ def _match(text: str, tokens: Iterable[str], rules: "Rules") -> list[str]:
 
 
 def grade(event: Event, payload: Any,
-          rules: "Rules | None" = None) -> tuple[str, list[str], list[str], int]:
+          rules: Rules | None = None) -> tuple[str, list[str], list[str], int]:
     """Return (verdict, fresh_hits, stale_hits, chars_scanned)."""
     rules = rules or DEFAULT
     text = flatten_text(payload, rules=rules)

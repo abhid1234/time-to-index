@@ -12,7 +12,8 @@ simulated. There is no fixture path that can leak into a published result.
 
 from __future__ import annotations
 
-from typing import Callable, Protocol
+from collections.abc import Callable
+from typing import Protocol
 
 from .. import config
 

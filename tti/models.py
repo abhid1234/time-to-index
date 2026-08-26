@@ -19,7 +19,6 @@ import json
 from dataclasses import dataclass, field
 from typing import Any
 
-
 # ---------------------------------------------------------------------------
 # Verdicts
 # ---------------------------------------------------------------------------
@@ -90,7 +89,7 @@ class Event:
     to_dict = lambda self: dataclasses.asdict(self)  # noqa: E731
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "Event":
+    def from_dict(cls, d: dict[str, Any]) -> Event:
         return cls(**d)
 
 
@@ -103,16 +102,22 @@ class Probe:
     mode: str            # provider-specific tier, e.g. "base" / "pro" / "basic"
     rung: int            # target lag in seconds after publication
     due_at: float        # UNIX seconds, = event.published_at + rung
+    phrasing: int = 0    # 0 = the canonical question; see tti/phrasing.py
     probe_id: str = ""
 
     def __post_init__(self) -> None:
         if not self.probe_id:
-            self.probe_id = _sha(self.event_id, self.provider, self.mode, str(self.rung))
+            parts = [self.event_id, self.provider, self.mode, str(self.rung)]
+            # Phrasing joins the hash only when non-zero, so a ledger written
+            # before this axis existed keeps its ids and stays re-gradable.
+            if self.phrasing:
+                parts.append(f"p{self.phrasing}")
+            self.probe_id = _sha(*parts)
 
     to_dict = lambda self: dataclasses.asdict(self)  # noqa: E731
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "Probe":
+    def from_dict(cls, d: dict[str, Any]) -> Probe:
         return cls(**d)
 
 
@@ -126,6 +131,7 @@ class ProbeResult:
     requested_at: float        # UNIX seconds when the call was dispatched
     lag: float                 # requested_at - event.published_at, the x-axis
     verdict: str
+    phrasing: int = 0          # which wording was asked; see tti/phrasing.py
     latency_ms: int = 0
     matched_fresh: list[str] = field(default_factory=list)
     matched_stale: list[str] = field(default_factory=list)
@@ -138,7 +144,7 @@ class ProbeResult:
     to_dict = lambda self: dataclasses.asdict(self)  # noqa: E731
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> "ProbeResult":
+    def from_dict(cls, d: dict[str, Any]) -> ProbeResult:
         return cls(**d)
 
 

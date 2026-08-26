@@ -18,7 +18,7 @@ import json
 import os
 import pathlib
 import time
-from typing import Iterator
+from collections.abc import Iterator
 
 from . import config
 from .models import Event, Probe, ProbeResult, dumps
@@ -57,7 +57,7 @@ class Ledger:
     def _read(path: pathlib.Path) -> Iterator[dict]:
         if not path.exists():
             return
-        with open(path, "r", encoding="utf-8") as fh:
+        with open(path, encoding="utf-8") as fh:
             for line in fh:
                 line = line.strip()
                 if line:
@@ -125,7 +125,7 @@ class Ledger:
         p = self.root / rel
         if not p.exists():
             return None
-        with open(p, "r", encoding="utf-8") as fh:
+        with open(p, encoding="utf-8") as fh:
             return json.load(fh)
 
     # -- state for the scheduler ------------------------------------------

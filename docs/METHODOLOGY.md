@@ -108,6 +108,45 @@ retrieval, not a stale one.
 excluded — a URL can carry a version string that the page body contradicts —
 and so is any echo of the query.
 
+## The phrasing axis
+
+The first version of this listed "no phrasing-sensitivity arm" as a
+limitation. This closes it.
+
+Questions come from one template per source. An agent does not ask the
+question a template would write — it asks whatever its own planner produced
+that turn. If a provider returns the new fact for "latest version of next"
+but not for "which version of the next npm package was released most
+recently", the freshness number attached to it is about the phrasing as much
+as the index.
+
+So `tti` can ask the same event, at the same rung, through the same provider,
+three ways: a full natural-language question, a differently-worded question
+with the same content, and a terse keyword string of the kind a planner emits
+once it has decided what it is looking for. Phrasing 0 is always the
+canonical question verbatim, so a run with the axis on is directly comparable
+to one with it off.
+
+The metric is **agreement**: of the events where *any* wording came back
+fresh, what share of wordings did? An arm at 100% is phrasing-insensitive at
+that rung. An arm at 40% has the document and does not reliably surface it —
+a different failure from not having it, and one an agent hits far more often
+than a benchmark does.
+
+Two design constraints:
+
+- **Off by default, and rung-limited when on.** Three wordings at every rung
+  triples the bill. Three at one rung adds two probes per event.
+- **Phrasing probes are excluded from every primary metric.** A second
+  wording of the same event is a second observation, not a second event.
+  Counting it would inflate recall and narrow every interval. The exclusion
+  is enforced in `metrics.py` and there is a test that a phrasing run leaves
+  time-to-index bit-identical.
+
+Templates that cannot be filled from an event's metadata are skipped rather
+than rendered with an empty slot: a question with a hole in it measures the
+hole.
+
 ## Statistics
 
 **Time to index is a survival problem.** Most events are still un-indexed at
@@ -150,6 +189,11 @@ requires the two to agree to 1e-6.
 **Medians are reported as brackets.** The survival function is genuinely
 undefined *inside* a support interval: the data cannot say where in (15m, 1h]
 the mass sits. Reporting a point median would be inventing that information.
+
+**Non-convergence is reported, not swallowed.** The EM fit carries a
+converged flag, and an arm whose estimator hit the iteration ceiling is
+called out on the dashboard. A non-converged fit still renders a
+plausible-looking median, which is exactly why it needs saying.
 
 **Rates get Wilson intervals**, not normal-approximation ones. At n≈40 events
 per source class the normal approximation puts the lower bound of a 100%
@@ -204,9 +248,9 @@ marketing page.
 - **Single-query retrieval.** One query per event, five results. A real agent
   reformulates and re-queries. This measures the first shot, which is the
   floor rather than the ceiling.
-- **Question phrasing.** Questions come from templates. A provider whose
-  rewriting favours a different phrasing is being under-measured, and there
-  is currently no phrasing-sensitivity arm.
+- **Question phrasing.** Questions come from templates, and the phrasing arm
+  below is off by default and rung-limited when on, so most runs measure a
+  single wording per event.
 - **Provider request shape.** Each adapter sends what that vendor's own
   documentation describes as the standard call. Parallel's API takes an
   objective plus literal queries, which is a different contract from the

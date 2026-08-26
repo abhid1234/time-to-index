@@ -4,15 +4,15 @@ These tests build a ledger with real stored payloads and confirm the harness
 detects the difference between a rule that changes verdicts locally and one
 that reorders the leaderboard. That distinction is the whole output.
 """
-import pathlib, sys
+import pathlib
+import sys
+
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-import pytest
 
 from tti import sensitivity
-from tti.grader import DEFAULT, Rules
 from tti.ledger import Ledger
-from tti.models import Event, FRESH, ABSENT, ProbeResult
+from tti.models import FRESH, Event, ProbeResult
 
 LADDER = [300, 900, 3600, 21600, 86400, 259200]
 

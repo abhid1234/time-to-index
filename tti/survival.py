@@ -75,10 +75,10 @@ class NPMLE:
         a lower bound on the CDF. `cdf_lower` is the matching upper bound;
         between them lies everything the data cannot resolve.
         """
-        return sum(m for (q, p), m in zip(self.support, self.mass) if p <= t)
+        return sum(m for (q, p), m in zip(self.support, self.mass, strict=True) if p <= t)
 
     def cdf_lower(self, t: float) -> float:
-        return sum(m for (q, p), m in zip(self.support, self.mass) if q < t)
+        return sum(m for (q, p), m in zip(self.support, self.mass, strict=True) if q < t)
 
     def quantile_bracket(self, q: float) -> tuple[float | None, float | None]:
         """The support interval containing the q-th quantile.
@@ -89,7 +89,7 @@ class NPMLE:
         the same statement as "slow".
         """
         cum = 0.0
-        for (lo, hi), m in zip(self.support, self.mass):
+        for (lo, hi), m in zip(self.support, self.mass, strict=True):
             cum += m
             if cum >= q - 1e-12:
                 return lo, (None if hi == INF else hi)
@@ -122,7 +122,7 @@ def _support_intervals(obs: list[Interval]) -> list[tuple[float, float]]:
         pts.add((iv.hi, 0))          # 0 = closes
     ordered = sorted(pts)
     out: list[tuple[float, float]] = []
-    for (v1, k1), (v2, k2) in zip(ordered, ordered[1:]):
+    for (v1, k1), (v2, k2) in zip(ordered, ordered[1:], strict=False):
         if k1 == 1 and k2 == 0 and v1 < v2:
             out.append((v1, v2))
     return out
@@ -174,7 +174,7 @@ def fit(obs: list[Interval], tol: float = 1e-10, max_iter: int = 10_000) -> NPML
             for j in idx:
                 new[j] += p[j] / denom
         new = [v / n for v in new]
-        delta = max(abs(a - b) for a, b in zip(new, p))
+        delta = max(abs(a - b) for a, b in zip(new, p, strict=True))
         p = new
         if delta < tol:
             est.iterations = it
@@ -185,7 +185,7 @@ def fit(obs: list[Interval], tol: float = 1e-10, max_iter: int = 10_000) -> NPML
 
     # Trim support intervals the estimator emptied. They carry no information
     # and their presence makes a bracket look narrower than it is.
-    keep = [(s, mass) for s, mass in zip(support, p) if mass > 1e-12]
+    keep = [(s, mass) for s, mass in zip(support, p, strict=True) if mass > 1e-12]
     est.support = [s for s, _ in keep]
     est.mass = [mass for _, mass in keep]
 

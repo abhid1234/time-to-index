@@ -77,7 +77,8 @@ class PyPI(BaseSource):
                 answer=latest,
                 answer_aliases=[latest, f"v{latest}", f"{pkg} {latest}", f"{pkg}=={latest}"],
                 predecessor=prev,
-                predecessor_aliases=[p for p in ([prev, f"v{prev}", f"{pkg}=={prev}"] if prev else [])],
+                predecessor_aliases=(
+                    [prev, f"v{prev}", f"{pkg}=={prev}"] if prev else []),
                 url=f"https://pypi.org/project/{pkg}/{latest}/",
                 origins=[f"https://pypi.org/project/{pkg}/{latest}/",
                          f"https://pypi.org/pypi/{pkg}/json"],

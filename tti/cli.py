@@ -22,12 +22,18 @@ import sys
 import time
 
 from . import config, providers, report, sources
-from .budget import Budget, utc_day, unit_cost
+from .budget import Budget, unit_cost, utc_day
 from .grader import grade
 from .ledger import Ledger
-from .metrics import (ProviderScore, fmt_duration, logrank, observations, score,
-                      staleness_by_rung)
-from .models import ERROR, FRESH, SKIPPED, STALE
+from .metrics import (
+    ProviderScore,
+    fmt_duration,
+    logrank,
+    observations,
+    score,
+    staleness_by_rung,
+)
+from .models import ERROR, SKIPPED
 from .scheduler import _count_results, discover, run_due
 
 
@@ -316,6 +322,7 @@ def cmd_demo(args) -> int:
     demo is evidence of.
     """
     import tempfile
+
     from . import demo as demo_mod
     root = pathlib.Path(__file__).resolve().parent.parent
     out = root / "docs" / "demo.html"

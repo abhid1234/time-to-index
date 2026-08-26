@@ -71,7 +71,7 @@ nothing here is a finding about any product. Real runs are published at
 
 <p class="sub">How long a newly published fact takes to become retrievable through each
 web-search API, and how often the API confidently returns the answer it replaced.
-Generated 2026-08-26 04:40 UTC.</p>
+Generated 2026-08-26 09:29 UTC.</p>
 
 <div class="panel">
   <div class="scroll"><table>
@@ -82,7 +82,9 @@ Generated 2026-08-26 04:40 UTC.</p>
     <th>staleness</th><th>p50 latency</th><th>$/1k events</th>
     <th>$/1k fresh<br><span style="text-transform:none;letter-spacing:0">answers</span></th>
     <th>events</th></tr></thead>
-    <tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>15m</td><td class='k'>15m–1.0h</td><td class='k'>99% (95–100)</td><td class='k'>99% (94–100)</td><td class='k bad'>66% (56–75)</td><td class='k'>1719ms</td><td class='k'>$10.14</td><td class='k'>$10.24</td><td class='k'>106</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>1.0h–6.0h</td><td class='k'>6.0h</td><td class='k'>6.0h–24.0h</td><td class='k'>91% (83–95)</td><td class='k'>91% (83–95)</td><td class='k bad'>73% (67–78)</td><td class='k'>1910ms</td><td class='k'>$19.15</td><td class='k'>$21.15</td><td class='k'>106</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>6.0h–24.0h</td><td class='k'>24.0h–3.0d</td><td class='k'>>3.0d</td><td class='k'>55% (45–64)</td><td class='k'>56% (46–67)</td><td class='k bad'>44% (39–50)</td><td class='k'>1515ms</td><td class='k'>$26.04</td><td class='k'>$47.59</td><td class='k'>106</td></tr></tbody></table></div>
+    <tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>15m</td><td class='k'>15m–1.0h</td><td class='k'>99% (95–100)</td><td class='k'>99% (94–100)</td><td class='k bad'>66% (56–75)</td><td class='k'>1334ms</td><td class='k'>$10.14</td><td class='k'>$10.24</td><td class='k'>106</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>1.0h–6.0h</td><td class='k'>6.0h</td><td class='k'>6.0h–24.0h</td><td class='k'>91% (83–95)</td><td class='k'>91% (83–95)</td><td class='k bad'>73% (67–78)</td><td class='k'>1380ms</td><td class='k'>$19.15</td><td class='k'>$21.15</td><td class='k'>106</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>6.0h–24.0h</td><td class='k'>24.0h–3.0d</td><td class='k'>>3.0d</td><td class='k'>55% (45–64)</td><td class='k'>56% (46–67)</td><td class='k bad'>44% (39–50)</td><td class='k'>760ms</td><td class='k'>$26.04</td><td class='k'>$47.59</td><td class='k'>106</td></tr></tbody></table></div>
+  
+  
   <p class="note">The CI column is a nonparametric bootstrap on the median bracket's
   upper edge. It is here because a median printed without one is the most common way a
   short run gets over-read: at forty events, a bracket can land a rung either side on

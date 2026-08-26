@@ -1,0 +1,46 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      - run: pip install -e ".[dev]"
+
+      # The suite makes no network calls. That is deliberate: a test run that
+      # depends on a live registry fails for reasons unrelated to the change,
+      # and a benchmark whose own CI is flaky has no standing to publish
+      # reliability numbers about anyone else.
+      - name: Tests
+        run: pytest -q
+
+      - name: Lint
+        run: ruff check tti tests
+
+      - name: The estimator must recover its own ground truth
+        run: tti demo
+
+      # A dry probe walks discovery and scheduling without spending anything
+      # or calling any provider, so a change that breaks the CLI wiring fails
+      # here rather than at 3am in a cron job.
+      - name: CLI smoke
+        run: |
+          tti --run-dir "$RUNNER_TEMP/ledger" status
+          tti --run-dir "$RUNNER_TEMP/ledger" probe --dry-run
+          tti --run-dir "$RUNNER_TEMP/ledger" sensitivity || true

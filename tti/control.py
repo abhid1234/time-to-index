@@ -214,7 +214,7 @@ def probe_origin(event: Event) -> dict[str, Any]:
 
 def conditional_recall(
     events: dict[str, Event],
-    results: list["Any"],
+    results: list[Any],
     provider: str,
     mode: str,
     rung: int,

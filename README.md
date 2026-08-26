@@ -44,6 +44,14 @@ it is wrong.
    choices, at zero API cost, and says whether the ranking is a finding or an
    artefact of the grader.
 
+Optionally, ask each event more than one way. A provider that returns the new
+fact for "latest version of next" but not for "which version of next shipped
+most recently" *has* the document and does not reliably surface it — a
+different failure from not having it, and one an agent hits far more often
+than a benchmark does, because an agent asks whatever its planner produced
+that turn. Off by default and rung-limited when on; see `phrasing_probe` in
+`data/settings.yaml`.
+
 Full design, and everything that could make the numbers wrong, in
 [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md).
 
@@ -161,10 +169,12 @@ commit and a note in `RESULTS.md`, not a quiet re-render.
 ## Tests
 
 ```bash
-pytest -q
+pip install -e ".[dev]"
+pytest -q && ruff check tti tests
 ```
 
-72 tests. The ones that matter:
+95 tests, on Python 3.10 through 3.13, no network calls. The ones that
+matter:
 
 - **Turnbull reduces to Kaplan–Meier** on right-censored data — a theorem, so
   running it on the Freireich 1963 6-MP arm ties the reported estimator to
@@ -184,6 +194,9 @@ pytest -q
   web" would let a bot-walled page make every provider look slow.
 - **Non-content fields are never evidence** — URLs, ids, request ids, and our
   own query echoed back.
+- **A phrasing run leaves time-to-index bit-identical.** A second wording of
+  the same event is a second observation, not a second event; counting it
+  would inflate recall and narrow every interval.
 - **A full pipeline run** against a scripted provider on a virtual clock:
   the estimator recovers a 1-hour indexing latency it was never told,
   carry-forward stops paying once an arm is FRESH, and the budget cap refuses
@@ -197,6 +210,12 @@ a contact header, what returns 403 to a non-browser client. It is the most
 reusable thing a benchmark produces and the part that usually goes unwritten.
 Everything in it is marked **Observed** (hit while building this, reproducible
 from it) or **Open** (a question a real run will answer, and has not yet).
+
+## Contributing
+
+[`CONTRIBUTING.md`](CONTRIBUTING.md) — how to add a provider (about twenty
+lines), add a source (one rule: it must stamp its own publication time), or
+argue with a number without writing any code at all.
 
 ## License
 

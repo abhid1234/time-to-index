@@ -14,7 +14,8 @@ upstream in the scheduler rather than charged to a provider.
 from __future__ import annotations
 
 import concurrent.futures as cf
-from typing import Any, Callable, Iterable, Protocol
+from collections.abc import Callable, Iterable
+from typing import Any, Protocol
 
 from ..models import Event
 

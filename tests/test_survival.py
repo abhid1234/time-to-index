@@ -7,7 +7,10 @@ Freireich 1963 data -- whose Kaplan-Meier values are published and already
 checked in test_metrics.py -- ties the new estimator to a known-good one
 rather than to my own arithmetic.
 """
-import pathlib, sys, math
+import math
+import pathlib
+import sys
+
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 import pytest
@@ -22,11 +25,11 @@ FREIREICH_C = [0, 0, 0, 1, 0, 1,  0,  1,  1,  0,  0,  1,  1,  1,  0,  0,  1,  1,
 def test_reduces_to_kaplan_meier_on_right_censored_data():
     eps = 1e-6
     obs = [Interval(t - eps, float(t)) if not c else Interval(float(t), INF)
-           for t, c in zip(FREIREICH_T, FREIREICH_C)]
+           for t, c in zip(FREIREICH_T, FREIREICH_C, strict=False)]
     est = fit(obs)
     km = kaplan_meier([Observation(float(t), not c)
-                       for t, c in zip(FREIREICH_T, FREIREICH_C)])
-    km_at = dict(zip(km.times, km.survival))
+                       for t, c in zip(FREIREICH_T, FREIREICH_C, strict=False)])
+    km_at = dict(zip(km.times, km.survival, strict=True))
     for t in (6, 7, 10, 13, 22, 23):
         s_turnbull = 1.0 - est.cdf_upper(float(t))
         assert abs(s_turnbull - km_at[float(t)]) < 1e-6, (
@@ -37,7 +40,7 @@ def test_exact_observations_give_the_empirical_distribution():
     eps = 1e-9
     obs = [Interval(t - eps, float(t)) for t in (1, 1, 2, 3, 3, 3)]
     est = fit(obs)
-    got = {round(hi): m for (lo, hi), m in zip(est.support, est.mass)}
+    got = {round(hi): m for (lo, hi), m in zip(est.support, est.mass, strict=True)}
     assert got == {1: pytest.approx(2 / 6), 2: pytest.approx(1 / 6),
                    3: pytest.approx(3 / 6)}
 

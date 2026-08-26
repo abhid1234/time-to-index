@@ -23,9 +23,8 @@ import time
 
 from . import report
 from .ledger import Ledger
-from .metrics import (fmt_duration, fmt_pair, logrank, observations, score,
-                      staleness_by_rung)
-from .models import ABSENT, ERROR, FRESH, STALE, Event, ProbeResult
+from .metrics import fmt_duration, fmt_pair, logrank, observations, score, staleness_by_rung
+from .models import ABSENT, FRESH, STALE, Event, ProbeResult
 
 # (arm, median latency in seconds, sigma, ceiling on ever indexing,
 #  probability of returning the superseded answer while un-indexed)

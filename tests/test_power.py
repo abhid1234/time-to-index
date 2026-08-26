@@ -5,14 +5,22 @@ textbook, which is the point: the arithmetic here decides whether the repo
 says "A is faster than B" or "not yet", and it should be checkable against
 something other than itself.
 """
-import pathlib, sys
+import pathlib
+import sys
+
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 import pytest
 
 from tti.metrics import Observation, logrank
-from tti.power import (achieved_power, analyse, events_for_power, hazard_ratio,
-                       proportions_n, _ppf)
+from tti.power import (
+    _ppf,
+    achieved_power,
+    analyse,
+    events_for_power,
+    hazard_ratio,
+    proportions_n,
+)
 
 
 def test_schoenfeld_matches_published_values():

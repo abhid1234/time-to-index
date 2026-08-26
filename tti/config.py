@@ -35,7 +35,7 @@ _cache: dict[str, Any] = {}
 
 def load(name: str) -> Any:
     if name not in _cache:
-        with open(DATA / f"{name}.yaml", "r", encoding="utf-8") as fh:
+        with open(DATA / f"{name}.yaml", encoding="utf-8") as fh:
             _cache[name] = yaml.safe_load(fh)
     return _cache[name]
 

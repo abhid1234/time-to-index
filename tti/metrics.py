@@ -24,10 +24,8 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 
 from .models import ABSENT, ERROR, FRESH, SKIPPED, STALE, Event, ProbeResult
-from .survival import INF, Interval, NPMLE
-from .survival import bootstrap_quantile
+from .survival import NPMLE, Interval, bootstrap_quantile, intervals_from_ladder
 from .survival import fit as turnbull_fit
-from .survival import intervals_from_ladder
 
 Z95 = 1.959963984540054
 
@@ -75,7 +73,7 @@ class SurvivalCurve:
         which is the honest answer for a provider that indexed under half of
         the corpus inside the observation window."""
         target = 1.0 - q
-        for t, s in zip(self.times, self.survival):
+        for t, s in zip(self.times, self.survival, strict=True):
             if s <= target + 1e-12:
                 return t
         return None
@@ -83,7 +81,7 @@ class SurvivalCurve:
     def at(self, t: float) -> float:
         """P(indexed by t)."""
         s = 1.0
-        for ti, si in zip(self.times, self.survival):
+        for ti, si in zip(self.times, self.survival, strict=True):
             if ti <= t:
                 s = si
             else:
@@ -203,6 +201,12 @@ class ProviderScore:
     # were not on the web yet.
     conditional_recall_24h: tuple[float, float, float] = (float("nan"),) * 3
     n_origin_confirmed: int = 0
+    # Of the events where at least one wording came back fresh, the share of
+    # wordings that did. 100% means the arm is phrasing-insensitive at the
+    # probed rung; a low number means it has the document and does not
+    # reliably surface it, which is a different failure from not having it.
+    phrasing_agreement: tuple[float, float, float] = (float("nan"),) * 3
+    n_phrasings_asked: int = 0
     staleness: tuple[float, float, float] = (float("nan"),) * 3
     n_stale_eligible: int = 0
     n_stale: int = 0
@@ -229,7 +233,7 @@ def observations(
     first_fresh: dict[str, float] = {}
     last_probed: dict[str, float] = {}
     for r in results:
-        if r.provider != provider or r.mode != mode:
+        if r.provider != provider or r.mode != mode or r.phrasing:
             continue
         if r.verdict in (ERROR, SKIPPED):
             continue
@@ -268,7 +272,7 @@ def intervals(
     """
     by_event: dict[str, list[tuple[float, bool]]] = {}
     for r in results:
-        if r.provider != provider or r.mode != mode:
+        if r.provider != provider or r.mode != mode or r.phrasing:
             continue
         if r.verdict in (ERROR, SKIPPED):
             continue
@@ -287,6 +291,40 @@ def intervals(
 ORIGIN = "origin"
 
 
+def phrasing_agreement(
+    events: dict[str, Event],
+    results: list[ProbeResult],
+    provider: str,
+    mode: str,
+    source_class: str | None = None,
+) -> tuple[int, int]:
+    """(fresh wordings, wordings asked) over events where any wording worked.
+
+    Restricted to (event, rung) cells that were probed with more than one
+    wording, and to cells where at least one came back fresh. Cells where no
+    wording worked are excluded on purpose: they say the document was not
+    indexed yet, which is time-to-index's job, not this metric's.
+    """
+    cells: dict[tuple[str, int], list[bool]] = {}
+    for r in results:
+        if r.provider != provider or r.mode != mode:
+            continue
+        if r.verdict in (ERROR, SKIPPED):
+            continue
+        ev = events.get(r.event_id)
+        if ev is None or (source_class and ev.source_class != source_class):
+            continue
+        cells.setdefault((r.event_id, r.rung), []).append(r.verdict == FRESH)
+
+    hits = asked = 0
+    for outcomes in cells.values():
+        if len(outcomes) < 2 or not any(outcomes):
+            continue
+        asked += len(outcomes)
+        hits += sum(outcomes)
+    return hits, asked
+
+
 def origin_confirmed_by(
     events: dict[str, Event],
     results: list[ProbeResult],
@@ -302,7 +340,7 @@ def origin_confirmed_by(
     """
     out: set[str] = set()
     for r in results:
-        if r.provider != ORIGIN or r.verdict != FRESH or r.lag > horizon:
+        if r.provider != ORIGIN or r.verdict != FRESH or r.lag > horizon or r.phrasing:
             continue
         ev = events.get(r.event_id)
         if ev is None or (source_class and ev.source_class != source_class):
@@ -351,7 +389,7 @@ def score(
         first_fresh: dict[str, float] = {}
         observed: set[str] = set()
         for r in results:
-            if r.provider != provider or r.mode != mode:
+            if r.provider != provider or r.mode != mode or r.phrasing:
                 continue
             if r.event_id not in confirmed or r.verdict in (ERROR, SKIPPED):
                 continue
@@ -371,7 +409,7 @@ def score(
     stale = eligible = 0
     lat: list[int] = []
     for r in results:
-        if r.provider != provider or r.mode != mode:
+        if r.provider != provider or r.mode != mode or r.phrasing:
             continue
         ev = events.get(r.event_id)
         if ev is None or (source_class and ev.source_class != source_class):
@@ -393,6 +431,11 @@ def score(
                 stale += 1
     fresh_24h = sum(1 for o in obs if o.indexed and o.time <= 86_400)
     sc.cost_per_fresh_24h = (sc.spend_usd / fresh_24h) if fresh_24h else float("inf")
+
+    ph_hits, ph_asked = phrasing_agreement(events, results, provider, mode, source_class)
+    sc.n_phrasings_asked = ph_asked
+    if ph_asked:
+        sc.phrasing_agreement = wilson(ph_hits, ph_asked)
 
     sc.n_stale, sc.n_stale_eligible = stale, eligible
     sc.staleness = wilson(stale, eligible)
@@ -451,7 +494,7 @@ def staleness_by_rung(
     """
     buckets: dict[int, list[int]] = {}
     for r in results:
-        if r.provider != provider or r.mode != mode:
+        if r.provider != provider or r.mode != mode or r.phrasing:
             continue
         if r.verdict not in (STALE, ABSENT):
             continue

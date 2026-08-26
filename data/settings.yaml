@@ -39,3 +39,14 @@ arms:
   - {provider: tavily,   mode: basic}
   - {provider: brave,    mode: web}
   - {provider: serper,   mode: search}
+
+# Optional second axis: ask the same event, at the same rung, more than one
+# way. A provider that returns the new fact for one wording and not another
+# has the document and does not reliably surface it -- a different failure
+# from not having it, and one an agent hits far more often than a benchmark
+# does. Off by default: three wordings at every rung triples the bill, while
+# three at one rung adds two probes per event.
+phrasing_probe:
+  enabled: false
+  rungs: [3600]
+  variants: 3

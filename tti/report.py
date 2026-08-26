@@ -18,8 +18,13 @@ import datetime as dt
 import html
 import math
 
-from .metrics import (ProviderScore, SurvivalCurve, fmt_bracket, fmt_duration,
-                      fmt_pair, logrank, observations)
+from .metrics import (
+    ProviderScore,
+    SurvivalCurve,
+    fmt_bracket,
+    fmt_duration,
+    fmt_pair,
+)
 from .models import Event, ProbeResult
 
 W, H = 720, 300
@@ -55,7 +60,7 @@ def _steps(curve: SurvivalCurve, tmin: float, tmax: float) -> str:
     observations between rungs that do not exist."""
     pts = [(_x(tmin, tmin, tmax), _y(0.0))]
     prev = 0.0
-    for t, s in zip(curve.times, curve.survival):
+    for t, s in zip(curve.times, curve.survival, strict=True):
         p = 1.0 - s
         x = _x(t, tmin, tmax)
         pts.append((x, _y(prev)))
@@ -69,7 +74,7 @@ def _band(curve: SurvivalCurve, tmin: float, tmax: float) -> str:
     if not curve.times:
         return ""
     up, down = [], []
-    for t, lo, hi in zip(curve.times, curve.lower, curve.upper):
+    for t, lo, hi in zip(curve.times, curve.lower, curve.upper, strict=True):
         x = _x(t, tmin, tmax)
         up.append((x, _y(1.0 - hi)))
         down.append((x, _y(1.0 - lo)))
@@ -147,7 +152,7 @@ def staleness_svg(series: list[tuple[str, list[tuple[int, float, int]]]],
         parts.append(f'<text x="{PAD_L-8}" y="{y+3:.1f}" font-size="10" '
                      f'text-anchor="end" fill="var(--muted)">{int(pv*100)}%</text>')
 
-    for i, (name, pts) in enumerate(series):
+    for i, (_name, pts) in enumerate(series):
         if not pts:
             continue
         colour = PALETTE[i % len(PALETTE)]
@@ -155,7 +160,7 @@ def staleness_svg(series: list[tuple[str, list[tuple[int, float, int]]]],
                           for r, rate, _ in pts)
         parts.append(f'<polyline points="{coords}" fill="none" stroke="{colour}" '
                      f'stroke-width="2" stroke-linejoin="round"/>')
-        for r, rate, n in pts:
+        for r, rate, _n in pts:
             parts.append(f'<circle cx="{_x(float(r), tmin, tmax):.1f}" '
                          f'cy="{_y(rate):.1f}" r="2.5" fill="{colour}"/>')
     parts.append(f'<text x="{PAD_L}" y="{H-6}" font-size="10" fill="var(--muted)">'
@@ -199,15 +204,16 @@ def leaderboard_md(scores: list[ProviderScore], rungs: list[int] | None = None) 
     rungs = rungs or [300, 900, 3600, 21600, 86400, 259200]
     rows = [
         "| provider | median TTI | p90 | 24h recall | staleness "
-        "| $/1k fresh answers | n |",
-        "|---|---|---|---|---|---|---|",
+        "| $/1k events | $/1k fresh answers | n |",
+        "|---|---|---|---|---|---|---|---|",
     ]
     for sc in sorted(scores, key=lambda s: (s.median_ttl is None, s.median_ttl or 0)):
         per_1k = (sc.spend_usd / sc.n_events * 1000) if sc.n_events else 0.0
         rows.append(
             f"| `{sc.provider}/{sc.mode}` | {fmt_pair(sc.median_bracket)} "
             f"| {fmt_pair(sc.p90_bracket)} | {_pct(sc.recall_24h)} "
-            f"| {_pct(sc.staleness)} | {_cpf(sc.cost_per_fresh_24h)} | {sc.n_events} |"
+            f"| {_pct(sc.staleness)} | ${per_1k:.2f} "
+            f"| {_cpf(sc.cost_per_fresh_24h)} | {sc.n_events} |"
         )
     return "\n".join(rows)
 
@@ -327,13 +333,34 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
     gen = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     ordered = sorted(scores, key=lambda s: (s.median_ttl is None, s.median_ttl or 0))
 
+    any_phrasing = any(s.n_phrasings_asked for s in scores)
+    ph_head = ("<th>phrasing<br><span style='text-transform:none;letter-spacing:0'>"
+               "agreement</span></th>" if any_phrasing else "")
+    ph_note = ("" if not any_phrasing else
+               "<p class='note'>Phrasing agreement asks the same event, at the same rung, "
+               "more than one way, and reports the share of wordings that came back fresh "
+               "among events where at least one did. An arm at 100% is phrasing-insensitive "
+               "here. A low number means it <i>has</i> the document and does not reliably "
+               "surface it &#8212; a different failure from not having it, and one an agent hits "
+               "far more often than a benchmark does, because an agent asks whatever its "
+               "planner produced that turn rather than what a template would write.</p>")
+
+    non_converged = [f"{s.provider}/{s.mode}" for s in scores
+                     if s.npmle.n and not s.npmle.converged]
+    converge_note = ("" if not non_converged else
+                     "<p class='note' style='border-color:var(--bad)'><b>The estimator did "
+                     "not converge</b> for " + e(", ".join(non_converged)) + ". Their medians "
+                     "and intervals are not trustworthy and should not be read as results. "
+                     "This is surfaced rather than swallowed because a non-converged fit "
+                     "still renders a plausible-looking number.</p>")
+
     legend = "".join(
         f'<span><i style="background:{PALETTE[i % len(PALETTE)]}"></i>'
         f'{e(sc.provider)}/{e(sc.mode)}</span>'
         for i, sc in enumerate(ordered))
 
     rows = "".join(
-        f"<tr><td class='k'>{e(sc.provider)}/{e(sc.mode)}</td>"
+        (f"<tr><td class='k'>{e(sc.provider)}/{e(sc.mode)}</td>"
         f"<td class='k'>{fmt_pair(sc.median_bracket)}</td>"
         f"<td class='k'>{_ci(sc)}</td>"
         f"<td class='k'>{fmt_pair(sc.p90_bracket)}</td>"
@@ -341,10 +368,11 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
         f"<td class='k'>{_pct(sc.conditional_recall_24h)}</td>"
         f"<td class='k{' bad' if sc.staleness[0] == sc.staleness[0] and sc.staleness[0] > 0.2 else ''}'>"
         f"{_pct(sc.staleness)}</td>"
-        f"<td class='k'>{sc.p50_latency_ms:.0f}ms</td>"
+        + (f"<td class='k'>{_pct(sc.phrasing_agreement)}</td>" if any_phrasing else "")
+        + f"<td class='k'>{sc.p50_latency_ms:.0f}ms</td>"
         f"<td class='k'>${(sc.spend_usd / sc.n_events * 1000) if sc.n_events else 0:.2f}</td>"
-        f"<td class='k'>{_cpf(sc.cost_per_fresh_24h)}</td>"
-        f"<td class='k'>{sc.n_events}</td></tr>"
+        + f"<td class='k'>{_cpf(sc.cost_per_fresh_24h)}</td>"
+        + f"<td class='k'>{sc.n_events}</td></tr>")
         for sc in ordered)
 
     class_blocks = ""
@@ -458,10 +486,12 @@ Generated {gen}.</p>
     <th>95% CI<br><span style="text-transform:none;letter-spacing:0">on the median</span></th>
     <th>p90</th><th>24h recall</th>
     <th>24h recall<br><span style="text-transform:none;letter-spacing:0">vs origin</span></th>
-    <th>staleness</th><th>p50 latency</th><th>$/1k events</th>
+    <th>staleness</th>{ph_head}<th>p50 latency</th><th>$/1k events</th>
     <th>$/1k fresh<br><span style="text-transform:none;letter-spacing:0">answers</span></th>
     <th>events</th></tr></thead>
     <tbody>{rows}</tbody></table></div>
+  {converge_note}
+  {ph_note}
   <p class="note">The CI column is a nonparametric bootstrap on the median bracket's
   upper edge. It is here because a median printed without one is the most common way a
   short run gets over-read: at forty events, a bracket can land a rung either side on

@@ -31,7 +31,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
-from .metrics import Observation, Z95
+from .metrics import Z95, Observation
 
 # z for 80% power, one-sided beta
 Z80 = 0.8416212335729143

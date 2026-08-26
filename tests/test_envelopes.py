@@ -11,7 +11,9 @@ into evidence, so both directions are pinned here.
 These are shapes, not captured responses. They assert what *this repo's* code
 does with a given structure, and nothing about any vendor's actual output.
 """
-import pathlib, sys
+import pathlib
+import sys
+
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 import pytest

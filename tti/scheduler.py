@@ -36,7 +36,7 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass
 
-from . import config, control, providers, sources
+from . import config, control, phrasing, providers, sources
 from .budget import Budget, BudgetExceeded, unit_cost, utc_day
 from .grader import grade
 from .ledger import Ledger
@@ -120,6 +120,26 @@ def discover(ledger: Ledger, source_names: list[str] | None = None,
               due_at=e.published_at + r)
         for e in added for (p, m) in arms for r in ladder
     ]
+
+    # Optional second axis: the same event, rung and provider asked more than
+    # one way. Rung-limited by configuration because three phrasings at every
+    # rung triples the bill, while three phrasings at one rung adds two probes
+    # per event. The control arm is excluded -- it fetches a URL and never
+    # sees a question.
+    ph = s.get("phrasing_probe") or {}
+    if ph.get("enabled"):
+        ph_rungs = [int(r) for r in ph.get("rungs", [3600])]
+        ph_max = int(ph.get("variants", 3))
+        for e in added:
+            n = min(phrasing.count(e), ph_max)
+            for (p, m) in arms:
+                if p == "origin":
+                    continue
+                for r in ph_rungs:
+                    for idx in range(1, n):
+                        queued.append(Probe(
+                            event_id=e.event_id, provider=p, mode=m, rung=r,
+                            due_at=e.published_at + r, phrasing=idx))
     rep.probes_queued = len(ledger.add_probes(queued))
     return rep
 
@@ -164,7 +184,10 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
         event = events[probe.event_id]
         lag = now - event.published_at
 
-        if (probe.event_id, probe.provider, probe.mode) in resolved:
+        # Carry-forward is per phrasing. A provider that answers one wording
+        # and not another has not "already resolved" the others, and skipping
+        # them would erase the only evidence of that.
+        if not probe.phrasing and (probe.event_id, probe.provider, probe.mode) in resolved:
             out.append(_skip(probe, event, now, lag, "carry-forward: already FRESH"))
             rep.skipped_carry += 1
             continue
@@ -199,8 +222,13 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
             if is_control:
                 payload = control.probe_origin(event)
             else:
+                question = (event.question if not probe.phrasing
+                            else phrasing.variant(event, probe.phrasing))
+                if question is None:
+                    raise RuntimeError(
+                        f"phrasing {probe.phrasing} unavailable for {event.source}")
                 payload = providers.get(probe.provider).search(
-                    event.question, probe.mode,
+                    question, probe.mode,
                     max_results=max_results, max_chars=max_chars)
         except Exception as exc:  # noqa: BLE001
             out.append(ProbeResult(
@@ -229,6 +257,7 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
         out.append(ProbeResult(
             probe_id=probe.probe_id, event_id=event.event_id,
             provider=probe.provider, mode=probe.mode, rung=probe.rung,
+            phrasing=probe.phrasing,
             requested_at=now, lag=lag, verdict=verdict, latency_ms=latency,
             matched_fresh=fresh_hits, matched_stale=stale_hits,
             n_results=_count_results(payload), chars=chars,
@@ -238,7 +267,8 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
         rep.spend_usd += cost
         if verdict == FRESH:
             rep.fresh += 1
-            resolved.add((probe.event_id, probe.provider, probe.mode))
+            if not probe.phrasing:
+                resolved.add((probe.event_id, probe.provider, probe.mode))
         elif verdict == STALE:
             rep.stale += 1
             if verbose:
@@ -255,8 +285,8 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
 def _skip(probe: Probe, event: Event, now: float, lag: float, note: str) -> ProbeResult:
     return ProbeResult(
         probe_id=probe.probe_id, event_id=event.event_id, provider=probe.provider,
-        mode=probe.mode, rung=probe.rung, requested_at=now, lag=lag,
-        verdict=SKIPPED, cost_usd=0.0, note=note)
+        mode=probe.mode, rung=probe.rung, phrasing=probe.phrasing,
+        requested_at=now, lag=lag, verdict=SKIPPED, cost_usd=0.0, note=note)
 
 
 def _count_results(payload) -> int:

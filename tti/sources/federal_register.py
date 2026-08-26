@@ -15,7 +15,7 @@ from __future__ import annotations
 import datetime as dt
 import time
 
-from .. import config, http
+from .. import http
 from ..models import Event
 from . import BaseSource, register
 

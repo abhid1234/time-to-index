@@ -4,7 +4,9 @@ The distinctions under test all collapse into "the provider missed it" if
 they are got wrong, which is the single easiest way for this benchmark to
 publish a number that blames a vendor for the open web.
 """
-import pathlib, sys
+import pathlib
+import sys
+
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 import pytest
@@ -20,9 +22,9 @@ def no_robots(monkeypatch):
 
 
 def ev(**kw):
-    base = dict(source="npm", source_class="package_registry", subject="p",
-                published_at=0.0, discovered_at=1.0, question="q", answer="15.4.2",
-                url="https://page.test/p")
+    base = {"source": "npm", "source_class": "package_registry", "subject": "p",
+            "published_at": 0.0, "discovered_at": 1.0, "question": "q",
+            "answer": "15.4.2", "url": "https://page.test/p"}
     base.update(kw)
     return Event(**base)
 

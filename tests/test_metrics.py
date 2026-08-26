@@ -1,8 +1,11 @@
-import sys, pathlib, math
+import pathlib
+import sys
+
 import pytest
+
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-from tti.metrics import Observation, kaplan_meier, logrank, wilson, fmt_duration
+from tti.metrics import Observation, fmt_duration, kaplan_meier, logrank, wilson
 
 
 def test_wilson_bounds_stay_sane_at_extremes():
@@ -17,10 +20,10 @@ def test_km_matches_textbook_freireich():
     # product-limit estimator. + marks censoring.
     times = [6, 6, 6, 6, 7, 9, 10, 10, 11, 13, 16, 17, 19, 20, 22, 23, 25, 32, 32, 34, 35]
     cens  = [0, 0, 0, 1, 0, 1,  0,  1,  1,  0,  0,  1,  1,  1,  0,  0,  1,  1,  1,  1,  1]
-    obs = [Observation(float(t), not c) for t, c in zip(times, cens)]
+    obs = [Observation(float(t), not c) for t, c in zip(times, cens, strict=False)]
     km = kaplan_meier(obs)
     # Published values: S(6)=0.857, S(7)=0.807, S(10)=0.753, S(13)=0.690, S(22)=0.538, S(23)=0.448
-    got = dict(zip(km.times, km.survival))
+    got = dict(zip(km.times, km.survival, strict=True))
     for t, expected in [(6, 0.857), (7, 0.807), (10, 0.753), (13, 0.690), (22, 0.538), (23, 0.448)]:
         assert abs(got[float(t)] - expected) < 0.002, (t, got[float(t)], expected)
     assert km.quantile(0.5) == 23.0   # published median survival is 23 weeks
@@ -38,7 +41,7 @@ def test_censoring_bias_is_the_thing_we_avoid():
 def test_km_confidence_band_stays_in_unit_interval():
     obs = [Observation(float(i), i % 3 != 0) for i in range(1, 40)]
     km = kaplan_meier(obs)
-    assert all(0.0 <= lo <= hi <= 1.0 for lo, hi in zip(km.lower, km.upper))
+    assert all(0.0 <= lo <= hi <= 1.0 for lo, hi in zip(km.lower, km.upper, strict=True))
 
 
 def test_logrank_separates_obvious_and_not_subtle():
