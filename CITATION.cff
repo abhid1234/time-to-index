@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: "Time to Index: a freshness and staleness benchmark for web-search APIs"
+message: "If you use this benchmark or its method, please cite it."
+type: software
+authors:
+  - family-names: Das
+    given-names: Abhijit
+repository-code: "https://github.com/abhid1234/time-to-index"
+license: MIT
+version: 0.1.0
+abstract: >-
+  Measures how long a newly published fact takes to become retrievable through
+  each web-search API, and how often the API confidently returns the answer it
+  replaced. Ground truth comes from sources that stamp their own publication
+  time. Latency is estimated with Turnbull's nonparametric MLE for
+  interval-censored data; an origin control arm separates provider indexing
+  lag from the document's own availability on the web.
+keywords:
+  - information retrieval
+  - search
+  - benchmark
+  - freshness
+  - survival analysis
+  - interval censoring

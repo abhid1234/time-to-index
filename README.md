@@ -26,12 +26,19 @@ it is wrong.
    is never used.
 2. **Build a question only the new content answers,** from the event's own
    metadata — never from any provider's output.
-3. **Ask every provider at t+5m, +15m, +1h, +6h, +24h, +72h.**
+3. **Ask every provider at t+5m, +15m, +1h, +6h, +24h, +72h** — and at every
+   rung, fetch the canonical URL directly as a control, so "the provider was
+   slow" is never confused with "the document was not on the web yet".
 4. **Grade FRESH / STALE / ABSENT** against the new answer token and the one
    it replaced.
-5. **Estimate with Kaplan–Meier**, right-censored at 72 hours, because most
-   events are still un-indexed when the window closes and dropping them
-   reports every provider as faster than it is.
+5. **Estimate with Turnbull's NPMLE for interval-censored data.** An arm seen
+   absent at 15m and fresh at 1h indexed somewhere in (15m, 1h]; it did not
+   index *at* 1h. Kaplan–Meier needs a point event time and would overstate
+   every latency, and it cannot represent a widened interval at all when a
+   probe is dropped.
+6. **Say when the numbers can't carry a claim.** `tti power` reports the
+   hazard ratio, the achieved power, and how many more days of collection a
+   real comparison would take.
 
 Full design, and everything that could make the numbers wrong, in
 [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md).
@@ -66,8 +73,14 @@ tti doctor                # is every source and provider reachable
 tti discover              # poll sources, enqueue the ladder
 tti probe                 # run whatever is due
 tti status                # queue depth and today's spend
+tti power                 # can this run support the claim it invites?
 tti report                # write RESULTS.md and docs/index.html
 ```
+
+The control arm runs automatically and costs nothing — it is a plain HTTP GET
+per event per rung, robots.txt honoured, and the spend cap never refuses it.
+Losing it would be the worst possible economy: without it, every ABSENT from
+every paid provider is ambiguous.
 
 `discover` and `probe` are the two that belong on a timer; both are idempotent
 and safe to re-run. Everything else is read-only over the ledger.
@@ -129,16 +142,39 @@ commit and a note in `RESULTS.md`, not a quiet re-render.
 pytest -q
 ```
 
-21 tests. The ones that matter:
+72 tests. The ones that matter:
 
-- Kaplan–Meier checked against the published values for the Freireich 1963
-  6-MP arm, the standard worked example for the product-limit estimator.
-- The `15.4.1`-inside-`15.4.10` substring trap, which silently inflates
-  freshness scores on exactly the packages that ship most often.
-- A full pipeline run against a scripted provider on a virtual clock,
-  asserting the estimator recovers a 1-hour indexing latency it was never
-  told, that carry-forward stops paying once an arm is FRESH, and that the
-  budget cap refuses rather than truncates.
+- **Turnbull reduces to Kaplan–Meier** on right-censored data — a theorem, so
+  running it on the Freireich 1963 6-MP arm ties the reported estimator to
+  published values rather than to my own arithmetic. Kaplan–Meier itself is
+  checked against those values separately.
+- **A missing rung widens rather than shifts.** Two arms index identically;
+  one had probes dropped. The bracket gets wider, the upper bound does not
+  move.
+- **Schoenfeld sample sizes** against the standard tables: 66 events for a
+  hazard ratio of 2, 191 for 1.5, 945 for 1.2.
+- **The `15.4.1`-inside-`15.4.10` substring trap**, which silently inflates
+  freshness on exactly the packages that ship most often — and its twin, the
+  `v15.4.2` prefix, which a strict word boundary rejects even though the
+  answer is plainly there. Both directions are pinned.
+- **403 is `blocked`, not `absent`.** An origin refusing our client says
+  nothing about whether a crawler can reach it, and scoring it as "not on the
+  web" would let a bot-walled page make every provider look slow.
+- **Non-content fields are never evidence** — URLs, ids, request ids, and our
+  own query echoed back.
+- **A full pipeline run** against a scripted provider on a virtual clock:
+  the estimator recovers a 1-hour indexing latency it was never told,
+  carry-forward stops paying once an arm is FRESH, and the budget cap refuses
+  rather than truncates.
+
+## Notes from building it
+
+[`docs/INTEGRATION-NOTES.md`](docs/INTEGRATION-NOTES.md) records the friction
+of wiring up each source and provider — what the docs got wrong, what needed
+a contact header, what returns 403 to a non-browser client. It is the most
+reusable thing a benchmark produces and the part that usually goes unwritten.
+Everything in it is marked **Observed** (hit while building this, reproducible
+from it) or **Open** (a question a real run will answer, and has not yet).
 
 ## License
 

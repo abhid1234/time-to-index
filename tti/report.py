@@ -19,7 +19,7 @@ import html
 import math
 
 from .metrics import (ProviderScore, SurvivalCurve, fmt_bracket, fmt_duration,
-                      logrank, observations)
+                      fmt_pair, logrank, observations)
 from .models import Event, ProbeResult
 
 W, H = 720, 300
@@ -117,9 +117,65 @@ def survival_svg(scores: list[ProviderScore], title: str = "") -> str:
     return "\n".join(parts)
 
 
+def staleness_svg(series: list[tuple[str, list[tuple[int, float, int]]]],
+                  rungs: list[int]) -> str:
+    """Staleness against lag, one line per arm.
+
+    Plotted on the same log-x as the survival chart so the two read as one
+    system. The y-axis is fixed to [0, 1] rather than scaled to the data:
+    auto-scaling a rate makes a 4% staleness look like a crisis and is the
+    most common way a chart lies without anyone deciding to.
+    """
+    if not any(pts for _, pts in series):
+        return ""
+    tmin, tmax = float(rungs[0]), float(rungs[-1])
+    parts = [f'<svg viewBox="0 0 {W} {H}" width="100%" role="img" '
+             f'aria-label="staleness by lag" '
+             f'style="max-width:{W}px;font-family:var(--mono)">']
+    for t, lbl in TICKS:
+        if not (tmin <= t <= tmax):
+            continue
+        x = _x(t, tmin, tmax)
+        parts.append(f'<line x1="{x:.1f}" y1="{PAD_T}" x2="{x:.1f}" y2="{_y(0)}" '
+                     f'stroke="var(--grid)" stroke-width="1"/>')
+        parts.append(f'<text x="{x:.1f}" y="{_y(0)+16:.0f}" font-size="10" '
+                     f'text-anchor="middle" fill="var(--muted)">{lbl}</text>')
+    for pv in (0.0, 0.25, 0.5, 0.75, 1.0):
+        y = _y(pv)
+        parts.append(f'<line x1="{PAD_L}" y1="{y:.1f}" x2="{W-PAD_R}" y2="{y:.1f}" '
+                     f'stroke="var(--grid)" stroke-width="1"/>')
+        parts.append(f'<text x="{PAD_L-8}" y="{y+3:.1f}" font-size="10" '
+                     f'text-anchor="end" fill="var(--muted)">{int(pv*100)}%</text>')
+
+    for i, (name, pts) in enumerate(series):
+        if not pts:
+            continue
+        colour = PALETTE[i % len(PALETTE)]
+        coords = " ".join(f"{_x(float(r), tmin, tmax):.1f},{_y(rate):.1f}"
+                          for r, rate, _ in pts)
+        parts.append(f'<polyline points="{coords}" fill="none" stroke="{colour}" '
+                     f'stroke-width="2" stroke-linejoin="round"/>')
+        for r, rate, n in pts:
+            parts.append(f'<circle cx="{_x(float(r), tmin, tmax):.1f}" '
+                         f'cy="{_y(rate):.1f}" r="2.5" fill="{colour}"/>')
+    parts.append(f'<text x="{PAD_L}" y="{H-6}" font-size="10" fill="var(--muted)">'
+                 f'lag since publication (log scale) &#183; share of not-yet-fresh '
+                 f'probes that returned the superseded answer</text>')
+    parts.append("</svg>")
+    return "\n".join(parts)
+
+
 # ---------------------------------------------------------------------------
 # Markdown
 # ---------------------------------------------------------------------------
+
+def _cpf(v: float) -> str:
+    if v != v:
+        return "—"
+    if v == float("inf"):
+        return "no answers"
+    return f"${v*1000:.2f}"
+
 
 def _pct(t: tuple[float, float, float]) -> str:
     p, lo, hi = t
@@ -131,15 +187,16 @@ def _pct(t: tuple[float, float, float]) -> str:
 def leaderboard_md(scores: list[ProviderScore], rungs: list[int] | None = None) -> str:
     rungs = rungs or [300, 900, 3600, 21600, 86400, 259200]
     rows = [
-        "| provider | median TTI | p90 | 24h recall | staleness | $/1k events | n |",
+        "| provider | median TTI | p90 | 24h recall | staleness "
+        "| $/1k fresh answers | n |",
         "|---|---|---|---|---|---|---|",
     ]
     for sc in sorted(scores, key=lambda s: (s.median_ttl is None, s.median_ttl or 0)):
         per_1k = (sc.spend_usd / sc.n_events * 1000) if sc.n_events else 0.0
         rows.append(
-            f"| `{sc.provider}/{sc.mode}` | {fmt_bracket(rungs, sc.median_ttl)} "
-            f"| {fmt_bracket(rungs, sc.p90_ttl)} | {_pct(sc.recall_24h)} "
-            f"| {_pct(sc.staleness)} | ${per_1k:.2f} | {sc.n_events} |"
+            f"| `{sc.provider}/{sc.mode}` | {fmt_pair(sc.median_bracket)} "
+            f"| {fmt_pair(sc.p90_bracket)} | {_pct(sc.recall_24h)} "
+            f"| {_pct(sc.staleness)} | {_cpf(sc.cost_per_fresh_24h)} | {sc.n_events} |"
         )
     return "\n".join(rows)
 
@@ -236,9 +293,24 @@ def full_page(fragment: str, title: str = "Time to Index") -> str:
     )
 
 
+def _overstatement(sc: ProviderScore) -> str:
+    lo, hi = sc.median_bracket
+    km = sc.median_ttl
+    if km is None or hi is None or hi <= 0:
+        return "—"
+    # KM reports `km`; the NPMLE says the truth is somewhere in (lo, hi].
+    # The largest defensible claim is the gap to the bracket's lower edge.
+    gap = km - (lo or 0.0)
+    if gap <= 0:
+        return "none"
+    return f"up to {fmt_duration(gap)}"
+
+
 def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
                    results: list[ProbeResult], by_class: dict[str, list[ProviderScore]],
-                   pairs: list[tuple[str, str, float]]) -> str:
+                   pairs: list[tuple[str, str, float]],
+                   powers: list = (),
+                   stale_series: list = ()) -> str:
     e = html.escape
     gen = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     ordered = sorted(scores, key=lambda s: (s.median_ttl is None, s.median_ttl or 0))
@@ -250,13 +322,15 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
 
     rows = "".join(
         f"<tr><td class='k'>{e(sc.provider)}/{e(sc.mode)}</td>"
-        f"<td class='k'>{fmt_bracket(RUNGS, sc.median_ttl)}</td>"
-        f"<td class='k'>{fmt_bracket(RUNGS, sc.p90_ttl)}</td>"
+        f"<td class='k'>{fmt_pair(sc.median_bracket)}</td>"
+        f"<td class='k'>{fmt_pair(sc.p90_bracket)}</td>"
         f"<td class='k'>{_pct(sc.recall_24h)}</td>"
+        f"<td class='k'>{_pct(sc.conditional_recall_24h)}</td>"
         f"<td class='k{' bad' if sc.staleness[0] == sc.staleness[0] and sc.staleness[0] > 0.2 else ''}'>"
         f"{_pct(sc.staleness)}</td>"
         f"<td class='k'>{sc.p50_latency_ms:.0f}ms</td>"
         f"<td class='k'>${(sc.spend_usd / sc.n_events * 1000) if sc.n_events else 0:.2f}</td>"
+        f"<td class='k'>{_cpf(sc.cost_per_fresh_24h)}</td>"
         f"<td class='k'>{sc.n_events}</td></tr>"
         for sc in ordered)
 
@@ -266,7 +340,7 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
             continue
         crows = "".join(
             f"<tr><td class='k'>{e(c.provider)}/{e(c.mode)}</td>"
-            f"<td class='k'>{fmt_bracket(RUNGS, c.median_ttl)}</td>"
+            f"<td class='k'>{fmt_pair(c.median_bracket)}</td>"
             f"<td class='k'>{_pct(c.recall_24h)}</td>"
             f"<td class='k'>{_pct(c.staleness)}</td>"
             f"<td class='k'>{c.n_events}</td></tr>"
@@ -278,11 +352,56 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
             f"<th>24h recall</th><th>staleness</th><th>n</th></tr></thead>"
             f"<tbody>{crows}</tbody></table></div></div>")
 
-    pair_rows = "".join(
-        f"<tr><td class='k'>{e(a)} vs {e(b)}</td>"
-        f"<td class='k'>p = {p:.4f}</td>"
-        f"<td>{'distinguishable' if p < 0.05 else 'not distinguishable at this n'}</td></tr>"
-        for a, b, p in pairs) or "<tr><td colspan='3'>not enough events yet</td></tr>"
+    def _pw(r) -> str:
+        cells = [
+            f"<td class='k'>{e(r.a)} vs {e(r.b)}</td>",
+            f"<td class='k'>{'—' if r.hazard_ratio != r.hazard_ratio else f'{r.hazard_ratio:.2f}'}</td>",
+            f"<td class='k'>{r.events_observed}</td>",
+            f"<td class='k'>{'—' if r.p_value != r.p_value else f'{r.p_value:.4f}'}</td>",
+            f"<td class='k'>{'—' if r.power_now != r.power_now else f'{r.power_now*100:.0f}%'}</td>",
+        ]
+        if r.verdict == "distinguishable":
+            tail = "<td class='good'>distinguishable</td>"
+        elif r.events_needed and r.days_needed:
+            tail = (f"<td>{e(r.verdict)} — needs ~{r.events_needed:.0f} more events "
+                    f"(~{r.days_needed:.0f}d)</td>")
+        else:
+            tail = f"<td>{e(r.verdict)}</td>"
+        return "<tr>" + "".join(cells) + tail + "</tr>"
+
+    pair_rows = "".join(_pw(r) for r in powers) or (
+        "".join(
+            f"<tr><td class='k'>{e(a)} vs {e(b)}</td><td colspan='4' class='k'>p = {p:.4f}</td>"
+            f"<td>{'distinguishable' if p < 0.05 else 'not distinguishable at this n'}</td></tr>"
+            for a, b, p in pairs)
+        or "<tr><td colspan='6'>not enough events yet</td></tr>")
+
+    km_rows = "".join(
+        f"<tr><td class='k'>{e(sc.provider)}/{e(sc.mode)}</td>"
+        f"<td class='k'>{fmt_pair(sc.median_bracket)}</td>"
+        f"<td class='k'>{fmt_bracket(RUNGS, sc.median_ttl)}</td>"
+        f"<td class='k'>{_overstatement(sc)}</td></tr>"
+        for sc in ordered)
+
+    origin_counts: dict[str, int] = {}
+    for r in results:
+        if r.provider == "origin":
+            key = (r.note or "origin:unknown").split()[0].replace("origin:", "")
+            origin_counts[key] = origin_counts.get(key, 0) + 1
+    MEANING = {
+        "found": "fetchable, and the answer was in the served bytes",
+        "not_found": "page fetched, answer not in it — nobody could index it from here",
+        "blocked": "origin refused this client (403/429); fetchability not established",
+        "disallowed": "robots.txt excludes it; no crawler should have it",
+        "error": "network or protocol failure on our side",
+    }
+    origin_rows = "".join(
+        f"<tr><td class='k'>{e(k)}</td><td class='k'>{v}</td>"
+        f"<td>{e(MEANING.get(k, ''))}</td></tr>"
+        for k, v in sorted(origin_counts.items(), key=lambda kv: -kv[1])
+    ) or "<tr><td colspan='3'>control arm not run</td></tr>"
+    n_confirmed = max((s.n_origin_confirmed for s in scores), default=0)
+    stale_chart = staleness_svg(list(stale_series), RUNGS) if stale_series else ""
 
     stale_total = sum(s.n_stale for s in scores)
     stale_elig = sum(s.n_stale_eligible for s in scores)
@@ -302,21 +421,62 @@ Generated {gen}.</p>
 <div class="panel">
   <div class="scroll"><table>
     <thead><tr><th>arm</th><th>median TTI</th><th>p90</th><th>24h recall</th>
-    <th>staleness</th><th>p50 latency</th><th>$/1k events</th><th>events</th></tr></thead>
+    <th>24h recall<br><span style="text-transform:none;letter-spacing:0">vs origin</span></th>
+    <th>staleness</th><th>p50 latency</th><th>$/1k events</th>
+    <th>$/1k fresh<br><span style="text-transform:none;letter-spacing:0">answers</span></th>
+    <th>events</th></tr></thead>
     <tbody>{rows}</tbody></table></div>
-  <p class="note">Median is a Kaplan&#8211;Meier estimate with right-censoring at 72 hours,
-  reported as the interval between ladder rungs rather than a point. An arm first seen
-  fresh at the 1h rung indexed somewhere in (15m, 1h]; printing "1h" would overstate it
-  by up to the width of the bracket. Events still un-indexed at the last rung are
-  censored, not dropped &#8212; discarding them would report every provider as faster than
-  it is, and unevenly, since the bias is largest for whoever has the most un-indexed
-  events. <b>&gt;72h</b> means the arm never crossed 50% inside the window.</p>
+  <p class="note">Two cost columns, because they can disagree and the disagreement is
+  the point. Cost per <i>event</i> is what you pay to ask; cost per <i>fresh answer</i>
+  is what you pay to get one, and a provider that returns nothing does it very cheaply.
+  A freshness win bought at 5&#215; the price is a different product decision than a
+  freshness win at parity, and a leaderboard that hides the denominator is
+  advertising.</p>
+  <p class="note">Median is a Turnbull nonparametric MLE for interval-censored data,
+  reported as the interval the estimate actually pins down. An arm seen absent at 15m
+  and fresh at 1h indexed somewhere in (15m, 1h] &#8212; it did not index <i>at</i> 1h, and
+  printing a point would invent precision the ladder cannot supply. Events still
+  un-indexed at 72h are censored, not dropped: discarding them reports every provider
+  as faster than it is, and unevenly, since the bias is largest for whoever has the
+  most un-indexed events. <b>&gt;72h</b> means the arm never accumulated half its mass
+  inside the window, which is a different statement from "slow".</p>
 </div>
 
 <h2>Time to index</h2>
 <div class="panel">
   {survival_svg(ordered, "time to index, all sources")}
   <div class="legend">{legend}</div>
+</div>
+
+<h2>The control arm</h2>
+<div class="panel">
+  <p style="margin-top:0">At every rung, each event's canonical URL is also fetched
+  directly, with robots.txt honoured, and checked for the answer token. Of the events
+  in this run, <b>{n_confirmed}</b> were confirmed retrievable from their own origin
+  within 24 hours.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>origin outcome</th><th>events</th><th>what it means</th></tr></thead>
+    <tbody>{origin_rows}</tbody></table></div>
+  <p class="note">Without this arm, every ABSENT is ambiguous: a provider that does not
+  return the fact might have a slow crawler, or the fact might not be fetchable from its
+  own page yet. The <b>24h recall vs origin</b> column asks the question only of events
+  the control proved were on the web, and it is the column that is actually about the
+  provider. Origins that refused us or that robots.txt excludes are omitted from that
+  denominator rather than guessed at.</p>
+</div>
+
+<h2>Estimator check</h2>
+<div class="panel">
+  <div class="scroll"><table>
+    <thead><tr><th>arm</th><th>Turnbull (reported)</th><th>Kaplan&#8211;Meier on the rung</th>
+    <th>overstatement</th></tr></thead>
+    <tbody>{km_rows}</tbody></table></div>
+  <p class="note">Kaplan&#8211;Meier needs a point event time, so feeding it the rung records
+  an arm as indexing <i>at</i> the probe that first saw it. That overstates every latency
+  by up to a bracket width, and it cannot represent a widened interval at all when a
+  probe is dropped for budget, rung slip, or a provider error. This column is kept
+  visible rather than deleted: if the overstatement is ever small, the ladder is fine
+  enough that the choice of estimator does not matter, and that is worth knowing too.</p>
 </div>
 
 <h2>Staleness</h2>
@@ -329,6 +489,15 @@ Generated {gen}.</p>
   stale answer identically. In production they are not the same event. An agent that
   gets nothing back retries, widens, or says it does not know. An agent that gets last
   quarter's number back cites it, and nothing downstream can tell that it is wrong.</p>
+  {stale_chart}
+  <div class="legend">{legend}</div>
+  <p class="note" style="border-color:var(--muted)">Staleness should fall as an index
+  catches up, so the shape matters as much as the level. A line that stays flat means
+  the provider is holding a superseded answer with confidence rather than slowly
+  acquiring the new one &#8212; a different problem, and a worse one. Only questions with a
+  superseded answer count here; preprints and Federal Register documents have none, so
+  they are excluded by <code>Event.measures_staleness</code> rather than by
+  convention.</p>
 </div>
 
 <h2>By source class</h2>
@@ -337,11 +506,16 @@ Generated {gen}.</p>
 <h2>Are the differences real</h2>
 <div class="panel">
   <div class="scroll"><table>
-    <thead><tr><th>comparison</th><th>log-rank</th><th>read</th></tr></thead>
+    <thead><tr><th>comparison</th><th>hazard ratio</th><th>events</th><th>log-rank p</th>
+    <th>power</th><th>read</th></tr></thead>
     <tbody>{pair_rows}</tbody></table></div>
   <p class="note">Log-rank rather than a t-test on the indexed subset, because most
-  observations are censored and a test that ignores censoring will find differences
-  that are artefacts of who ran out of window first.</p>
+  observations are censored and a test that ignores censoring finds differences that are
+  artefacts of who ran out of window first. The power column is here because the honest
+  answer early in a run is "not yet", and a leaderboard invites a claim long before the
+  data can carry it: at the observed hazard ratio, Schoenfeld's formula says how many
+  events 80% power would take. A hazard ratio of 2 needs 66 events; a ratio of 1.2 needs
+  945.</p>
 </div>
 
 <footer>

@@ -22,6 +22,11 @@ max_detection_lag_seconds: 600
 # recorded at a rung it did not actually observe.
 max_rung_slip_seconds: 600
 
+# Fetch each event's canonical URL directly at every rung, to separate "the
+# provider was slow" from "the document was not on the web yet". Free, and
+# the arm most likely to change how the leaderboard reads.
+origin_control: true
+
 # Sources enabled for collection.
 sources: [npm, pypi, github_release, edgar, arxiv, federal_register]
 

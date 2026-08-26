@@ -70,6 +70,7 @@ class ArXiv(BaseSource):
                     answer_aliases=[ident, f"arXiv:{ident}", f"abs/{ident}"],
                     predecessor=None,
                     url=f"https://arxiv.org/abs/{ident}",
+                    origins=[f"https://arxiv.org/abs/{ident}"],
                     meta={"category": category, "title": title},
                 ))
             return out

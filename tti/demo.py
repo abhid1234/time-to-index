@@ -23,9 +23,9 @@ import time
 
 from . import report
 from .ledger import Ledger
-from .metrics import (bracket, fmt_bracket, fmt_duration, logrank,
-                      observations, score)
-from .models import ABSENT, FRESH, STALE, Event, ProbeResult
+from .metrics import (fmt_duration, fmt_pair, logrank, observations, score,
+                      staleness_by_rung)
+from .models import ABSENT, ERROR, FRESH, STALE, Event, ProbeResult
 
 # (arm, median latency in seconds, sigma, ceiling on ever indexing,
 #  probability of returning the superseded answer while un-indexed)
@@ -67,6 +67,35 @@ def generate(run_dir: pathlib.Path, ladder: list[int], seed: int = 7
 
     results: list[ProbeResult] = []
     truth: dict[str, list[float]] = {}   # arm -> the latencies actually drawn
+
+    # The origin control. Most facts are on their own page immediately; a
+    # minority of origins refuse a non-browser client, and a few pages never
+    # contain the fact at all because they render it client-side. Those
+    # proportions are invented, but the *shape* is what the real arm produced
+    # on live pages during development, and the panel exists to make that
+    # shape visible rather than to assert the numbers.
+    origin_state: dict[str, str] = {}
+    for ev in events:
+        roll = rng.random()
+        state = ("blocked" if roll < 0.14 else
+                 "not_found" if roll < 0.20 else "found")
+        origin_state[ev.event_id] = state
+        appears_at = rng.choice([0, 300, 300, 300, 900])
+        for rung in ladder:
+            if state == "blocked":
+                results.append(_r(ev, "origin", "direct", rung, "ERROR", 0.0, now,
+                                  note="origin:blocked"))
+                continue
+            if state == "not_found":
+                results.append(_r(ev, "origin", "direct", rung, ABSENT, 0.0, now,
+                                  note="origin:not_found"))
+                continue
+            if rung >= appears_at:
+                results.append(_r(ev, "origin", "direct", rung, FRESH, 0.0, now,
+                                  note="origin:found rank=0"))
+                break
+            results.append(_r(ev, "origin", "direct", rung, ABSENT, 0.0, now,
+                              note="origin:not_found"))
     for provider, mode, median, sigma, ceiling, stale_rate in PROFILES:
         mu = math.log(median)
         drawn: list[float] = []
@@ -108,7 +137,7 @@ def true_median(latencies: list[float]) -> float:
 
 
 def _r(ev: Event, provider: str, mode: str, rung: int, verdict: str,
-       cost: float, now: float) -> ProbeResult:
+       cost: float, now: float, note: str = "") -> ProbeResult:
     return ProbeResult(
         probe_id=f"{ev.event_id}-{provider}-{rung}", event_id=ev.event_id,
         provider=provider, mode=mode, rung=rung,
@@ -116,7 +145,7 @@ def _r(ev: Event, provider: str, mode: str, rung: int, verdict: str,
         latency_ms=random.Random(hash((provider, rung)) & 0xFFFF).randint(300, 2400),
         matched_stale=[ev.predecessor] if verdict == STALE and ev.predecessor else [],
         matched_fresh=[ev.answer] if verdict == FRESH else [],
-        n_results=5, cost_usd=cost, raw_ref="")
+        n_results=5, cost_usd=cost, raw_ref="", note=note)
 
 
 BANNER = """
@@ -135,7 +164,7 @@ nothing here is a finding about any product. Real runs are published at
 def render(run_dir: pathlib.Path, out: pathlib.Path, ladder: list[int]) -> str:
     led, truth = generate(run_dir, ladder)
     events, results = led.events(), led.results()
-    arms = sorted({(r.provider, r.mode) for r in results})
+    arms = sorted({(r.provider, r.mode) for r in results if r.provider != "origin"})
     scores = [score(events, results, p, m) for p, m in arms]
     classes = sorted({e.source_class for e in events.values()})
     by_class = {c: [score(events, results, p, m, c) for p, m in arms] for c in classes}
@@ -149,7 +178,21 @@ def render(run_dir: pathlib.Path, out: pathlib.Path, ladder: list[int]) -> str:
                 pairs.append((f"{arms[i][0]}/{arms[i][1]}",
                               f"{arms[j][0]}/{arms[j][1]}", pv))
 
-    html = report.dashboard_html(scores, events, results, by_class, pairs)
+    from .power import analyse
+    powers = []
+    for i in range(len(arms)):
+        for j in range(i + 1, len(arms)):
+            oa = observations(events, results, *arms[i])
+            ob = observations(events, results, *arms[j])
+            _, pv = logrank(oa, ob)
+            powers.append(analyse(f"{arms[i][0]}/{arms[i][1]}", oa,
+                                  f"{arms[j][0]}/{arms[j][1]}", ob, pv, 15.0))
+    stale_series = [(f"{sc.provider}/{sc.mode}",
+                     staleness_by_rung(events, results, sc.provider, sc.mode))
+                    for sc in sorted(scores, key=lambda s: (s.median_ttl is None,
+                                                            s.median_ttl or 0))]
+    html = report.dashboard_html(scores, events, results, by_class, pairs, powers,
+                                 stale_series)
     html = html.replace("<h1>Time to Index</h1>", "<h1>Time to Index</h1>" + BANNER)
     html = html.replace("<title>Time to Index</title>",
                         "<title>Time to Index — synthetic demo</title>")
@@ -163,11 +206,11 @@ def render(run_dir: pathlib.Path, out: pathlib.Path, ladder: list[int]) -> str:
     lines = []
     for sc in sorted(scores, key=lambda s: (s.median_ttl is None, s.median_ttl or 0)):
         actual = true_median(truth[f"{sc.provider}/{sc.mode}"])
-        lo, hi = bracket(ladder, sc.median_ttl)
+        lo, hi = sc.median_bracket
         ok = (lo or 0) < actual <= (hi if hi is not None else float("inf"))
         lines.append(
             f"  {'OK ' if ok else 'MISS'} {sc.provider}/{sc.mode}: "
-            f"estimated {fmt_bracket(ladder, sc.median_ttl):>10s}  "
+            f"estimated {fmt_pair(sc.median_bracket):>10s}  "
             f"true {fmt_duration(actual) if actual != float('inf') else 'never':>7s}  "
             f"(n={sc.n_events}, indexed {sc.n_indexed})")
     return "\n".join(lines)

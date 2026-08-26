@@ -75,6 +75,11 @@ class Npm(BaseSource):
                 predecessor=prev,
                 predecessor_aliases=[p for p in ([prev, f"v{prev}", f"{pkg}@{prev}"] if prev else [])],
                 url=f"https://www.npmjs.com/package/{pkg}/v/{latest}",
+                # npmjs.com returns 403 to non-browser clients, so the origin
+                # control falls back to the registry document and records that
+                # it did. See control.probe_origin.
+                origins=[f"https://www.npmjs.com/package/{pkg}/v/{latest}",
+                         f"https://registry.npmjs.org/{pkg}"],
                 meta={"registry": "npm"},
             ))
             return out

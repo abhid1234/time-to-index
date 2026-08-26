@@ -71,20 +71,30 @@ nothing here is a finding about any product. Real runs are published at
 
 <p class="sub">How long a newly published fact takes to become retrievable through each
 web-search API, and how often the API confidently returns the answer it replaced.
-Generated 2026-08-26 04:12 UTC.</p>
+Generated 2026-08-26 04:34 UTC.</p>
 
 <div class="panel">
   <div class="scroll"><table>
     <thead><tr><th>arm</th><th>median TTI</th><th>p90</th><th>24h recall</th>
-    <th>staleness</th><th>p50 latency</th><th>$/1k events</th><th>events</th></tr></thead>
-    <tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>15m–60m</td><td class='k'>99% (95–100)</td><td class='k bad'>59% (47–69)</td><td class='k'>1025ms</td><td class='k'>$9.25</td><td class='k'>106</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>60m–6.0h</td><td class='k'>6.0h–24.0h</td><td class='k'>92% (85–95)</td><td class='k bad'>70% (64–75)</td><td class='k'>1199ms</td><td class='k'>$20.24</td><td class='k'>106</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>24.0h–3.0d</td><td class='k'>>3.0d</td><td class='k'>40% (31–49)</td><td class='k bad'>46% (41–51)</td><td class='k'>1747ms</td><td class='k'>$27.31</td><td class='k'>106</td></tr></tbody></table></div>
-  <p class="note">Median is a Kaplan&#8211;Meier estimate with right-censoring at 72 hours,
-  reported as the interval between ladder rungs rather than a point. An arm first seen
-  fresh at the 1h rung indexed somewhere in (15m, 1h]; printing "1h" would overstate it
-  by up to the width of the bracket. Events still un-indexed at the last rung are
-  censored, not dropped &#8212; discarding them would report every provider as faster than
-  it is, and unevenly, since the bias is largest for whoever has the most un-indexed
-  events. <b>&gt;72h</b> means the arm never crossed 50% inside the window.</p>
+    <th>24h recall<br><span style="text-transform:none;letter-spacing:0">vs origin</span></th>
+    <th>staleness</th><th>p50 latency</th><th>$/1k events</th>
+    <th>$/1k fresh<br><span style="text-transform:none;letter-spacing:0">answers</span></th>
+    <th>events</th></tr></thead>
+    <tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>15m–1.0h</td><td class='k'>99% (95–100)</td><td class='k'>99% (94–100)</td><td class='k bad'>66% (56–75)</td><td class='k'>2129ms</td><td class='k'>$10.14</td><td class='k'>$10.24</td><td class='k'>106</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>1.0h–6.0h</td><td class='k'>6.0h–24.0h</td><td class='k'>91% (83–95)</td><td class='k'>91% (83–95)</td><td class='k bad'>73% (67–78)</td><td class='k'>792ms</td><td class='k'>$19.15</td><td class='k'>$21.15</td><td class='k'>106</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>6.0h–24.0h</td><td class='k'>>3.0d</td><td class='k'>55% (45–64)</td><td class='k'>56% (46–67)</td><td class='k bad'>44% (39–50)</td><td class='k'>1244ms</td><td class='k'>$26.04</td><td class='k'>$47.59</td><td class='k'>106</td></tr></tbody></table></div>
+  <p class="note">Two cost columns, because they can disagree and the disagreement is
+  the point. Cost per <i>event</i> is what you pay to ask; cost per <i>fresh answer</i>
+  is what you pay to get one, and a provider that returns nothing does it very cheaply.
+  A freshness win bought at 5&#215; the price is a different product decision than a
+  freshness win at parity, and a leaderboard that hides the denominator is
+  advertising.</p>
+  <p class="note">Median is a Turnbull nonparametric MLE for interval-censored data,
+  reported as the interval the estimate actually pins down. An arm seen absent at 15m
+  and fresh at 1h indexed somewhere in (15m, 1h] &#8212; it did not index <i>at</i> 1h, and
+  printing a point would invent precision the ladder cannot supply. Events still
+  un-indexed at 72h are censored, not dropped: discarding them reports every provider
+  as faster than it is, and unevenly, since the bias is largest for whoever has the
+  most un-indexed events. <b>&gt;72h</b> means the arm never accumulated half its mass
+  inside the window, which is a different statement from "slow".</p>
 </div>
 
 <h2>Time to index</h2>
@@ -114,40 +124,130 @@ Generated 2026-08-26 04:12 UTC.</p>
 <text x="48" y="80.0" font-size="10" text-anchor="end" fill="var(--muted)">75%</text>
 <line x1="56" y1="16.0" x2="702" y2="16.0" stroke="var(--grid)" stroke-width="1"/>
 <text x="48" y="19.0" font-size="10" text-anchor="end" fill="var(--muted)">100%</text>
-<polygon points="180.2,186.4 265.0,84.0 372.0,30.7 510.2,27.3 510.2,16.2 372.0,16.9 265.0,47.4 180.2,141.3" fill="#3b6ea5" opacity="0.10"/>
-<polyline points="56.0,260.0 180.2,260.0 180.2,165.6 265.0,165.6 265.0,64.3 372.0,64.3 372.0,20.6 510.2,20.6 510.2,18.3 702.0,18.3" fill="none" stroke="#3b6ea5" stroke-width="2" stroke-linejoin="round"/>
-<polygon points="265.0,252.2 372.0,219.5 510.2,101.5 617.2,52.0 702.0,43.3 702.0,21.7 617.2,26.2 510.2,61.0 372.0,179.8 265.0,227.4" fill="#c2571a" opacity="0.10"/>
-<polyline points="56.0,260.0 265.0,260.0 265.0,243.9 372.0,243.9 372.0,202.5 510.2,202.5 510.2,80.5 617.2,80.5 617.2,36.7 702.0,36.7 702.0,29.8 702.0,29.8" fill="none" stroke="#c2571a" stroke-width="2" stroke-linejoin="round"/>
-<polygon points="372.0,257.8 510.2,243.9 617.2,184.3 702.0,132.6 702.0,87.9 617.2,139.0 510.2,213.5 372.0,239.2" fill="#2f7d5c" opacity="0.10"/>
-<polyline points="56.0,260.0 372.0,260.0 372.0,253.1 510.2,253.1 510.2,232.4 617.2,232.4 617.2,163.3 702.0,163.3 702.0,110.4 702.0,110.4" fill="none" stroke="#2f7d5c" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="180.2,194.9 265.0,113.7 372.0,40.3 510.2,27.3 510.2,16.2 372.0,20.3 265.0,71.1 180.2,150.7" fill="#3b6ea5" opacity="0.10"/>
+<polyline points="56.0,260.0 180.2,260.0 180.2,174.8 265.0,174.8 265.0,92.0 372.0,92.0 372.0,27.5 510.2,27.5 510.2,18.3 702.0,18.3" fill="none" stroke="#3b6ea5" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="180.2,257.8 265.0,245.6 372.0,192.8 510.2,91.6 617.2,54.8 702.0,46.2 702.0,23.1 617.2,27.8 510.2,53.1 372.0,148.4 265.0,216.2 180.2,239.2" fill="#c2571a" opacity="0.10"/>
+<polyline points="56.0,260.0 180.2,260.0 180.2,253.1 265.0,253.1 265.0,234.7 372.0,234.7 372.0,172.5 510.2,172.5 510.2,71.2 617.2,71.2 617.2,39.0 702.0,39.0 702.0,32.1 702.0,32.1" fill="none" stroke="#c2571a" stroke-width="2" stroke-linejoin="round"/>
+<polygon points="372.0,256.5 510.2,225.4 617.2,148.8 702.0,111.3 702.0,69.1 617.2,103.0 510.2,187.3 372.0,236.2" fill="#2f7d5c" opacity="0.10"/>
+<polyline points="56.0,260.0 372.0,260.0 372.0,250.8 510.2,250.8 510.2,209.4 617.2,209.4 617.2,126.5 702.0,126.5 702.0,89.7 702.0,89.7" fill="none" stroke="#2f7d5c" stroke-width="2" stroke-linejoin="round"/>
 <text x="56" y="294" font-size="10" fill="var(--muted)">lag since publication (log scale) &#183; shaded band = 95% CI</text>
 </svg>
   <div class="legend"><span><i style="background:#3b6ea5"></i>provider-a/fast</span><span><i style="background:#c2571a"></i>provider-b/base</span><span><i style="background:#2f7d5c"></i>provider-c/base</span></div>
+</div>
+
+<h2>The control arm</h2>
+<div class="panel">
+  <p style="margin-top:0">At every rung, each event's canonical URL is also fetched
+  directly, with robots.txt honoured, and checked for the answer token. Of the events
+  in this run, <b>85</b> were confirmed retrievable from their own origin
+  within 24 hours.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>origin outcome</th><th>events</th><th>what it means</th></tr></thead>
+    <tbody><tr><td class='k'>blocked</td><td class='k'>90</td><td>origin refused this client (403/429); fetchability not established</td></tr><tr><td class='k'>found</td><td class='k'>85</td><td>fetchable, and the answer was in the served bytes</td></tr><tr><td class='k'>not_found</td><td class='k'>50</td><td>page fetched, answer not in it — nobody could index it from here</td></tr></tbody></table></div>
+  <p class="note">Without this arm, every ABSENT is ambiguous: a provider that does not
+  return the fact might have a slow crawler, or the fact might not be fetchable from its
+  own page yet. The <b>24h recall vs origin</b> column asks the question only of events
+  the control proved were on the web, and it is the column that is actually about the
+  provider. Origins that refused us or that robots.txt excludes are omitted from that
+  denominator rather than guessed at.</p>
+</div>
+
+<h2>Estimator check</h2>
+<div class="panel">
+  <div class="scroll"><table>
+    <thead><tr><th>arm</th><th>Turnbull (reported)</th><th>Kaplan&#8211;Meier on the rung</th>
+    <th>overstatement</th></tr></thead>
+    <tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>5m–15m</td><td class='k'>up to 10m</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>1.0h–6.0h</td><td class='k'>1.0h–6.0h</td><td class='k'>up to 5.0h</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>6.0h–24.0h</td><td class='k'>6.0h–24.0h</td><td class='k'>up to 18.0h</td></tr></tbody></table></div>
+  <p class="note">Kaplan&#8211;Meier needs a point event time, so feeding it the rung records
+  an arm as indexing <i>at</i> the probe that first saw it. That overstates every latency
+  by up to a bracket width, and it cannot represent a widened interval at all when a
+  probe is dropped for budget, rung slip, or a provider error. This column is kept
+  visible rather than deleted: if the overstatement is ever small, the ladder is fine
+  enough that the choice of estimator does not matter, and that is worth knowing too.</p>
 </div>
 
 <h2>Staleness</h2>
 <div class="panel">
   <p style="margin-top:0">Across every probe where the provider had not yet indexed the
   new answer and the question had a superseded one, it returned the superseded answer
-  <span class="big bad">56%</span> of the time
-  (380 of 684 opportunities).</p>
+  <span class="big bad">57%</span> of the time
+  (380 of 664 opportunities).</p>
   <p class="note">Existing search benchmarks score a miss and a confidently-wrong
   stale answer identically. In production they are not the same event. An agent that
   gets nothing back retries, widens, or says it does not know. An agent that gets last
   quarter's number back cites it, and nothing downstream can tell that it is wrong.</p>
+  <svg viewBox="0 0 720 300" width="100%" role="img" aria-label="staleness by lag" style="max-width:720px;font-family:var(--mono)">
+<line x1="56.0" y1="16" x2="56.0" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="56.0" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">5m</text>
+<line x1="161.0" y1="16" x2="161.0" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="161.0" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">15m</text>
+<line x1="293.4" y1="16" x2="293.4" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="293.4" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">1h</text>
+<line x1="464.6" y1="16" x2="464.6" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="464.6" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">6h</text>
+<line x1="597.0" y1="16" x2="597.0" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="597.0" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">24h</text>
+<line x1="702.0" y1="16" x2="702.0" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="702.0" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">72h</text>
+<line x1="56" y1="260.0" x2="702" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="48" y="263.0" font-size="10" text-anchor="end" fill="var(--muted)">0%</text>
+<line x1="56" y1="199.0" x2="702" y2="199.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="48" y="202.0" font-size="10" text-anchor="end" fill="var(--muted)">25%</text>
+<line x1="56" y1="138.0" x2="702" y2="138.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="48" y="141.0" font-size="10" text-anchor="end" fill="var(--muted)">50%</text>
+<line x1="56" y1="77.0" x2="702" y2="77.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="48" y="80.0" font-size="10" text-anchor="end" fill="var(--muted)">75%</text>
+<line x1="56" y1="16.0" x2="702" y2="16.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="48" y="19.0" font-size="10" text-anchor="end" fill="var(--muted)">100%</text>
+<polyline points="56.0,91.1 161.0,103.1 293.4,97.3 464.6,260.0 597.0,260.0 702.0,16.0" fill="none" stroke="#3b6ea5" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="56.0" cy="91.1" r="2.5" fill="#3b6ea5"/>
+<circle cx="161.0" cy="103.1" r="2.5" fill="#3b6ea5"/>
+<circle cx="293.4" cy="97.3" r="2.5" fill="#3b6ea5"/>
+<circle cx="464.6" cy="260.0" r="2.5" fill="#3b6ea5"/>
+<circle cx="597.0" cy="260.0" r="2.5" fill="#3b6ea5"/>
+<circle cx="702.0" cy="16.0" r="2.5" fill="#3b6ea5"/>
+<polyline points="56.0,92.9 161.0,82.2 293.4,66.6 464.6,85.7 597.0,113.6 702.0,50.9" fill="none" stroke="#c2571a" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="56.0" cy="92.9" r="2.5" fill="#c2571a"/>
+<circle cx="161.0" cy="82.2" r="2.5" fill="#c2571a"/>
+<circle cx="293.4" cy="66.6" r="2.5" fill="#c2571a"/>
+<circle cx="464.6" cy="85.7" r="2.5" fill="#c2571a"/>
+<circle cx="597.0" cy="113.6" r="2.5" fill="#c2571a"/>
+<circle cx="702.0" cy="50.9" r="2.5" fill="#c2571a"/>
+<polyline points="56.0,134.8 161.0,157.3 293.4,149.7 464.6,167.0 597.0,162.4 702.0,132.2" fill="none" stroke="#2f7d5c" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="56.0" cy="134.8" r="2.5" fill="#2f7d5c"/>
+<circle cx="161.0" cy="157.3" r="2.5" fill="#2f7d5c"/>
+<circle cx="293.4" cy="149.7" r="2.5" fill="#2f7d5c"/>
+<circle cx="464.6" cy="167.0" r="2.5" fill="#2f7d5c"/>
+<circle cx="597.0" cy="162.4" r="2.5" fill="#2f7d5c"/>
+<circle cx="702.0" cy="132.2" r="2.5" fill="#2f7d5c"/>
+<text x="56" y="294" font-size="10" fill="var(--muted)">lag since publication (log scale) &#183; share of not-yet-fresh probes that returned the superseded answer</text>
+</svg>
+  <div class="legend"><span><i style="background:#3b6ea5"></i>provider-a/fast</span><span><i style="background:#c2571a"></i>provider-b/base</span><span><i style="background:#2f7d5c"></i>provider-c/base</span></div>
+  <p class="note" style="border-color:var(--muted)">Staleness should fall as an index
+  catches up, so the shape matters as much as the level. A line that stays flat means
+  the provider is holding a superseded answer with confidence rather than slowly
+  acquiring the new one &#8212; a different problem, and a worse one. Only questions with a
+  superseded answer count here; preprints and Federal Register documents have none, so
+  they are excluded by <code>Event.measures_staleness</code> rather than by
+  convention.</p>
 </div>
 
 <h2>By source class</h2>
-<div class='panel'><h2 style='margin-top:0'>code release</h2><div class='scroll'><table><thead><tr><th>arm</th><th>median</th><th>24h recall</th><th>staleness</th><th>n</th></tr></thead><tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>95% (78–99)</td><td class='k'>57% (37–76)</td><td class='k'>22</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>60m–6.0h</td><td class='k'>86% (67–95)</td><td class='k'>78% (66–86)</td><td class='k'>22</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>24.0h–3.0d</td><td class='k'>41% (23–61)</td><td class='k'>49% (40–59)</td><td class='k'>22</td></tr></tbody></table></div></div><div class='panel'><h2 style='margin-top:0'>gov publication</h2><div class='scroll'><table><thead><tr><th>arm</th><th>median</th><th>24h recall</th><th>staleness</th><th>n</th></tr></thead><tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>100% (76–100)</td><td class='k'>—</td><td class='k'>12</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>60m–6.0h</td><td class='k'>92% (65–99)</td><td class='k'>—</td><td class='k'>12</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>6.0h–24.0h</td><td class='k'>50% (25–75)</td><td class='k'>—</td><td class='k'>12</td></tr></tbody></table></div></div><div class='panel'><h2 style='margin-top:0'>package registry</h2><div class='scroll'><table><thead><tr><th>arm</th><th>median</th><th>24h recall</th><th>staleness</th><th>n</th></tr></thead><tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>100% (91–100)</td><td class='k'>57% (41–72)</td><td class='k'>40</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>60m–6.0h</td><td class='k'>95% (83–99)</td><td class='k'>71% (62–78)</td><td class='k'>40</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>24.0h–3.0d</td><td class='k'>40% (26–55)</td><td class='k'>44% (37–51)</td><td class='k'>40</td></tr></tbody></table></div></div><div class='panel'><h2 style='margin-top:0'>preprint</h2><div class='scroll'><table><thead><tr><th>arm</th><th>median</th><th>24h recall</th><th>staleness</th><th>n</th></tr></thead><tbody><tr><td class='k'>provider-a/fast</td><td class='k'>≤5m</td><td class='k'>100% (82–100)</td><td class='k'>—</td><td class='k'>18</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>60m–6.0h</td><td class='k'>100% (82–100)</td><td class='k'>—</td><td class='k'>18</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>24.0h–3.0d</td><td class='k'>44% (25–66)</td><td class='k'>—</td><td class='k'>18</td></tr></tbody></table></div></div><div class='panel'><h2 style='margin-top:0'>regulatory filing</h2><div class='scroll'><table><thead><tr><th>arm</th><th>median</th><th>24h recall</th><th>staleness</th><th>n</th></tr></thead><tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>100% (78–100)</td><td class='k'>64% (39–84)</td><td class='k'>14</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>60m–6.0h</td><td class='k'>79% (52–92)</td><td class='k'>57% (43–70)</td><td class='k'>14</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>>3.0d</td><td class='k'>21% (8–48)</td><td class='k'>47% (36–58)</td><td class='k'>14</td></tr></tbody></table></div></div>
+<div class='panel'><h2 style='margin-top:0'>code release</h2><div class='scroll'><table><thead><tr><th>arm</th><th>median</th><th>24h recall</th><th>staleness</th><th>n</th></tr></thead><tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>100% (85–100)</td><td class='k'>70% (49–84)</td><td class='k'>22</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>1.0h–6.0h</td><td class='k'>95% (78–99)</td><td class='k'>71% (59–81)</td><td class='k'>22</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>6.0h–24.0h</td><td class='k'>64% (43–80)</td><td class='k'>40% (31–50)</td><td class='k'>22</td></tr></tbody></table></div></div><div class='panel'><h2 style='margin-top:0'>gov publication</h2><div class='scroll'><table><thead><tr><th>arm</th><th>median</th><th>24h recall</th><th>staleness</th><th>n</th></tr></thead><tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>100% (76–100)</td><td class='k'>—</td><td class='k'>12</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>15m–1.0h</td><td class='k'>100% (76–100)</td><td class='k'>—</td><td class='k'>12</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>6.0h–24.0h</td><td class='k'>58% (32–81)</td><td class='k'>—</td><td class='k'>12</td></tr></tbody></table></div></div><div class='panel'><h2 style='margin-top:0'>package registry</h2><div class='scroll'><table><thead><tr><th>arm</th><th>median</th><th>24h recall</th><th>staleness</th><th>n</th></tr></thead><tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>98% (87–100)</td><td class='k'>65% (50–78)</td><td class='k'>40</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>1.0h–6.0h</td><td class='k'>88% (74–95)</td><td class='k'>74% (66–81)</td><td class='k'>40</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>24.0h–3.0d</td><td class='k'>48% (33–63)</td><td class='k'>43% (37–51)</td><td class='k'>40</td></tr></tbody></table></div></div><div class='panel'><h2 style='margin-top:0'>preprint</h2><div class='scroll'><table><thead><tr><th>arm</th><th>median</th><th>24h recall</th><th>staleness</th><th>n</th></tr></thead><tbody><tr><td class='k'>provider-a/fast</td><td class='k'>≤5m</td><td class='k'>100% (82–100)</td><td class='k'>—</td><td class='k'>18</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>1.0h–6.0h</td><td class='k'>100% (82–100)</td><td class='k'>—</td><td class='k'>18</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>6.0h–24.0h</td><td class='k'>56% (34–75)</td><td class='k'>—</td><td class='k'>18</td></tr></tbody></table></div></div><div class='panel'><h2 style='margin-top:0'>regulatory filing</h2><div class='scroll'><table><thead><tr><th>arm</th><th>median</th><th>24h recall</th><th>staleness</th><th>n</th></tr></thead><tbody><tr><td class='k'>provider-a/fast</td><td class='k'>15m–1.0h</td><td class='k'>100% (78–100)</td><td class='k'>65% (43–82)</td><td class='k'>14</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>6.0h–24.0h</td><td class='k'>71% (45–88)</td><td class='k'>71% (58–81)</td><td class='k'>14</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>6.0h–24.0h</td><td class='k'>57% (33–79)</td><td class='k'>54% (42–65)</td><td class='k'>14</td></tr></tbody></table></div></div>
 
 <h2>Are the differences real</h2>
 <div class="panel">
   <div class="scroll"><table>
-    <thead><tr><th>comparison</th><th>log-rank</th><th>read</th></tr></thead>
-    <tbody><tr><td class='k'>provider-a/fast vs provider-b/base</td><td class='k'>p = 0.0000</td><td>distinguishable</td></tr><tr><td class='k'>provider-a/fast vs provider-c/base</td><td class='k'>p = 0.0000</td><td>distinguishable</td></tr><tr><td class='k'>provider-b/base vs provider-c/base</td><td class='k'>p = 0.0000</td><td>distinguishable</td></tr></tbody></table></div>
+    <thead><tr><th>comparison</th><th>hazard ratio</th><th>events</th><th>log-rank p</th>
+    <th>power</th><th>read</th></tr></thead>
+    <tbody><tr><td class='k'>provider-a/fast vs provider-b/base</td><td class='k'>2.81</td><td class='k'>204</td><td class='k'>0.0000</td><td class='k'>100%</td><td class='good'>distinguishable</td></tr><tr><td class='k'>provider-a/fast vs provider-c/base</td><td class='k'>4.62</td><td class='k'>179</td><td class='k'>0.0000</td><td class='k'>100%</td><td class='good'>distinguishable</td></tr><tr><td class='k'>provider-b/base vs provider-c/base</td><td class='k'>2.57</td><td class='k'>173</td><td class='k'>0.0000</td><td class='k'>100%</td><td class='good'>distinguishable</td></tr></tbody></table></div>
   <p class="note">Log-rank rather than a t-test on the indexed subset, because most
-  observations are censored and a test that ignores censoring will find differences
-  that are artefacts of who ran out of window first.</p>
+  observations are censored and a test that ignores censoring finds differences that are
+  artefacts of who ran out of window first. The power column is here because the honest
+  answer early in a run is "not yet", and a leaderboard invites a claim long before the
+  data can carry it: at the observed hazard ratio, Schoenfeld's formula says how many
+  events 80% power would take. A hazard ratio of 2 needs 66 events; a ratio of 1.2 needs
+  945.</p>
 </div>
 
 <footer>

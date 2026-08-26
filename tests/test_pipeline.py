@@ -194,7 +194,7 @@ def test_demo_estimator_recovers_its_own_ground_truth(tmp_path):
     no number this repo publishes about a real vendor can be trusted.
     """
     from tti import demo
-    from tti.metrics import bracket, score
+    from tti.metrics import score
 
     ladder = [300, 900, 3600, 21600, 86400, 259200]
     led, truth = demo.generate(tmp_path, ladder)
@@ -202,7 +202,7 @@ def test_demo_estimator_recovers_its_own_ground_truth(tmp_path):
     for provider, mode, *_ in demo.PROFILES:
         sc = score(events, results, provider, mode)
         actual = demo.true_median(truth[f"{provider}/{mode}"])
-        lo, hi = bracket(ladder, sc.median_ttl)
+        lo, hi = sc.median_bracket
         assert (lo or 0) < actual <= (hi if hi is not None else float("inf")), (
             f"{provider}/{mode}: true median {actual:.0f}s outside "
             f"recovered bracket ({lo}, {hi}]")

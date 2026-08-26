@@ -56,6 +56,11 @@ class Event:
     predecessor: str | None = None  # canonical superseded answer token
     predecessor_aliases: list[str] = field(default_factory=list)
     url: str = ""                   # canonical URL of the new fact (never sent to providers)
+    # Origin URLs for the control arm, most crawler-representative first.
+    # A human-facing page is what a search crawler would index, so it leads;
+    # an API URL is a fallback that answers a weaker question ("the fact was
+    # public") and is labelled as such in the record.
+    origins: list[str] = field(default_factory=list)
     meta: dict[str, Any] = field(default_factory=dict)
     event_id: str = ""
 
@@ -66,6 +71,8 @@ class Event:
             self.answer_aliases.insert(0, self.answer)
         if self.predecessor and self.predecessor not in self.predecessor_aliases:
             self.predecessor_aliases.insert(0, self.predecessor)
+        if not self.origins and self.url:
+            self.origins = [self.url]
 
     @property
     def detection_lag(self) -> float:

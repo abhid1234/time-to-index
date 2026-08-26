@@ -79,6 +79,8 @@ class PyPI(BaseSource):
                 predecessor=prev,
                 predecessor_aliases=[p for p in ([prev, f"v{prev}", f"{pkg}=={prev}"] if prev else [])],
                 url=f"https://pypi.org/project/{pkg}/{latest}/",
+                origins=[f"https://pypi.org/project/{pkg}/{latest}/",
+                         f"https://pypi.org/pypi/{pkg}/json"],
                 meta={"registry": "pypi"},
             ))
             return out

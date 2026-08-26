@@ -24,6 +24,9 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 
 from .models import ABSENT, ERROR, FRESH, SKIPPED, STALE, Event, ProbeResult
+from .survival import INF, Interval, NPMLE
+from .survival import fit as turnbull_fit
+from .survival import intervals_from_ladder
 
 Z95 = 1.959963984540054
 
@@ -179,14 +182,30 @@ class ProviderScore:
     n_events: int = 0
     n_indexed: int = 0
     curve: SurvivalCurve = field(default_factory=SurvivalCurve)
+    # Turnbull is the reported estimator; Kaplan-Meier is kept alongside it
+    # for the log-rank test and for the KM-vs-NPMLE delta the report prints,
+    # which is a standing check that the ladder is fine enough to matter.
+    npmle: NPMLE = field(default_factory=NPMLE)
+    median_bracket: tuple[float | None, float | None] = (None, None)
+    p90_bracket: tuple[float | None, float | None] = (None, None)
     median_ttl: float | None = None
     p90_ttl: float | None = None
     recall_24h: tuple[float, float, float] = (float("nan"),) * 3
     recall_72h: tuple[float, float, float] = (float("nan"),) * 3
+    # Recall restricted to events the origin control verified were actually
+    # fetchable from their own URL by the same horizon. This is the number
+    # that is about the provider; plain recall charges it for documents that
+    # were not on the web yet.
+    conditional_recall_24h: tuple[float, float, float] = (float("nan"),) * 3
+    n_origin_confirmed: int = 0
     staleness: tuple[float, float, float] = (float("nan"),) * 3
     n_stale_eligible: int = 0
     n_stale: int = 0
     spend_usd: float = 0.0
+    # Dollars per fresh answer inside 24h. Cost per *event* rewards a provider
+    # that answers nothing cheaply; cost per answer is the number a buyer is
+    # actually choosing on.
+    cost_per_fresh_24h: float = float("nan")
     n_calls: int = 0
     n_errors: int = 0
     n_skipped_budget: int = 0
@@ -230,6 +249,63 @@ def observations(
     return out
 
 
+def intervals(
+    events: dict[str, Event],
+    results: list[ProbeResult],
+    provider: str,
+    mode: str,
+    source_class: str | None = None,
+) -> list[Interval]:
+    """One interval-censored observation per event.
+
+    Errored and skipped probes are simply not collected, so their absence
+    widens the interval instead of dropping the event or inventing a rung.
+    """
+    by_event: dict[str, list[tuple[float, bool]]] = {}
+    for r in results:
+        if r.provider != provider or r.mode != mode:
+            continue
+        if r.verdict in (ERROR, SKIPPED):
+            continue
+        ev = events.get(r.event_id)
+        if ev is None or (source_class and ev.source_class != source_class):
+            continue
+        by_event.setdefault(r.event_id, []).append((r.lag, r.verdict == FRESH))
+    out = []
+    for probed in by_event.values():
+        iv = intervals_from_ladder(probed)
+        if iv is not None:
+            out.append(iv)
+    return out
+
+
+ORIGIN = "origin"
+
+
+def origin_confirmed_by(
+    events: dict[str, Event],
+    results: list[ProbeResult],
+    horizon: float,
+    source_class: str | None = None,
+) -> set[str]:
+    """Events the control arm fetched, with the answer present, by `horizon`.
+
+    Deliberately strict. An event whose origin was blocked, disallowed, or
+    errored is not in this set: we failed to establish fetchability, and
+    guessing either way would put a made-up number in the denominator of the
+    metric that is supposed to be the clean one.
+    """
+    out: set[str] = set()
+    for r in results:
+        if r.provider != ORIGIN or r.verdict != FRESH or r.lag > horizon:
+            continue
+        ev = events.get(r.event_id)
+        if ev is None or (source_class and ev.source_class != source_class):
+            continue
+        out.add(r.event_id)
+    return out
+
+
 def score(
     events: dict[str, Event],
     results: list[ProbeResult],
@@ -245,12 +321,38 @@ def score(
     sc.median_ttl = sc.curve.quantile(0.5)
     sc.p90_ttl = sc.curve.quantile(0.9)
 
+    ivs = intervals(events, results, provider, mode, source_class)
+    sc.npmle = turnbull_fit(ivs)
+    sc.median_bracket = sc.npmle.quantile_bracket(0.5)
+    sc.p90_bracket = sc.npmle.quantile_bracket(0.9)
+
     for horizon, attr in ((86_400, "recall_24h"), (259_200, "recall_72h")):
         hit = sum(1 for o in obs if o.indexed and o.time <= horizon)
         # Only events observed to the horizon count in the denominator; an
         # event censored at 6h says nothing about 24-hour recall.
         denom = sum(1 for o in obs if o.indexed and o.time <= horizon or o.time >= horizon)
         setattr(sc, attr, wilson(hit, denom))
+
+    # Conditional recall: same question as recall_24h, but asked only of
+    # events the control arm proved were on the web by 24 hours.
+    confirmed = origin_confirmed_by(events, results, 86_400, source_class)
+    sc.n_origin_confirmed = len(confirmed)
+    if confirmed and provider != ORIGIN:
+        first_fresh: dict[str, float] = {}
+        observed: set[str] = set()
+        for r in results:
+            if r.provider != provider or r.mode != mode:
+                continue
+            if r.event_id not in confirmed or r.verdict in (ERROR, SKIPPED):
+                continue
+            observed.add(r.event_id)
+            if r.verdict == FRESH:
+                prev = first_fresh.get(r.event_id)
+                if prev is None or r.lag < prev:
+                    first_fresh[r.event_id] = r.lag
+        denom = len(observed)
+        hit = sum(1 for t in first_fresh.values() if t <= 86_400)
+        sc.conditional_recall_24h = wilson(hit, denom)
 
     # Staleness: of all probes where the provider had not yet indexed the new
     # answer and the question had a superseded answer, how often did it return
@@ -279,6 +381,9 @@ def score(
             eligible += 1
             if r.verdict == STALE:
                 stale += 1
+    fresh_24h = sum(1 for o in obs if o.indexed and o.time <= 86_400)
+    sc.cost_per_fresh_24h = (sc.spend_usd / fresh_24h) if fresh_24h else float("inf")
+
     sc.n_stale, sc.n_stale_eligible = stale, eligible
     sc.staleness = wilson(stale, eligible)
     if lat:
@@ -320,12 +425,57 @@ def fmt_bracket(rungs: list[int], t: float | None) -> str:
     return f"{fmt_duration(lo)}–{fmt_duration(hi)}"
 
 
+def staleness_by_rung(
+    events: dict[str, Event],
+    results: list[ProbeResult],
+    provider: str,
+    mode: str,
+    source_class: str | None = None,
+) -> list[tuple[int, float, int]]:
+    """(rung, staleness rate, n) for each rung.
+
+    Staleness should fall as an index catches up. A curve that does not fall
+    is the interesting case: it means the provider is holding a superseded
+    answer with confidence rather than slowly acquiring the new one, and the
+    shape says that in a way a single pooled percentage cannot.
+    """
+    buckets: dict[int, list[int]] = {}
+    for r in results:
+        if r.provider != provider or r.mode != mode:
+            continue
+        if r.verdict not in (STALE, ABSENT):
+            continue
+        ev = events.get(r.event_id)
+        if ev is None or not ev.measures_staleness:
+            continue
+        if source_class and ev.source_class != source_class:
+            continue
+        buckets.setdefault(r.rung, []).append(1 if r.verdict == STALE else 0)
+    return [(rung, sum(v) / len(v), len(v))
+            for rung, v in sorted(buckets.items()) if v]
+
+
+def fmt_pair(b: tuple[float | None, float | None]) -> str:
+    """Render a Turnbull quantile bracket.
+
+    (0, 300]        -> "≤5m"     already indexed by the first probe
+    (900, 3600]     -> "15m–1h"
+    (259200, None)  -> ">72h"    never accumulated this much mass
+    """
+    lo, hi = b
+    if hi is None:
+        return f">{fmt_duration(lo)}" if lo else "—"
+    if not lo:
+        return f"≤{fmt_duration(hi)}"
+    return f"{fmt_duration(lo)}–{fmt_duration(hi)}"
+
+
 def fmt_duration(sec: float | None) -> str:
     if sec is None:
         return ">72h"
     if sec < 90:
         return f"{sec:.0f}s"
-    if sec < 5400:
+    if sec < 3600:
         return f"{sec/60:.0f}m"
     if sec < 172_800:
         return f"{sec/3600:.1f}h"

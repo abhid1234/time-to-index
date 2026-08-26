@@ -25,7 +25,8 @@ from . import config, providers, report, sources
 from .budget import Budget, utc_day, unit_cost
 from .grader import grade
 from .ledger import Ledger
-from .metrics import ProviderScore, fmt_duration, logrank, observations, score
+from .metrics import (ProviderScore, fmt_duration, logrank, observations, score,
+                      staleness_by_rung)
 from .models import ERROR, FRESH, SKIPPED, STALE
 from .scheduler import _count_results, discover, run_due
 
@@ -37,6 +38,13 @@ def _ledger(args) -> Ledger:
 # ---------------------------------------------------------------------------
 
 def cmd_doctor(args) -> int:
+    ua = config.contact_ua()
+    if "set TTI_USER_AGENT" in ua:
+        # SEC's fair-access policy and arXiv's terms both require a real
+        # contact. Without one their collectors will be refused, and the
+        # refusal looks like an unreachable host.
+        print("  ! TTI_USER_AGENT is unset. SEC and arXiv require a real contact\n"
+              "    string and will refuse requests without one.\n")
     print("sources")
     bad = 0
     for name in config.settings().get("sources", []):
@@ -193,6 +201,53 @@ def cmd_regrade(args) -> int:
     return 0
 
 
+def _events_per_day(led: Ledger) -> float:
+    evs = list(led.events().values())
+    if len(evs) < 2:
+        return 0.0
+    span = max(e.published_at for e in evs) - min(e.published_at for e in evs)
+    return (len(evs) / (span / 86_400.0)) if span > 3600 else 0.0
+
+
+def cmd_power(args) -> int:
+    """Can this run support the claim its leaderboard invites?
+
+    Printed as its own command rather than buried in the report, because the
+    honest answer early in a run is "no", and that is the moment it matters.
+    """
+    from .power import analyse
+
+    led = _ledger(args)
+    events, results = led.events(), led.results()
+    arms = sorted({(r.provider, r.mode) for r in results if r.provider != "origin"})
+    if len(arms) < 2:
+        print("need at least two provider arms with results")
+        return 1
+
+    rate = _events_per_day(led)
+    print(f"{len(events)} events, {rate:.1f}/day observed\n")
+    hdr = f"{'comparison':38s} {'HR':>6s} {'events':>7s} {'power':>7s} {'need':>7s} {'days':>6s}  verdict"
+    print(hdr)
+    print("-" * len(hdr))
+    for i in range(len(arms)):
+        for j in range(i + 1, len(arms)):
+            a, b = arms[i], arms[j]
+            oa = observations(events, results, *a)
+            ob = observations(events, results, *b)
+            _, pv = logrank(oa, ob)
+            r = analyse(f"{a[0]}/{a[1]}", oa, f"{b[0]}/{b[1]}", ob, pv, rate)
+            hr = "—" if r.hazard_ratio != r.hazard_ratio else f"{r.hazard_ratio:.2f}"
+            pw = "—" if r.power_now != r.power_now else f"{r.power_now*100:.0f}%"
+            need = "—" if r.events_for_80 is None else f"{r.events_for_80:.0f}"
+            days = "—" if r.days_needed is None else f"{r.days_needed:.0f}"
+            print(f"{r.a + ' vs ' + r.b:38s} {hr:>6s} {r.events_observed:>7d} "
+                  f"{pw:>7s} {need:>7s} {days:>6s}  {r.verdict}")
+    print("\nHR > 1 means the first arm indexes faster. `need` is the Schoenfeld")
+    print("event count for 80% power at the observed hazard ratio; `days` is how")
+    print("much more collection that is at the current rate.")
+    return 0
+
+
 def cmd_demo(args) -> int:
     """Render docs/demo.html from a synthetic run.
 
@@ -223,22 +278,32 @@ def cmd_report(args) -> int:
     classes = sorted({e.source_class for e in events.values()})
     by_class = {c: _all_scores(led, c) for c in classes}
 
-    pairs = []
+    from .power import analyse
+    rate = _events_per_day(led)
+    pairs, powers = [], []
     arms = [(s.provider, s.mode) for s in
-            sorted(scores, key=lambda s: (s.median_ttl is None, s.median_ttl or 0))]
+            sorted(scores, key=lambda s: (s.median_ttl is None, s.median_ttl or 0))
+            if s.provider != "origin"]
     for i in range(len(arms)):
         for j in range(i + 1, len(arms)):
             a = observations(events, results, *arms[i])
             b = observations(events, results, *arms[j])
             _, p = logrank(a, b)
+            na = f"{arms[i][0]}/{arms[i][1]}"
+            nb = f"{arms[j][0]}/{arms[j][1]}"
             if p == p:
-                pairs.append((f"{arms[i][0]}/{arms[i][1]}",
-                              f"{arms[j][0]}/{arms[j][1]}", p))
+                pairs.append((na, nb, p))
+            powers.append(analyse(na, a, nb, b, p, rate))
 
     root = pathlib.Path(__file__).resolve().parent.parent
     (root / "docs").mkdir(exist_ok=True)
+    stale_series = [(f"{sc.provider}/{sc.mode}",
+                     staleness_by_rung(events, results, sc.provider, sc.mode))
+                    for sc in sorted(scores, key=lambda s: (s.median_ttl is None,
+                                                            s.median_ttl or 0))]
     html = report.full_page(
-        report.dashboard_html(scores, events, results, by_class, pairs))
+        report.dashboard_html(scores, events, results, by_class, pairs, powers,
+                              stale_series))
     (root / "docs" / "index.html").write_text(html, encoding="utf-8")
     (root / "RESULTS.md").write_text(
         "# Results\n\n" + report.summary_md(scores, events, results) + "\n",
@@ -271,6 +336,8 @@ def main(argv: list[str] | None = None) -> int:
                    ).set_defaults(fn=cmd_report)
     sub.add_parser("demo", help="render docs/demo.html from a synthetic run"
                    ).set_defaults(fn=cmd_demo)
+    sub.add_parser("power", help="can this run support the claim it invites?"
+                   ).set_defaults(fn=cmd_power)
 
     rg = sub.add_parser("regrade", help="re-grade stored payloads, no API calls")
     rg.add_argument("--write", action="store_true", help="apply the new verdicts")

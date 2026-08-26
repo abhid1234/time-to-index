@@ -60,7 +60,7 @@ def flatten_text(payload: Any, _depth: int = 0) -> str:
             if lk in _SKIP_KEYS:
                 continue
             if lk in _TEXT_KEYS:
-                out.append(_stringify(v))
+                out.append(_stringify(v, _depth + 1))
             elif isinstance(v, (dict, list)):
                 out.append(flatten_text(v, _depth + 1))
     elif isinstance(payload, list):
@@ -69,24 +69,42 @@ def flatten_text(payload: Any, _depth: int = 0) -> str:
     return "\n".join(s for s in out if s)
 
 
-def _stringify(v: Any) -> str:
+def _stringify(v: Any, _depth: int = 0) -> str:
+    # Depth-bounded like flatten_text. Without this, a known content key
+    # holding a deeply nested value recurses without limit, and a provider
+    # response is attacker-adjacent input: it is not worth a stack overflow
+    # in an unattended job to read one more level.
+    if _depth > 12:
+        return ""
     if isinstance(v, str):
         return v
     if isinstance(v, list):
-        return "\n".join(_stringify(x) for x in v)
+        return "\n".join(_stringify(x, _depth + 1) for x in v)
     if isinstance(v, dict):
-        return "\n".join(_stringify(x) for x in v.values())
+        return "\n".join(_stringify(x, _depth + 1) for x in v.values())
     return ""
 
 
 def _pattern(token: str) -> re.Pattern[str]:
     """Boundary-safe matcher for one answer token.
 
-    The lookarounds exclude word characters and dots on both sides so that
+    The lookarounds exclude word characters and dots on both sides, so
     `15.4.1` does not match inside `15.4.10` or `v115.4.1x`, while still
     matching in `next@15.4.1,` or `(15.4.1)`.
+
+    The optional `v` is not cosmetic. Half the web writes a release as
+    `v15.4.2`, and the strict lookbehind rejects that -- the character before
+    the digits is a word character. Every version-shaped answer would then
+    score ABSENT against a response that plainly contains it. Including the
+    `v` inside the match moves the lookbehind to the character before it, so
+    `v15.4.2` matches while `115.4.2` still does not. Applied only to tokens
+    that start with a digit, so it cannot loosen matching on an identifier
+    that happens to begin with a letter.
     """
-    return re.compile(rf"(?<![\w.]){re.escape(token)}(?![\w.])", re.IGNORECASE)
+    core = re.escape(token)
+    if token[:1].isdigit():
+        core = "[vV]?" + core
+    return re.compile(rf"(?<![\w.]){core}(?![\w.])", re.IGNORECASE)
 
 
 _PATTERN_CACHE: dict[str, re.Pattern[str]] = {}

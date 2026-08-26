@@ -36,7 +36,7 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass
 
-from . import config, providers, sources
+from . import config, control, providers, sources
 from .budget import Budget, BudgetExceeded, unit_cost, utc_day
 from .grader import grade
 from .ledger import Ledger
@@ -110,6 +110,10 @@ def discover(ledger: Ledger, source_names: list[str] | None = None,
     rep.new_events = len(added)
 
     arms = providers.available_arms()
+    if s.get("origin_control", True):
+        # Always first, so the control's own fetch happens as close to the
+        # rung as the paid calls do.
+        arms = [("origin", "direct")] + arms
     ladder = config.ladder()
     queued = [
         Probe(event_id=e.event_id, provider=p, mode=m, rung=r,
@@ -171,7 +175,12 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
             rep.dropped_slip += 1
             continue
 
-        cost = unit_cost(probe.provider, probe.mode, max_results)
+        # The origin control is a plain HTTP GET, so it is free and is never
+        # refused by the spend cap. Losing it would be the worst possible
+        # economy: without it, every ABSENT verdict from every paid provider
+        # becomes ambiguous.
+        is_control = probe.provider == "origin"
+        cost = 0.0 if is_control else unit_cost(probe.provider, probe.mode, max_results)
         try:
             budget.charge(cost)
         except BudgetExceeded as exc:
@@ -187,9 +196,12 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
 
         t0 = time.perf_counter()
         try:
-            payload = providers.get(probe.provider).search(
-                event.question, probe.mode,
-                max_results=max_results, max_chars=max_chars)
+            if is_control:
+                payload = control.probe_origin(event)
+            else:
+                payload = providers.get(probe.provider).search(
+                    event.question, probe.mode,
+                    max_results=max_results, max_chars=max_chars)
         except Exception as exc:  # noqa: BLE001
             out.append(ProbeResult(
                 probe_id=probe.probe_id, event_id=event.event_id,
@@ -202,6 +214,16 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
 
         latency = int((time.perf_counter() - t0) * 1000)
         verdict, fresh_hits, stale_hits, chars = grade(event, payload)
+        note = ""
+        if is_control:
+            state = payload.get("state", "")
+            rank = payload.get("origin_rank", -1)
+            # A control probe that could not fetch anything is an ERROR, not
+            # an ABSENT. Scoring it as ABSENT would assert the fact was not on
+            # the web, which is exactly what we failed to establish.
+            if state in (control.BLOCKED, control.DISALLOWED, control.ERROR):
+                verdict = ERROR
+            note = f"origin:{state}" + (f" rank={rank}" if rank >= 0 else "")
         raw_ref = ledger.store_raw(probe.provider, probe.probe_id, payload)
 
         out.append(ProbeResult(
@@ -210,7 +232,7 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
             requested_at=now, lag=lag, verdict=verdict, latency_ms=latency,
             matched_fresh=fresh_hits, matched_stale=stale_hits,
             n_results=_count_results(payload), chars=chars,
-            cost_usd=cost, raw_ref=raw_ref))
+            cost_usd=cost, raw_ref=raw_ref, note=note))
 
         rep.dispatched += 1
         rep.spend_usd += cost

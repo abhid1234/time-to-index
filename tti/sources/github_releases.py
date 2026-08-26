@@ -68,6 +68,8 @@ class GithubReleases(BaseSource):
                      if len(t) >= 3] if prev_tag else []
                 ),
                 url=latest.get("html_url", ""),
+                origins=[u for u in (latest.get("html_url"),
+                                     f"https://github.com/{repo}/releases") if u],
                 meta={"name": latest.get("name") or ""},
             ))
             return out

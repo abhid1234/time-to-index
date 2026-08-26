@@ -65,6 +65,9 @@ class FederalRegister(BaseSource):
                 answer_aliases=[num],
                 predecessor=None,
                 url=r.get("html_url", ""),
+                origins=[u for u in (r.get("html_url"),
+                         f"https://www.federalregister.gov/api/v1/documents/{num}.json")
+                         if u],
                 meta={"agency": agency, "title": title, "type": r.get("type") or ""},
             ))
         return out

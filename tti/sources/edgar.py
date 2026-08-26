@@ -96,6 +96,12 @@ class Edgar(BaseSource):
                 ),
                 url=(f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/"
                      f"{accn_dashless}/{accn}-index.htm"),
+                origins=[
+                    f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/"
+                    f"{accn_dashless}/{accn}-index.htm",
+                    f"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany"
+                    f"&CIK={cik}&type={form}&dateb=&owner=include&count=10",
+                ],
                 meta={"company": company, "form": form,
                       "filing_date": dates[idx] if idx < len(dates) else ""},
             ))

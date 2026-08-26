@@ -117,17 +117,39 @@ and it is wrong in a specific direction: it discards exactly the slow cases.
 Worse, the bias does not cancel across a leaderboard — it is largest for the
 provider with the most un-indexed events, so it can reorder the ranking.
 
-So: Kaplan–Meier with right-censoring at the last rung actually fired, and
-Greenwood's formula on a log-log scale for the interval, which keeps the band
-inside [0,1] where the plain version exits it. The implementation is checked
-against the published values for the Freireich 1963 6-MP arm, the standard
-worked example for the product-limit estimator.
+**And it is interval-censored, not right-censored.** This is the part that
+took a second pass. An arm seen ABSENT at 15m and FRESH at 1h did not index
+*at* 1h — it indexed somewhere in (15m, 1h]. Kaplan–Meier needs a point event
+time, so feeding it the rung overstates every latency by up to a bracket
+width. Worse, when a probe is dropped — budget cap, rung slip, provider error
+— the true interval widens to (15m, 6h], and Kaplan–Meier cannot represent
+that at all. It either invents a rung nobody observed or discards the event.
 
-**Medians are reported as brackets.** An arm first seen FRESH at the 1h rung
-indexed somewhere in (15m, 1h]. It did not index at 1h. Printing "1h"
-overstates the latency by up to the width of the bracket, so the ladder's
-resolution is stated rather than hidden. A finer ladder would cost an order
-of magnitude more per event.
+So the reported estimator is **Turnbull's nonparametric MLE for
+interval-censored data** (Turnbull 1976, in the EM formulation of Gentleman
+and Geyer 1994). Each observation is an interval; right-censored ones run to
+infinity. The estimator finds the support intervals where the data can
+actually locate probability mass and solves for the mass by self-consistency.
+
+A dropped probe then *widens* an interval instead of removing an event. That
+is not a rounding detail: it means a run with a flaky provider, an exhausted
+budget, or a missed cron tick still contributes its events at honest, wider
+precision.
+
+Kaplan–Meier is kept alongside it and the dashboard prints the gap between
+the two, rather than deleting the comparison. If the gap is ever small, the
+ladder is fine enough that the choice of estimator does not matter — worth
+knowing too.
+
+Correctness is anchored rather than asserted. Turnbull's estimator provably
+reduces to Kaplan–Meier when every observation is either an exact event or
+right-censored, so the test suite runs it on the Freireich 1963 6-MP data —
+whose Kaplan–Meier values are published, and separately checked — and
+requires the two to agree to 1e-6.
+
+**Medians are reported as brackets.** The survival function is genuinely
+undefined *inside* a support interval: the data cannot say where in (15m, 1h]
+the mass sits. Reporting a point median would be inventing that information.
 
 **Rates get Wilson intervals**, not normal-approximation ones. At n≈40 events
 per source class the normal approximation puts the lower bound of a 100%
@@ -136,6 +158,17 @@ recall below 90% and the upper bound of a 0% staleness above 0.
 **Differences get a log-rank test.** "A is faster than B" needs a test that
 handles censoring; a t-test on the indexed subset will find differences that
 are artefacts of who ran out of window first.
+
+**And a power calculation, printed next to it.** A leaderboard invites a
+claim, and after two days of collection that claim is usually unsupportable.
+The failure mode is not a wrong number — it is a true number with a
+confidence interval nobody printed, repeated until it sounds settled. So
+`tti power` reports, per pair: the hazard ratio from the log-rank O/E
+statistic, the power the run currently has, the events Schoenfeld's formula
+says 80% power would take, and how many more days that is at the observed
+event rate. A hazard ratio of 2 needs 66 events; a ratio of 1.2 needs 945.
+That gap is the whole argument for saying "not distinguishable yet" out loud
+instead of ranking arms that sit inside each other's noise.
 
 ## Cost
 
@@ -183,6 +216,14 @@ marketing page.
   dial differently, and the adapter is twenty lines.
 - **Geography and time of day.** All probes run from one region on one
   schedule. Crawl cadence is not uniform across either.
+- **Origin verification is not universal.** Where an origin blocks
+  non-browser clients, conditional recall simply has fewer events, and npm —
+  one of the highest-volume sources here — is one of those. The fallback to
+  a registry document answers a weaker question, and events verified only at
+  rank 1 should be read as such.
+- **The control shares our network.** If a CDN serves us differently than it
+  serves a commercial crawler, the control measures our view of the origin,
+  not the crawler's. It bounds the confound rather than eliminating it.
 
 ## Reproducing
 
