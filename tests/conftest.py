@@ -56,6 +56,24 @@ PAGES = {
                     f'</script></head><body><div id="__next"></div></body></html>",',
 }
 
+SITEMAP = ("<?xml version='1.0' encoding='UTF-8'?>"
+           "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>"
+           + "".join(f"<url><loc>{{base}}/page/r{i:03d}</loc></url>" for i in range(40))
+           + "</urlset>")
+
+SITEMAP_INDEX = ("<?xml version='1.0' encoding='UTF-8'?>"
+                 "<sitemapindex xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>"
+                 "<sitemap><loc>{base}/sitemap-child.xml</loc></sitemap>"
+                 "</sitemapindex>")
+
+# A sitemap listing a host we are not surveying. Judging those pages as this
+# site's would be wrong, so they must be filtered out.
+SITEMAP_FOREIGN = ("<?xml version='1.0' encoding='UTF-8'?>"
+                   "<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>"
+                   "<url><loc>https://cdn.example.net/a</loc></url>"
+                   "<url><loc>{base}/page/ssr</loc></url>"
+                   "</urlset>")
+
 ROBOTS_OPEN = "User-agent: *\nAllow: /\n"
 ROBOTS_BLOCK_AI = ("User-agent: *\nAllow: /\n\n"
                    "User-agent: GPTBot\nDisallow: /\n\n"
@@ -70,6 +88,11 @@ class Origin(ThreadingHTTPServer):
         super().__init__(*a, **kw)
         self.hits: dict[str, int] = {}
         self.robots = ROBOTS_OPEN
+        # Each sitemap route is opt-in so a test that exercises one is not
+        # silently also finding the others.
+        self.serve_sitemap = False
+        self.serve_gzip_sitemap = False
+        self.serve_index = False
         self.npm: dict[str, dict] = {}
         self.pypi: dict[str, dict] = {}
 
@@ -123,6 +146,38 @@ class Handler(BaseHTTPRequestHandler):
             doc = srv.pypi.get(pkg)
             return self._send(200, json.dumps(doc), "application/json") if doc \
                 else self._send(404, "{}", "application/json")
+        if path == "/sitemap.xml":
+            if not srv.serve_sitemap:
+                return self._send(404, "")
+            return self._send(200, SITEMAP.replace("{base}", srv.base),
+                              "application/xml")
+        if path == "/sitemap.xml.gz":
+            if not srv.serve_gzip_sitemap:
+                return self._send(404, "")
+            import gzip as _gz
+            raw = _gz.compress(SITEMAP.replace("{base}", srv.base).encode())
+            self.send_response(200)
+            self.send_header("Content-Type", "application/octet-stream")
+            self.send_header("Content-Length", str(len(raw)))
+            self.end_headers()
+            self.wfile.write(raw)
+            return
+        if path == "/sitemap-index.xml":
+            if not srv.serve_index:
+                return self._send(404, "")
+            return self._send(200, SITEMAP_INDEX.replace("{base}", srv.base),
+                              "application/xml")
+        if path == "/sitemap-child.xml":
+            if not srv.serve_index:
+                return self._send(404, "")
+            return self._send(200, SITEMAP_FOREIGN.replace("{base}", srv.base),
+                              "application/xml")
+        if path.startswith("/page/r"):
+            # Distinct bodies, so route sampling is not mistaken for
+            # interception.
+            n = path[len("/page/r"):]
+            return self._send(200, f"<html><body><h1>Route {n}</h1>"
+                                   f"<p>{PROSE}{n}</p></body></html>")
         if path == "/flaky":
             # Alternates: the exact failure that made single-fetch verdicts
             # untrustworthy in the real survey.

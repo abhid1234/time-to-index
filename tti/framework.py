@@ -274,6 +274,38 @@ AI_AGENTS = {
 }
 
 
+def llms_txt_url(url: str) -> str:
+    import urllib.parse
+    parts = urllib.parse.urlsplit(url)
+    return f"{parts.scheme}://{parts.netloc}/llms.txt"
+
+
+def summarise_llms_txt(body: str) -> dict:
+    """What a site's /llms.txt actually offers an agent.
+
+    Included because a site that ships one has made a deliberate statement
+    about wanting to be read, and it is the only signal here that is
+    unambiguously intentional -- robots.txt permissions are usually inherited
+    and rendering posture is usually an accident. A shell page with a good
+    llms.txt is a different situation from a shell page with nothing: the
+    content is reachable, just not where the crawler looked.
+
+    Reported, never scored. This file is young enough that a convention has
+    not settled, and turning an emerging practice into a grade would be
+    inventing a standard rather than measuring one.
+    """
+    lines = [ln.rstrip() for ln in body.splitlines()]
+    links = re.findall(r"\]\(([^)]+)\)", body)
+    return {
+        "bytes": len(body),
+        "lines": len(lines),
+        "title": next((ln.lstrip("# ").strip() for ln in lines
+                       if ln.startswith("#")), ""),
+        "links": len(links),
+        "sections": sum(1 for ln in lines if ln.startswith("##")),
+    }
+
+
 def robots_matrix(robots_txt: str, url: str) -> dict[str, bool | None]:
     """Which AI agents robots.txt permits for this URL.
 

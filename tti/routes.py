@@ -24,6 +24,7 @@ sample moves between runs cannot show that a site changed.
 
 from __future__ import annotations
 
+import gzip
 import re
 import urllib.parse
 import xml.etree.ElementTree as ET
@@ -62,14 +63,34 @@ def _sitemaps_from_robots(base: str) -> list[str]:
             re.finditer(r"(?im)^\s*sitemap:\s*(\S+)\s*$", txt)]
 
 
+def _decode_sitemap(raw: bytes) -> str:
+    """Bytes to XML text, transparently un-gzipping.
+
+    Detection is by magic number rather than by the `.gz` suffix or the
+    Content-Type header: plenty of sitemaps are gzipped without either, and a
+    gzipped body read as text parses as nothing, which is indistinguishable
+    from a site that declares no routes at all.
+    """
+    if raw[:2] == b"\x1f\x8b":
+        try:
+            raw = gzip.decompress(raw)
+        except OSError:
+            return ""
+    if len(raw) > MAX_SITEMAP_BYTES:
+        raw = raw[:MAX_SITEMAP_BYTES]
+    # Sitemaps are spec'd as UTF-8; replace rather than raise, so one bad byte
+    # does not discard a valid route list.
+    return raw.decode("utf-8", "replace")
+
+
 def _parse_sitemap(url: str, depth: int = 0) -> tuple[list[str], list[str]]:
     """Return (page urls, child sitemap urls)."""
     try:
-        body = http.get_text(url, timeout=20, retries=0)
+        body = _decode_sitemap(http.get_bytes(url, timeout=20, retries=0))
     except Exception:  # noqa: BLE001
         return [], []
-    if len(body) > MAX_SITEMAP_BYTES:
-        body = body[:MAX_SITEMAP_BYTES]
+    if not body:
+        return [], []
     try:
         root = ET.fromstring(body)
     except ET.ParseError:
@@ -88,7 +109,8 @@ def discover(site: str, limit: int = 5000) -> RouteSample:
     rs = RouteSample(site=base)
 
     candidates = _sitemaps_from_robots(base)
-    candidates += [f"{base}/sitemap.xml", f"{base}/sitemap_index.xml"]
+    candidates += [f"{base}/sitemap.xml", f"{base}/sitemap.xml.gz",
+                   f"{base}/sitemap_index.xml", f"{base}/sitemap-index.xml"]
 
     seen: set[str] = set()
     pages: list[str] = []

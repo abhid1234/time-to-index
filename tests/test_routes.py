@@ -11,9 +11,8 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-import pytest
 
-from tti.framework import SSR, STATIC, PageProfile
+from tti.framework import STATIC, PageProfile
 from tti.routes import stratified
 from tti.survey import SiteResult, Survey
 
@@ -107,3 +106,68 @@ def test_sample_of_a_site_without_a_sitemap_is_empty_not_guessed(origin):
     from tti import routes
     rs = routes.sample(origin.base, 5)
     assert rs.sampled == []
+
+
+# ---------------------------------------------------------------------------
+# Sitemap parsing, over real HTTP
+# ---------------------------------------------------------------------------
+
+def test_a_plain_sitemap_is_discovered_and_sampled(origin):
+    from tti import routes
+    origin.serve_sitemap = True
+    rs = routes.sample(origin.base, 6)
+    assert rs.discovered == 40
+    assert len(rs.sampled) == 6
+    assert all(u.startswith(origin.base + "/page/r") for u in rs.sampled)
+
+
+def test_a_gzipped_sitemap_is_transparently_decompressed(origin):
+    """Large sites commonly serve sitemap.xml.gz, often with no `.gz` in the
+    declared URL and no helpful Content-Type. Read as text it parses as
+    nothing, which is indistinguishable from a site that declares no routes."""
+    from tti import routes
+    origin.serve_gzip_sitemap = True          # only the .gz path answers
+    rs = routes.sample(origin.base, 5)
+    assert rs.discovered == 40, "gzipped sitemap was not decompressed"
+    assert len(rs.sampled) == 5
+
+
+def test_decode_handles_garbage_without_raising():
+    from tti.routes import _decode_sitemap
+    assert _decode_sitemap(b"\x1f\x8bnot actually gzip") == ""
+    assert "hello" in _decode_sitemap(b"hello")
+    assert _decode_sitemap(b"\xff\xfe\x00bad utf8") != ""     # replaced, not raised
+
+
+def test_a_sitemap_index_is_expanded_one_level(origin, monkeypatch):
+    from tti import routes
+    origin.serve_index = True
+    monkeypatch.setattr(routes, "_sitemaps_from_robots",
+                        lambda base: [base + "/sitemap-index.xml"])
+    rs = routes.discover(origin.base)
+    # The child lists one foreign host and one same-host page; only the
+    # same-host one may be kept.
+    assert rs.pages == [origin.base + "/page/ssr"]
+
+
+def test_foreign_hosts_in_a_sitemap_are_dropped(origin, monkeypatch):
+    """A sitemap may legitimately list a CDN or a docs subdomain. Judging
+    those pages as this site's would attribute someone else's rendering."""
+    from tti import routes
+    origin.serve_index = True
+    monkeypatch.setattr(routes, "_sitemaps_from_robots",
+                        lambda base: [base + "/sitemap-child.xml"])
+    rs = routes.discover(origin.base)
+    assert all("cdn.example.net" not in u for u in rs.pages)
+
+
+def test_routes_of_a_site_with_distinct_pages_are_all_judged(origin, capsys):
+    """End-to-end: sitemap -> sample -> profile, with genuinely distinct
+    bodies so the interception guard does not fire."""
+    from tti.cli import main
+    origin.serve_sitemap = True
+    assert main(["routes", origin.base, "--sample", "4", "--repeat", "1"]) == 0
+    out = capsys.readouterr().out
+    assert "4/4 sampled routes readable" in out
+    assert "Uniformly readable" in out
+    assert "identical to another route" not in out

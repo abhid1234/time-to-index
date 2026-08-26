@@ -407,6 +407,20 @@ def cmd_crawlability(args) -> int:
             else:
                 print(f"  '{args.find}' is not in the served bytes at all. "
                       f"Nothing that does not run JavaScript can find it here.")
+        llms = ""
+        with contextlib.suppress(Exception):
+            llms = _http.get_text(fw.llms_txt_url(url), timeout=10, retries=0)
+        if llms and len(llms) > 40:
+            info = fw.summarise_llms_txt(llms)
+            row["llms_txt"] = info
+            print(f"  llms.txt: present — {info['bytes']:,} bytes, "
+                  f"{info['sections']} sections, {info['links']} links"
+                  + (f", titled {info['title'][:40]!r}" if info["title"] else ""))
+            print("    A deliberate statement that the site wants to be read. Reported,")
+            print("    not scored — the convention is too young to grade against.")
+        else:
+            row["llms_txt"] = None
+
         if not robots:
             print("  robots.txt: not readable — no crawler policy could be checked")
         elif blocked:

@@ -46,6 +46,18 @@ def post_json(url: str, *, json: dict, headers: dict | None = None,
                     retries=retries).json()
 
 
+def get_bytes(url: str, *, headers: dict | None = None, timeout: float = 20.0,
+              retries: int = 1) -> bytes:
+    """Raw body, for content whose encoding we must decide ourselves.
+
+    Sitemaps are the reason. Large sites commonly serve `sitemap.xml.gz`, and
+    reading that through a text decoder produces mojibake that parses as
+    nothing -- which looks exactly like a site that declares no routes.
+    """
+    return _request("GET", url, headers=headers, timeout=timeout,
+                    retries=retries).content
+
+
 def raw_get(url: str, *, headers: dict | None = None, timeout: float = 25.0,
             retries: int = 1) -> requests.Response:
     """A GET whose status code the caller inspects.
