@@ -304,6 +304,12 @@ matter:
   outlasts its interval the next run starts alongside it. Measured: six
   queued probes became twelve provider calls, six duplicate rows, and exactly
   double the spend, with every later rate counting one observation twice.
+- **Malformed API responses never crash a run or invent an event.** 38 cases
+  across all six collectors — null documents, error objects returned where a
+  list was expected, unparseable dates, and EDGAR's parallel arrays
+  disagreeing in length. Every one produces zero events and leaves a
+  per-subject error behind, so a source that has started returning garbage is
+  visible rather than quiet.
 - **A torn write does not destroy a month of collection.** This appends
   JSONL unattended for weeks; a reboot mid-write left a partial last line and
   every read path then raised. Worse, the next run's append fused onto that

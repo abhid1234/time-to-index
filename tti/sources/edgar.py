@@ -63,6 +63,21 @@ class Edgar(BaseSource):
             if not forms:
                 return out
 
+            # `recent` is parallel arrays keyed by position, so a length
+            # mismatch means position i in one array does not describe the
+            # same filing as position i in another. Reading across them anyway
+            # produced an event with a zero timestamp, which was then dropped
+            # downstream as "detected late" -- a malformed response wearing
+            # the costume of a benign outcome, and the wrong count in the
+            # wrong bucket.
+            lengths = {len(forms), len(accns), len(accepted), len(dates)}
+            if len(lengths) > 1:
+                raise ValueError(
+                    f"EDGAR `recent` arrays disagree in length for CIK {cik}: "
+                    f"form={len(forms)} accession={len(accns)} "
+                    f"acceptance={len(accepted)} filingDate={len(dates)}. "
+                    f"Positions do not describe the same filing.")
+
             # Walk newest-first; take the newest filing of a form we track,
             # and the next filing of the same form as its predecessor.
             idx = next((i for i, f in enumerate(forms) if f in FORMS), None)
@@ -82,7 +97,7 @@ class Edgar(BaseSource):
                 source=self.name,
                 source_class=self.source_class,
                 subject=subject,
-                published_at=_accept_ts(accepted[idx]) if idx < len(accepted) else 0.0,
+                published_at=_accept_ts(accepted[idx]),
                 discovered_at=time.time(),
                 question=(
                     f"What is the SEC accession number of the most recent "
@@ -103,7 +118,7 @@ class Edgar(BaseSource):
                     f"&CIK={cik}&type={form}&dateb=&owner=include&count=10",
                 ],
                 meta={"company": company, "form": form,
-                      "filing_date": dates[idx] if idx < len(dates) else ""},
+                      "filing_date": dates[idx]},
             ))
             return out
 
