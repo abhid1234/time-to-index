@@ -258,7 +258,7 @@ pip install -e ".[dev]"
 pytest -q && ruff check tti tests
 ```
 
-233 tests, on Python 3.10 through 3.13, no network calls. The ones that
+243 tests, on Python 3.10 through 3.13, no network calls. The ones that
 matter:
 
 - **Turnbull reduces to Kaplan–Meier** on right-censored data — a theorem, so
@@ -285,6 +285,11 @@ matter:
 - **A phrasing run leaves time-to-index bit-identical.** A second wording of
   the same event is a second observation, not a second event; counting it
   would inflate recall and narrow every interval.
+- **A torn write does not destroy a month of collection.** This appends
+  JSONL unattended for weeks; a reboot mid-write left a partial last line and
+  every read path then raised. Worse, the next run's append fused onto that
+  fragment and lost its own record too — the recovery path was eating the
+  data it existed to save.
 - **A formatter never turns a non-number into a claim.** `fmt_bracket(nan)`
   rendered as ">15m" — asserting something was never reached inside the
   window, from a value that was not a number. Visible garbage gets noticed;

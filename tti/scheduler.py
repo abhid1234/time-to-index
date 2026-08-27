@@ -203,7 +203,15 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
         # economy: without it, every ABSENT verdict from every paid provider
         # becomes ambiguous.
         is_control = probe.provider == "origin"
-        cost = 0.0 if is_control else unit_cost(probe.provider, probe.mode, max_results)
+        try:
+            cost = (0.0 if is_control
+                    else unit_cost(probe.provider, probe.mode, max_results))
+        except config.ConfigError as exc:
+            # An arm the price table no longer knows. Skipping is right;
+            # spending against a cap that cannot see the charge is not.
+            out.append(_skip(probe, event, now, lag, f"unpriced: {exc}"))
+            rep.skipped_budget += 1
+            continue
         try:
             budget.charge(cost)
         except BudgetExceeded as exc:

@@ -209,9 +209,36 @@ def cmd_status(args) -> int:
         print(f"next due  {dt.datetime.fromtimestamp(nxt, dt.timezone.utc):%H:%M:%S UTC} "
               f"(in {fmt_duration(nxt - now)})")
     print(f"budget    ${b.spent:.4f} / ${b.cap:.2f} today")
-    est = sum(unit_cost(p.provider, p.mode) for p in due)
+    est = 0.0
+    unpriced: set[str] = set()
+    for pr in due:
+        try:
+            est += unit_cost(pr.provider, pr.mode)
+        except config.ConfigError:
+            unpriced.add(f"{pr.provider}/{pr.mode}")
     if due:
         print(f"due cost  ${est:.4f} to clear the {len(due)} probes due now")
+    if unpriced:
+        print(f"  ! {len(unpriced)} arm(s) in the ledger are not in "
+              f"providers.yaml: {', '.join(sorted(unpriced))}")
+        print("    Their probes cannot be priced and will be refused by the cap.")
+
+    bad = led.integrity()
+    if bad:
+        print("\nledger integrity")
+        for fname, counts in sorted(bad.items()):
+            parts = []
+            if counts["unparseable"]:
+                parts.append(f"{counts['unparseable']} unparseable "
+                             f"(a torn write, usually the last line)")
+            if counts["wrong_shape"]:
+                parts.append(f"{counts['wrong_shape']} wrong shape "
+                             f"(an older schema)")
+            print(f"  ! {fname}: {', '.join(parts)} of {counts['total']} records")
+        print("  These are skipped, not fatal — one interrupted write must not make")
+        print("  a month of collection unreadable. But they are records that no")
+        print("  longer count, so every rate computed from this ledger is over a")
+        print("  smaller denominator than the file length suggests.")
     return 0
 
 

@@ -161,6 +161,7 @@ of that mistake were actually made here.
 | "0 new events" | an unreachable host | collectors track per-subject errors; an all-failed source is reported broken |
 | a $5 daily spend cap | a config file saying $6, with a YAML typo | every config file is validated on load and refused, never defaulted |
 | ">15m" on the dashboard | a NaN reaching a formatter | formatters render "—" for anything not a finite, non-negative number |
+| an unreadable month of data | one interrupted write | malformed lines are skipped and counted, and `tti status` names the damage |
 
 The pattern is the same every time: something that is not a measurement
 classifies perfectly as one. Each guard costs data — dropped events, excluded

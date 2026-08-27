@@ -53,7 +53,15 @@ def unit_cost(provider: str, mode: str, n_results: int = 5) -> float:
     carries the URL it came from so a reader can check it against the vendor's
     own page rather than trusting this repo.
     """
-    cfg = config.providers_config()["providers"][provider]
+    providers = config.providers_config()["providers"]
+    if provider not in providers:
+        # Realistic: an arm is removed from providers.yaml after it has
+        # already written results. Pricing it as zero would let it spend
+        # against a cap that cannot see it; guessing a price would be worse.
+        raise config.ConfigError(
+            f"data/providers.yaml has no entry for `{provider}`, but the ledger "
+            f"references it. Restore the entry or the arm cannot be priced.")
+    cfg = providers[provider]
     modes = cfg.get("modes", {})
     m = modes.get(mode) or next(iter(modes.values()))
     per_k = float(m.get("usd_per_1k_requests", 0.0))
