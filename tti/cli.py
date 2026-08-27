@@ -487,6 +487,64 @@ def cmd_routes(args) -> int:
     return 0
 
 
+def cmd_watch(args) -> int:
+    """Record a survey into a ledger, or report how postures have moved.
+
+    A single scan says a page is unreadable today. It cannot say the page used
+    to be readable, which is the actionable statement: nobody decides to
+    become invisible to agents, they ship a refactor and no signal turns red.
+    """
+    from . import survey as sv_mod
+    from . import watch as w
+
+    run_dir = pathlib.Path(args.run_dir) if args.run_dir else config.RUNS
+    hist = w.history(run_dir)
+
+    if not args.report:
+        targets = [(u, "cli") for u in args.urls] if args.urls else None
+        sv = sv_mod.run(targets, workers=args.workers, repeat=args.repeat)
+        n = w.record(sv, run_dir)
+        hit, judged = sv.readable_rate()
+        print(f"recorded {n} observations · {hit}/{judged} readable this run")
+        hist = w.history(run_dir)
+
+    cov = w.coverage(hist)
+    if not cov.runs:
+        print("no history yet — run `tti watch` at least twice, days apart")
+        return 1
+
+    print(f"\n{cov.urls} URLs · {cov.runs} runs · {cov.span_days:.1f} days of history "
+          f"· {cov.judged_rate*100:.0f}% of observations judged")
+    if cov.runs < 2:
+        print("  One run is not a series. Nothing can be said about change yet.")
+        return 0
+    if cov.span_days < 1:
+        print("  Under a day of history. Sites redeploy on the order of days, so")
+        print("  'nothing changed' here is a statement about the window, not the web.")
+
+    ch = w.changes(hist)
+    if not ch:
+        print("\nNo posture changed between judged observations.")
+    else:
+        worse = [c for c in ch if c.worsened]
+        print(f"\n{len(ch)} change(s), {len(worse)} of them regressions:")
+        for c in ch:
+            mark = "!" if c.worsened else " "
+            when = dt.datetime.fromtimestamp(c.at, dt.timezone.utc).strftime("%Y-%m-%d")
+            print(f" {mark} {when}  {c.url[8:60]:52s} {c.describe()}")
+        if worse:
+            print("\n  Each regression shipped in a routine change. No build check, no")
+            print("  deploy gate and no dashboard turns red when a route stops being")
+            print("  readable, which is why these are only visible in hindsight.")
+
+    if cov.never_judged:
+        print(f"\n{len(cov.never_judged)} URL(s) were never judged in any run and "
+              f"contribute nothing:")
+        for u in cov.never_judged[:8]:
+            print(f"  {u}")
+    return 0
+
+
 def cmd_survey(args) -> int:
     """Scan a corpus of pages and report how much of it an agent can read.
 
@@ -753,6 +811,15 @@ def main(argv: list[str] | None = None) -> int:
                     help="fetches per route; a verdict needs them to agree")
     rt.add_argument("--workers", type=int, default=6)
     rt.set_defaults(fn=cmd_routes)
+
+    wt = sub.add_parser("watch",
+                        help="record crawlability over time and report what moved")
+    wt.add_argument("urls", nargs="*", help="URLs to record (default: data/corpus.yaml)")
+    wt.add_argument("--report", action="store_true",
+                    help="only report on existing history; do not fetch")
+    wt.add_argument("--repeat", type=int, default=2)
+    wt.add_argument("--workers", type=int, default=12)
+    wt.set_defaults(fn=cmd_watch)
 
     sv = sub.add_parser("survey",
                         help="how much of a corpus is readable without JavaScript?")

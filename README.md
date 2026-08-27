@@ -85,6 +85,22 @@ robots.txt and ship them nothing at all** — no readable body and no metadata.
 Nobody chose that. It falls out of a rendering default, and the robots.txt
 records that the team wanted the opposite.
 
+`tti watch` records each run and reports where posture *moved*. That is the
+statement a single scan cannot make and the only one that is actionable:
+nobody decides to become invisible to agents, they ship a refactor and no
+signal turns red. There is no build check, no deploy gate and no dashboard
+panel that goes red when a route stops being readable, so a regression is
+only ever visible in hindsight — and only if something was watching.
+
+```bash
+tti watch                 # record a run
+tti watch --report        # what moved, without fetching
+```
+
+It refuses to overclaim: one run is not a series, and under a day of history
+"nothing changed" describes the observation window rather than the web. Both
+are printed rather than assumed.
+
 `tti routes` exists because one page is enough to prove a failure and not
 enough to describe a site. Marketing pages are almost always server-rendered;
 the interesting failures are on detail pages. It reads the site's own sitemap,
