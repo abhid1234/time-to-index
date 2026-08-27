@@ -67,7 +67,16 @@ ledger required, measure the corpus rather than the providers:
 tti crawlability https://yoursite.com --find "the fact you care about"
 tti routes https://yoursite.com --sample 8    # sample the site's own sitemap
 tti survey                                     # scan data/corpus.yaml
+tti survey --out-dir docs                      # ...and render corpus.html
+tti watch --out-dir docs                       # ...with the change history
 ```
+
+The corpus half gets its own page rather than a section of the provider
+dashboard, because the two measure different things on different schedules
+and a combined page would imply a joint analysis that only exists once both
+have run. It refuses whatever the terminal refuses: unreachable, unstable and
+intercepted targets appear as excluded with the reason, never folded into the
+rate.
 
 `crawlability` answers the two questions that decide whether a page enters an
 AI system: is the content in the served bytes as text, and is the crawler

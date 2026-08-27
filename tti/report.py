@@ -17,6 +17,7 @@ from __future__ import annotations
 import datetime as dt
 import html
 import math
+import statistics
 
 from .metrics import (
     ProviderScore,
@@ -295,6 +296,190 @@ td.k{font-family:var(--mono);font-size:12.5px}
 footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);
        color:var(--muted);font-size:12.5px}
 """
+
+
+def corpus_html(sv, hist=None, changes=(), coverage=None) -> str:
+    """The corpus half, rendered.
+
+    Kept as a separate page from the provider leaderboard rather than a
+    section of it, because the two measure different things and are usually
+    collected on different schedules. A page that stitched them together
+    would imply a joint analysis that only exists once both have run.
+
+    Everything the terminal output refuses to claim, this page refuses too:
+    unreachable, unstable and intercepted targets are shown as excluded with
+    the reason, never folded into the rate.
+    """
+    esc = html.escape
+    gen = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    hit, n = sv.readable_rate()
+    meta = sv.metadata_only()
+    ratios = sv.text_ratios()
+    pct = (hit / n * 100) if n else float("nan")
+
+    MEANING = {
+        "server_rendered": "readable — content in the served HTML",
+        "static_html": "readable — plain server-delivered HTML",
+        "metadata_only": "partial — JSON-LD or OpenGraph over an unreadable body",
+        "client_shell": "not readable — a mount point and a bundle",
+        "flight_payload": "at risk — content only in a hydration stream",
+        "no_body": "no verdict — response too small to judge",
+    }
+
+    rows = "".join(
+        "<tr>"
+        f"<td class='k'>{esc(r.url[8:72])}</td>"
+        f"<td class='k'>{r.prof.text_ratio*100:.2f}%</td>"
+        f"<td class='k'>{r.prof.visible_chars:,}</td>"
+        f"<td class='k'>{esc(r.prof.framework)}</td>"
+        f"<td class='k{'' if r.readable else ' bad'}'>{esc(r.prof.posture)}</td>"
+        f"<td class='k'>{len(r.robots_blocked)}/{r.robots_checked}</td>"
+        "</tr>"
+        for r in sorted(sv.usable, key=lambda x: x.prof.text_ratio))
+
+    posture_rows = "".join(
+        f"<tr><td class='k'>{esc(k)}</td><td class='k'>{v}</td>"
+        f"<td>{esc(MEANING.get(k, ''))}</td></tr>"
+        for k, v in sv.by_posture().most_common())
+
+    cat_rows = "".join(
+        f"<tr><td>{esc(c.replace('_', ' '))}</td>"
+        f"<td class='k'>{h}/{t}</td>"
+        f"<td class='k'>{h/t*100:.0f}%</td></tr>"
+        for c, (h, t) in sv.by_category().items())
+
+    empty = sv.open_and_empty()
+    partial = [r for r in sv.open_but_unreadable() if r not in empty]
+    empty_block = ""
+    if empty:
+        empty_block = (
+            "<div class='panel'><p style='margin-top:0'><b>"
+            f"{len(empty)} page(s) allow every AI crawler in robots.txt and ship "
+            "them nothing at all</b> — no readable body and no metadata.</p><ul>"
+            + "".join(f"<li class='k'>{esc(r.url)} "
+                      f"<span style='color:var(--muted)'>"
+                      f"({r.prof.visible_chars} visible chars)</span></li>"
+                      for r in empty)
+            + "</ul><p class='note'>Nobody chose this. It falls out of a rendering "
+              "default, and the robots.txt records that the team wanted the "
+              "opposite.</p>"
+            + ("" if not partial else
+               "<p class='note' style='border-color:var(--muted)'>"
+               f"{len(partial)} more allow every crawler and ship metadata only: a "
+               "summary of what the page is, not what it says.</p>")
+            + "</div>")
+
+    excluded = []
+    if sv.intercepted:
+        excluded.append(f"{len(sv.intercepted)} returned a body identical to another "
+                        f"URL's — one page served for many is a challenge, block or "
+                        f"proxy, not a rendering posture")
+    if sv.unstable:
+        excluded.append(f"{len(sv.unstable)} answered differently across repeat "
+                        f"fetches")
+    plain_unreachable = len(sv.unreachable) - len(sv.unstable) - len(sv.intercepted)
+    if plain_unreachable > 0:
+        excluded.append(f"{plain_unreachable} could not be fetched")
+    excluded_block = ("" if not excluded else
+                      "<div class='panel'><p style='margin-top:0'><b>Excluded from "
+                      "every rate above:</b></p><ul>"
+                      + "".join(f"<li>{esc(x)}</li>" for x in excluded)
+                      + "</ul><p class='note'>A survey that counts failed fetches as "
+                        "unreadable pages is measuring its own network.</p></div>")
+
+    history_block = ""
+    if coverage and coverage.runs >= 2:
+        worse = [c for c in changes if c.worsened]
+        change_rows = "".join(
+            f"<tr><td class='k'>"
+            f"{dt.datetime.fromtimestamp(c.at, dt.timezone.utc):%Y-%m-%d}</td>"
+            f"<td class='k'>{esc(c.url[8:60])}</td>"
+            f"<td class='k{' bad' if c.worsened else ''}'>{esc(c.describe())}</td>"
+            "</tr>" for c in changes)
+        history_block = f"""
+<h2>What moved</h2>
+<div class="panel">
+  <p style="margin-top:0">{coverage.urls} URLs over {coverage.span_days:.1f} days
+  and {coverage.runs} runs. <b>{len(changes)}</b> posture change(s),
+  <b>{len(worse)}</b> of them regressions.</p>
+  {"<div class='scroll'><table><thead><tr><th>when</th><th>page</th>"
+   "<th>what changed</th></tr></thead><tbody>" + change_rows +
+   "</tbody></table></div>" if changes else
+   "<p>No posture changed between judged observations.</p>"}
+  <p class="note">{"Under a day of history — 'nothing changed' describes the "
+   "observation window, not the web." if coverage.span_days < 1 else
+   "Nobody decides to become invisible to agents. They ship a refactor, and no "
+   "build check, deploy gate or dashboard turns red when a route stops being "
+   "readable. These are only ever visible in hindsight, and only if something "
+   "was watching."}</p>
+</div>"""
+
+    ratio_line = ("" if not ratios else
+                  f"Median visible-text ratio {statistics.median(ratios)*100:.1f}%, "
+                  f"ranging {ratios[0]*100:.2f}% to {ratios[-1]*100:.1f}%.")
+
+    return f"""<title>Can an Agent Read the Web</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>{_CSS}</style>
+<div class="wrap">
+<h1>Can an Agent Read the Web</h1>
+<p class="sub">Whether a page's content arrives in the served bytes as text, or as
+instructions for producing text. Many crawlers — including several feeding large AI
+systems — do not run those instructions. Generated {gen}.</p>
+
+<div class="panel">
+  <p style="margin-top:0"><span class="big">{hit} of {n}</span> pages were readable
+  without executing JavaScript{f" ({pct:.0f}%)" if n else ""}.
+  {f"<b>{len(meta)}</b> more shipped metadata over an unreadable body." if meta else ""}</p>
+  <p class="note">{esc(ratio_line)} A page can be correct, fast, fully permitted by
+  robots.txt, and still contribute nothing.</p>
+</div>
+
+{empty_block}
+
+<h2>Every page judged</h2>
+<div class="panel">
+  <div class="scroll"><table>
+    <thead><tr><th>page</th><th>visible text</th><th>chars</th><th>framework</th>
+    <th>posture</th><th>robots blocks</th></tr></thead>
+    <tbody>{rows}</tbody></table></div>
+  <p class="note">Visible text is what remains once script, style, template and
+  noscript blocks and all tags are stripped — roughly what a crawler that does not
+  execute JavaScript reads. Framework is detected from served-byte markers and is
+  reported, not blamed: posture predicts retrievability and framework only correlates
+  with it. The same framework and version produce a fully server-rendered article and
+  an empty shell, and which one you get is an application decision.</p>
+</div>
+
+<h2>Posture</h2>
+<div class="panel">
+  <div class="scroll"><table>
+    <thead><tr><th>posture</th><th>pages</th><th>meaning</th></tr></thead>
+    <tbody>{posture_rows}</tbody></table></div>
+</div>
+
+<h2>By category</h2>
+<div class="panel">
+  <div class="scroll"><table>
+    <thead><tr><th>category</th><th>readable</th><th>rate</th></tr></thead>
+    <tbody>{cat_rows}</tbody></table></div>
+  <p class="note">Deep pages, not homepages. Homepages are marketing and are almost
+  always server-rendered; the interesting failures are on the detail pages where the
+  fact an agent was sent for actually lives.</p>
+</div>
+
+{excluded_block}
+{history_block}
+
+<footer>
+Reproduce any row with <code>tti crawlability &lt;url&gt;</code>. Nothing here is
+scored against a standard that does not exist: <code>llms.txt</code> is reported and
+never graded, and a site that deliberately blocks AI crawlers is recorded as having
+made a choice, not as having failed.
+</footer>
+</div>"""
 
 
 def placeholder_page() -> str:

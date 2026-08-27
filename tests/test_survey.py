@@ -108,3 +108,56 @@ def test_unstable_pages_cannot_reach_the_headline_claim():
                    seen=["client_shell", "error"])])
     assert sv.open_and_empty() == []
     assert sv.open_but_unreadable() == []
+
+
+# ---------------------------------------------------------------------------
+# The rendered corpus page
+# ---------------------------------------------------------------------------
+
+def test_the_corpus_page_refuses_what_the_terminal_refuses():
+    """Whatever the CLI declines to claim, the page must decline too.
+    A rendered artifact is the version that gets screenshotted."""
+    from tti import report
+    from tti.framework import METADATA
+
+    sv = Survey([
+        r("https://good/a", STATIC, category="docs", ratio=0.2),
+        r("https://shell/b", SHELL, category="docs", ratio=0.001, blocked=[]),
+        r("https://meta/c", METADATA, category="registry", ratio=0.01, blocked=[]),
+        SiteResult(url="https://dead/d", error="ProxyError"),
+        r("https://flaky/e", SHELL, stable=False, seen=["client_shell", "error"]),
+    ])
+    sv.results[-1].body_sha = ""
+    html = report.corpus_html(sv)
+
+    assert ">1 of 3</span> pages were readable" in html
+    # The shell page invites every crawler and ships nothing: the headline.
+    assert "ship them nothing at all" in html
+    assert "https://shell/b" in html
+    # Excluded targets are named as excluded, never folded into the rate.
+    assert "Excluded from" in html
+    assert "measuring its own network" in html
+    # Metadata is a third state, not a pardon.
+    assert "metadata_only" in html
+
+
+def test_the_corpus_page_does_not_overclaim_from_one_run():
+    from tti import report
+    from tti.watch import Coverage
+
+    sv = Survey([r("https://a", STATIC)])
+    cov = Coverage(urls=1, runs=2, first=0.0, last=3600.0, judged_rate=1.0)
+    html = report.corpus_html(sv, {}, [], cov)
+    assert "describes the observation window" in html
+
+
+def test_the_corpus_page_escapes_hostile_urls():
+    """URLs come from a corpus file and from sitemaps, so they are not
+    trusted input. What matters is that no raw angle bracket from that data
+    reaches the document — the payload appearing as escaped *text* is the
+    correct outcome, not a failure."""
+    from tti import report
+    sv = Survey([r('https://x/"><img src=x onerror=alert(1)>', STATIC)])
+    html = report.corpus_html(sv)
+    assert "<img" not in html            # no element was created
+    assert "&lt;img src=x onerror=alert(1)&gt;" in html   # it is inert text

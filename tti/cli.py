@@ -672,6 +672,7 @@ def cmd_watch(args) -> int:
     run_dir = pathlib.Path(args.run_dir) if args.run_dir else config.RUNS
     hist = w.history(run_dir)
 
+    sv = None
     if not args.report:
         targets = [(u, "cli") for u in args.urls] if args.urls else None
         sv = sv_mod.run(targets, workers=args.workers, repeat=args.repeat)
@@ -681,6 +682,7 @@ def cmd_watch(args) -> int:
         hist = w.history(run_dir)
 
     cov = w.coverage(hist)
+    ch: list = []
     if not cov.runs:
         print("no history yet — run `tti watch` at least twice, days apart")
         return 1
@@ -689,6 +691,12 @@ def cmd_watch(args) -> int:
           f"· {cov.judged_rate*100:.0f}% of observations judged")
     if cov.runs < 2:
         print("  One run is not a series. Nothing can be said about change yet.")
+        if getattr(args, "out_dir", None) and sv is not None:
+            out = _out_dir(args) / "corpus.html"
+            out.write_text(report.full_page(report.corpus_html(sv, hist, [], cov),
+                                            "Can an Agent Read the Web"),
+                           encoding="utf-8")
+            print(f"  wrote {out}")
         return 0
     if cov.span_days < 1:
         print("  Under a day of history. Sites redeploy on the order of days, so")
@@ -714,6 +722,16 @@ def cmd_watch(args) -> int:
               f"contribute nothing:")
         for u in cov.never_judged[:8]:
             print(f"  {u}")
+
+    if getattr(args, "out_dir", None):
+        if sv is None:
+            print("\n--out-dir needs a survey to render; drop --report to fetch one")
+        else:
+            out = _out_dir(args) / "corpus.html"
+            out.write_text(
+                report.full_page(report.corpus_html(sv, hist, ch, cov),
+                                 "Can an Agent Read the Web"), encoding="utf-8")
+            print(f"\nwrote {out}")
     return 0
 
 
@@ -796,6 +814,13 @@ def cmd_survey(args) -> int:
               f"fetches and were excluded:")
         for r in sv.unstable[:10]:
             print(f"  {r.url[8:56]:50s} {' / '.join(r.postures_seen)}")
+
+    if getattr(args, "out_dir", None):
+        out = _out_dir(args) / "corpus.html"
+        out.write_text(report.full_page(report.corpus_html(sv),
+                                        "Can an Agent Read the Web"),
+                       encoding="utf-8")
+        print(f"\nwrote {out}")
 
     if sv.unreachable and args.verbose:
         print(f"\nnot judged ({len(sv.unreachable)}):")
@@ -996,6 +1021,7 @@ def main(argv: list[str] | None = None) -> int:
                     help="only report on existing history; do not fetch")
     wt.add_argument("--repeat", type=int, default=2)
     wt.add_argument("--workers", type=int, default=12)
+    wt.add_argument("--out-dir", help="also render corpus.html here")
     wt.set_defaults(fn=cmd_watch)
 
     sv = sub.add_parser("survey",
@@ -1006,6 +1032,7 @@ def main(argv: list[str] | None = None) -> int:
                     help="fetches per URL; a verdict needs them to agree (default 2)")
     sv.add_argument("--json", action="store_true")
     sv.add_argument("--verbose", action="store_true", help="list unreachable targets")
+    sv.add_argument("--out-dir", help="also render corpus.html here")
     sv.set_defaults(fn=cmd_survey)
 
     fx = sub.add_parser("forecast", help="days until this run can support a claim")
