@@ -43,6 +43,7 @@ class Ledger:
         (self.root / "raw").mkdir(parents=True, exist_ok=True)
         self.skipped: dict[str, int] = {}
         self.shape_errors: dict[str, int] = {}
+        self.duplicates = 0
 
     # -- paths -------------------------------------------------------------
     @property
@@ -152,7 +153,25 @@ class Ledger:
                         shape += 1
             if unparseable or shape:
                 out[path.name] = {"unparseable": unparseable,
-                                  "wrong_shape": shape, "total": total}
+                                  "wrong_shape": shape, "total": total,
+                                  "duplicates": 0}
+
+        # Duplicate probe ids are a separate failure with a separate cause:
+        # two runs overlapping rather than one write being interrupted.
+        seen: set[str] = set()
+        dupes = 0
+        for row in self._read(self.results_path):
+            pid = row.get("probe_id")
+            if pid is None:
+                continue
+            if pid in seen:
+                dupes += 1
+            seen.add(pid)
+        if dupes:
+            entry = out.setdefault(self.results_path.name,
+                                   {"unparseable": 0, "wrong_shape": 0,
+                                    "total": len(seen) + dupes, "duplicates": 0})
+            entry["duplicates"] = dupes
         return out
 
     # -- events ------------------------------------------------------------
@@ -191,7 +210,24 @@ class Ledger:
 
     # -- results -----------------------------------------------------------
     def results(self) -> list[ProbeResult]:
-        return list(self._typed(self.results_path, ProbeResult.from_dict))
+        """Results, de-duplicated by probe_id, first occurrence winning.
+
+        Two overlapping `tti probe` runs both dispatch every due probe and
+        both append, so the same probe_id lands twice. Counting it twice
+        inflates every rate and double-counts the spend. The lock in
+        `tti.lock` stops it happening again; this keeps a ledger that already
+        has it from being wrong, and `integrity()` reports how many there
+        were.
+        """
+        seen: set[str] = set()
+        out: list[ProbeResult] = []
+        for r in self._typed(self.results_path, ProbeResult.from_dict):
+            if r.probe_id in seen:
+                self.duplicates = getattr(self, "duplicates", 0) + 1
+                continue
+            seen.add(r.probe_id)
+            out.append(r)
+        return out
 
     def completed_probe_ids(self) -> set[str]:
         return {d["probe_id"] for d in self._read(self.results_path)

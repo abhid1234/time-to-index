@@ -162,6 +162,7 @@ of that mistake were actually made here.
 | a $5 daily spend cap | a config file saying $6, with a YAML typo | every config file is validated on load and refused, never defaulted |
 | ">15m" on the dashboard | a NaN reaching a formatter | formatters render "—" for anything not a finite, non-negative number |
 | an unreadable month of data | one interrupted write | malformed lines are skipped and counted, and `tti status` names the damage |
+| twice the spend and every rate doubled | two cron runs overlapping | an advisory lock; a second run exits zero saying it was early |
 
 The pattern is the same every time: something that is not a measurement
 classifies perfectly as one. Each guard costs data — dropped events, excluded

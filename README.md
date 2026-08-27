@@ -258,7 +258,7 @@ pip install -e ".[dev]"
 pytest -q && ruff check tti tests
 ```
 
-243 tests, on Python 3.10 through 3.13, no network calls. The ones that
+252 tests, on Python 3.10 through 3.13, no network calls. The ones that
 matter:
 
 - **Turnbull reduces to Kaplan–Meier** on right-censored data — a theorem, so
@@ -285,6 +285,11 @@ matter:
 - **A phrasing run leaves time-to-index bit-identical.** A second wording of
   the same event is a second observation, not a second event; counting it
   would inflate recall and narrow every interval.
+- **Two cron runs cannot overlap.** Cron fires on a schedule, not on
+  completion, so the moment a provider is slow enough that `tti probe`
+  outlasts its interval the next run starts alongside it. Measured: six
+  queued probes became twelve provider calls, six duplicate rows, and exactly
+  double the spend, with every later rate counting one observation twice.
 - **A torn write does not destroy a month of collection.** This appends
   JSONL unattended for weeks; a reboot mid-write left a partial last line and
   every read path then raised. Worse, the next run's append fused onto that

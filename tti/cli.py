@@ -144,8 +144,15 @@ def cmd_doctor(args) -> int:
 
 
 def cmd_discover(args) -> int:
+    from . import lock
+
     led = _ledger(args)
-    rep = discover(led, source_names=args.sources or None)
+    try:
+        with lock.exclusive(led.root, "discover"):
+            rep = discover(led, source_names=args.sources or None)
+    except lock.Busy as exc:
+        print(f"skipped: {exc}")
+        return 0
     print(f"collected {rep.collected} · new {rep.new_events} · "
           f"dropped-late {rep.dropped_late} · probes queued {rep.probes_queued}")
     for k, v in sorted(rep.per_source.items()):
@@ -159,8 +166,26 @@ def cmd_discover(args) -> int:
 
 
 def cmd_probe(args) -> int:
+    from . import lock
+
     led = _ledger(args)
-    rep = run_due(led, limit=args.limit, dry_run=args.dry_run)
+    if args.dry_run:
+        rep = run_due(led, limit=args.limit, dry_run=True)
+    else:
+        try:
+            with lock.exclusive(led.root, "probe"):
+                if not lock.SUPPORTED:
+                    print("  ! file locking unavailable on this platform; "
+                          "overlapping runs are not prevented")
+                rep = run_due(led, limit=args.limit, dry_run=False)
+        except lock.Busy as exc:
+            # Exit 0. A second run that cannot take the lock is early, not
+            # broken, and a cron wrapper should not page anyone for it.
+            print(f"skipped: {exc}")
+            print("  Two overlapping runs dispatch every due probe twice — double "
+                  "spend,\n  duplicate rows, and every rate computed afterwards "
+                  "counting one\n  observation twice.")
+            return 0
     print(f"dispatched {rep.dispatched} · FRESH {rep.fresh} · STALE {rep.stale} · "
           f"ABSENT {rep.absent} · errors {rep.errors}")
     print(f"skipped: carry-forward {rep.skipped_carry} · budget {rep.skipped_budget} · "
@@ -234,6 +259,9 @@ def cmd_status(args) -> int:
             if counts["wrong_shape"]:
                 parts.append(f"{counts['wrong_shape']} wrong shape "
                              f"(an older schema)")
+            if counts.get("duplicates"):
+                parts.append(f"{counts['duplicates']} duplicate probe id(s) "
+                             f"(two runs overlapped)")
             print(f"  ! {fname}: {', '.join(parts)} of {counts['total']} records")
         print("  These are skipped, not fatal — one interrupted write must not make")
         print("  a month of collection unreadable. But they are records that no")

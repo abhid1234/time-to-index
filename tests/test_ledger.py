@@ -73,7 +73,9 @@ def test_a_record_of_the_wrong_shape_is_counted_separately(tmp_path):
     with open(led.results_path, "a", encoding="utf-8") as fh:
         fh.write(json.dumps({"unexpected": "shape"}) + "\n")
     report = Ledger(tmp_path).integrity()
-    assert report["results.jsonl"] == {"unparseable": 0, "wrong_shape": 1, "total": 2}
+    assert report["results.jsonl"]["wrong_shape"] == 1
+    assert report["results.jsonl"]["unparseable"] == 0
+    assert report["results.jsonl"]["duplicates"] == 0
 
 
 def test_a_clean_ledger_reports_nothing(tmp_path):
