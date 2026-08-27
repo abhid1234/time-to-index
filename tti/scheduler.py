@@ -48,6 +48,7 @@ class DiscoverReport:
     collected: int = 0
     new_events: int = 0
     dropped_late: int = 0
+    dropped_future: int = 0
     probes_queued: int = 0
     per_source: dict = None
     source_errors: dict = None
@@ -64,6 +65,7 @@ def discover(ledger: Ledger, source_names: list[str] | None = None,
     s = config.settings()
     names = source_names or s.get("sources", [])
     max_lag = float(s.get("max_detection_lag_seconds", config.MAX_DETECTION_LAG))
+    max_skew = float(s.get("max_clock_skew_seconds", config.MAX_CLOCK_SKEW))
     seen = ledger.seen_subjects()
     rep = DiscoverReport()
 
@@ -97,6 +99,15 @@ def discover(ledger: Ledger, source_names: list[str] | None = None,
     for e in candidates:
         if e.published_at <= 0:
             rep.dropped_late += 1
+            continue
+        # A publication timestamp ahead of our clock. Seconds of skew are
+        # ordinary; more than the tolerance means the ladder would anchor to
+        # a t0 that has not happened, so every lag it produced would describe
+        # nothing while looking like a normal event. Causes seen in the wild:
+        # a publisher's clock, an embargoed release dated forward, and a
+        # timezone bug in a collector.
+        if e.detection_lag < -max_skew:
+            rep.dropped_future += 1
             continue
         if e.detection_lag > max_lag:
             # Not a failure. The watchlist is polled every five minutes, so

@@ -76,6 +76,16 @@ Three rules discard data to keep the rest honest:
 publication cannot be probed at the 5-minute rung. Rather than record it at
 the wrong lag, the event is dropped. Threshold: 600 seconds.
 
+**Clock skew.** Every ladder is anchored to the publisher's timestamp, not
+one we observed — that is the point, since it is the only clock describing
+when the fact entered the world. It also means the measurement inherits
+whatever that clock says. A publisher a few seconds ahead is ordinary; one
+days ahead anchors the ladder to a time that has not happened, so every lag
+it produces describes nothing while the event looks entirely normal on the
+way in. Beyond 120 seconds of forward skew the event is dropped and counted
+separately from a late detection, because the causes differ: one is our
+polling interval, the other is someone else's clock.
+
 **Rung slip.** If the runner was down and a probe fires 90 minutes past its
 15-minute due time, recording it as a 15-minute observation is false and
 recording it as a 105-minute observation biases the ladder. It is dropped,

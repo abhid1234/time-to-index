@@ -26,6 +26,13 @@ DEFAULT_LADDER = [300, 900, 3600, 21_600, 86_400, 259_200]
 # attribute our own collection delay to a provider.
 MAX_DETECTION_LAG = 600.0
 
+# How far a publisher's clock may run ahead of ours before its timestamp is
+# treated as an error rather than as skew. A few seconds is ordinary and
+# harmless. Hours mean the ladder would be anchored to a t0 that never
+# happened, and every lag it produced would describe nothing -- while looking
+# exactly like a normal event.
+MAX_CLOCK_SKEW = 120.0
+
 # A probe fired more than this far past its due time is dropped rather than
 # recorded at the wrong rung.
 MAX_RUNG_SLIP = 600.0
@@ -73,7 +80,8 @@ def _validate_settings(name: str, d: Any) -> None:
         _fail(name, f"`daily_usd_cap` must be a positive number of dollars, "
                     f"got {cap!r}")
 
-    for key, lo, hi in (("max_results", 1, 100),
+    for key, lo, hi in (("max_clock_skew_seconds", 0, 86_400),
+                        ("max_results", 1, 100),
                         ("max_chars_per_result", 100, 100_000),
                         ("max_detection_lag_seconds", 1, 86_400),
                         ("max_rung_slip_seconds", 1, 86_400)):

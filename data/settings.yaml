@@ -22,6 +22,12 @@ max_detection_lag_seconds: 600
 # recorded at a rung it did not actually observe.
 max_rung_slip_seconds: 600
 
+# How far a publisher's clock may run ahead of ours before its timestamp is
+# treated as an error rather than as skew. Seconds are ordinary. Beyond this,
+# the ladder would be anchored to a t0 that has not happened and every lag it
+# produced would describe nothing.
+max_clock_skew_seconds: 120
+
 # Fetch each event's canonical URL directly at every rung, to separate "the
 # provider was slow" from "the document was not on the web yet". Free, and
 # the arm most likely to change how the leaderboard reads.

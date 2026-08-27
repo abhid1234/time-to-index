@@ -216,6 +216,11 @@ def cmd_discover(args) -> int:
         return 0
     print(f"collected {rep.collected} · new {rep.new_events} · "
           f"dropped-late {rep.dropped_late} · probes queued {rep.probes_queued}")
+    if rep.dropped_future:
+        print(f"  ! {rep.dropped_future} event(s) had a publication timestamp ahead "
+              f"of our clock by more than the skew tolerance and were dropped.")
+        print("    Their ladder would have been anchored to a time that has not "
+              "happened.")
     for k, v in sorted(rep.per_source.items()):
         print(f"  {k:18s} {v}")
     if rep.broken_sources:
