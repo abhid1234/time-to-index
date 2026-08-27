@@ -186,17 +186,23 @@ def _ci(sc: ProviderScore) -> str:
 
 
 def _cpf(v: float) -> str:
-    if v != v:
+    if not isinstance(v, (int, float)) or v != v:
         return "—"
     if v == float("inf"):
         return "no answers"
+    if v < 0:
+        return "—"      # not a price
     return f"${v*1000:.2f}"
 
 
 def _pct(t: tuple[float, float, float]) -> str:
     p, lo, hi = t
-    if p != p:  # NaN
+    if not all(isinstance(v, (int, float)) and math.isfinite(v) for v in t):
         return "—"
+    # Clamp the interval to [0, 1]. Wilson stays inside it by construction,
+    # but a rendered "0% (-10–150)" is worse than a clamped one either way,
+    # and this is the last place to catch it.
+    lo, hi = max(0.0, min(1.0, lo)), max(0.0, min(1.0, hi))
     return f"{p*100:.0f}% ({lo*100:.0f}–{hi*100:.0f})"
 
 
@@ -393,6 +399,16 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
                "far more often than a benchmark does, because an agent asks whatever its "
                "planner produced that turn rather than what a template would write.</p>")
 
+    dropped = [(f"{s.provider}/{s.mode}", s.npmle.dropped) for s in scores
+               if s.npmle.dropped]
+    drop_note = ("" if not dropped else
+                 "<p class='note' style='border-color:var(--bad)'><b>"
+                 + e(", ".join(f"{a}: {n}" for a, n in dropped))
+                 + "</b> observation(s) matched no support interval and were "
+                   "excluded from the fit. That shrinks the denominator of every "
+                   "rate on this row, so it is stated rather than left as an "
+                   "unexplained gap.</p>")
+
     non_converged = [f"{s.provider}/{s.mode}" for s in scores
                      if s.npmle.n and not s.npmle.converged]
     converge_note = ("" if not non_converged else
@@ -579,6 +595,7 @@ Generated {gen}.</p>
     <th>events</th></tr></thead>
     <tbody>{rows}</tbody></table></div>
   {converge_note}
+  {drop_note}
   {ph_note}
   <p class="note">The CI column is a nonparametric bootstrap on the median bracket's
   upper edge. It is here because a median printed without one is the most common way a

@@ -66,6 +66,11 @@ class NPMLE:
     iterations: int = 0
     converged: bool = True
     loglik: float = 0.0
+    # Observations that matched no support interval and were excluded. An
+    # inverted or zero-width interval carries no information, but dropping
+    # one silently shrinks the denominator of every rate computed from this
+    # fit, and nothing downstream would show that it happened.
+    dropped: int = 0
 
     # -- the survival function ------------------------------------------
     def cdf_upper(self, t: float) -> float:
@@ -152,6 +157,8 @@ def fit(obs: list[Interval], tol: float = 1e-10, max_iter: int = 10_000) -> NPML
         idx = [j for j, (q, p) in enumerate(support) if iv.contains(q, p)]
         if idx:
             rows.append(idx)
+        else:
+            est.dropped += 1
     if not rows:
         return est
     n = len(rows)

@@ -38,6 +38,12 @@ def wilson(successes: int, n: int, z: float = Z95) -> tuple[float, float, float]
     """Wilson score interval. Returns (point, low, high)."""
     if n == 0:
         return (float("nan"),) * 3
+    if successes < 0 or successes > n:
+        # A caller bug, and a silent clamp would turn it into a plausible
+        # number on a published page. `math domain error` from deep inside
+        # the arithmetic was the previous behaviour and named nothing.
+        raise ValueError(f"wilson: {successes} successes out of {n} trials is "
+                         f"not a proportion")
     p = successes / n
     d = 1 + z * z / n
     centre = (p + z * z / (2 * n)) / d
@@ -413,6 +419,16 @@ def score(
     sc.p90_ttl = sc.curve.quantile(0.9)
 
     ivs = intervals(events, results, provider, mode, source_class)
+    # An inverted interval means the builder produced a first-FRESH lag
+    # earlier than the last not-FRESH lag, which should be impossible. If it
+    # ever happens the fit silently loses the event, so it is asserted here
+    # rather than discovered as an unexplained gap between n_events and the
+    # estimator's n.
+    bad = [iv for iv in ivs if iv.hi < iv.lo]
+    if bad:
+        raise ValueError(f"{provider}/{mode}: {len(bad)} interval(s) with hi < lo, "
+                         f"e.g. {bad[0]}. A probe was graded FRESH before an "
+                         f"earlier probe was graded not-FRESH.")
     sc.npmle = turnbull_fit(ivs)
     sc.median_bracket = sc.npmle.quantile_bracket(0.5)
     sc.p90_bracket = sc.npmle.quantile_bracket(0.9)
@@ -492,7 +508,7 @@ def score(
     return sc
 
 
-def bracket(rungs: list[int], t: float | None) -> tuple[float | None, float | None]:
+def bracket(rungs: list[int], t: float | None) -> tuple[float | None, float | None]:  # noqa: D401
     """The interval a ladder observation actually pins down.
 
     A provider probed at 5m, 15m, 1h and first seen FRESH at the 1h rung
@@ -506,8 +522,10 @@ def bracket(rungs: list[int], t: float | None) -> tuple[float | None, float | No
     0 means the provider had already indexed by the first rung, which is its
     own finding.
     """
-    if t is None:
-        return (float(rungs[-1]) if rungs else None, None)
+    if t is None or not _finite(t):
+        # A NaN is not "never reached". It is "we do not know", and the two
+        # render identically unless they are distinguished here.
+        return (float(rungs[-1]) if (rungs and t is None) else None, None)
     lower = 0.0
     for r in rungs:
         if float(r) >= t:
@@ -517,6 +535,8 @@ def bracket(rungs: list[int], t: float | None) -> tuple[float | None, float | No
 
 
 def fmt_bracket(rungs: list[int], t: float | None) -> str:
+    if t is not None and not _finite(t):
+        return "—"
     lo, hi = bracket(rungs, t)
     if hi is None:
         return f">{fmt_duration(lo)}" if lo else ">72h"
@@ -555,6 +575,20 @@ def staleness_by_rung(
             for rung, v in sorted(buckets.items()) if v]
 
 
+def _finite(v: object) -> bool:
+    """Is this a real, non-negative, finite number?
+
+    Every formatter below routes through this. A NaN or an infinity that
+    reaches a rendered page becomes either visible garbage ("nand", "infd")
+    or, worse, a confident claim: `fmt_bracket(nan)` used to print ">15m",
+    asserting that something was never reached on the strength of a value
+    that was not a number. Formatters are the last code between a computation
+    and a published figure, so they refuse rather than improvise.
+    """
+    return isinstance(v, (int, float)) and not isinstance(v, bool) \
+        and math.isfinite(v) and v >= 0
+
+
 def fmt_pair(b: tuple[float | None, float | None]) -> str:
     """Render a Turnbull quantile bracket.
 
@@ -563,8 +597,12 @@ def fmt_pair(b: tuple[float | None, float | None]) -> str:
     (259200, None)  -> ">72h"    never accumulated this much mass
     """
     lo, hi = b
+    if lo is not None and not _finite(lo):
+        return "—"
     if hi is None:
         return f">{fmt_duration(lo)}" if lo else "—"
+    if not _finite(hi):
+        return "—"
     if not lo:
         return f"≤{fmt_duration(hi)}"
     return f"{fmt_duration(lo)}–{fmt_duration(hi)}"
@@ -573,6 +611,8 @@ def fmt_pair(b: tuple[float | None, float | None]) -> str:
 def fmt_duration(sec: float | None) -> str:
     if sec is None:
         return ">72h"
+    if not _finite(sec):
+        return "—"
     if sec < 90:
         return f"{sec:.0f}s"
     if sec < 3600:

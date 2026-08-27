@@ -159,6 +159,8 @@ of that mistake were actually made here.
 | a confident render verdict | a URL that answered differently on the next fetch | repeat fetches must agree |
 | "this whole registry is client-rendered" | one challenge page served for six routes | byte-identical bodies across distinct URLs are excluded |
 | "0 new events" | an unreachable host | collectors track per-subject errors; an all-failed source is reported broken |
+| a $5 daily spend cap | a config file saying $6, with a YAML typo | every config file is validated on load and refused, never defaulted |
+| ">15m" on the dashboard | a NaN reaching a formatter | formatters render "—" for anything not a finite, non-negative number |
 
 The pattern is the same every time: something that is not a measurement
 classifies perfectly as one. Each guard costs data — dropped events, excluded

@@ -258,7 +258,7 @@ pip install -e ".[dev]"
 pytest -q && ruff check tti tests
 ```
 
-213 tests, on Python 3.10 through 3.13, no network calls. The ones that
+233 tests, on Python 3.10 through 3.13, no network calls. The ones that
 matter:
 
 - **Turnbull reduces to Kaplan–Meier** on right-censored data — a theorem, so
@@ -285,6 +285,10 @@ matter:
 - **A phrasing run leaves time-to-index bit-identical.** A second wording of
   the same event is a second observation, not a second event; counting it
   would inflate recall and narrow every interval.
+- **A formatter never turns a non-number into a claim.** `fmt_bracket(nan)`
+  rendered as ">15m" — asserting something was never reached inside the
+  window, from a value that was not a number. Visible garbage gets noticed;
+  a confident claim manufactured from a NaN does not.
 - **A malformed config is refused, never defaulted.** A YAML typo used to
   parse to something unusable, every lookup fell back to a hard-coded
   default, and the daily spend cap silently became $5 while the file said $6
