@@ -164,10 +164,16 @@ tti doctor                # is every source and provider reachable
 tti discover              # poll sources, enqueue the ladder
 tti probe                 # run whatever is due
 tti status                # queue depth and today's spend
+tti score                 # the leaderboard, as markdown
 tti power                 # can this run support the claim it invites?
 tti sensitivity           # does the ranking survive the rules that produced it?
 tti report                # write RESULTS.md and docs/index.html
+tti placeholder           # the pre-run docs/index.html, before any results exist
 ```
+
+Every command exits `2` on a configuration error — distinct from `1`, so a
+cron wrapper can tell "misconfigured" from "ran and found nothing". `tti
+doctor` validates every config file before it checks anything else.
 
 The control arm runs automatically and costs nothing — it is a plain HTTP GET
 per event per rung, robots.txt honoured, and the spend cap never refuses it.
@@ -252,7 +258,7 @@ pip install -e ".[dev]"
 pytest -q && ruff check tti tests
 ```
 
-107 tests, on Python 3.10 through 3.13, no network calls. The ones that
+213 tests, on Python 3.10 through 3.13, no network calls. The ones that
 matter:
 
 - **Turnbull reduces to Kaplan–Meier** on right-censored data — a theorem, so
@@ -279,6 +285,10 @@ matter:
 - **A phrasing run leaves time-to-index bit-identical.** A second wording of
   the same event is a second observation, not a second event; counting it
   would inflate recall and narrow every interval.
+- **A malformed config is refused, never defaulted.** A YAML typo used to
+  parse to something unusable, every lookup fell back to a hard-coded
+  default, and the daily spend cap silently became $5 while the file said $6
+  — at exit code 0.
 - **A full pipeline run** against a scripted provider on a virtual clock:
   the estimator recovers a 1-hour indexing latency it was never told,
   carry-forward stops paying once an arm is FRESH, and the budget cap refuses

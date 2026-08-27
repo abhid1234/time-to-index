@@ -45,10 +45,6 @@ def get(name: str) -> Provider:
     return _REGISTRY[name]()
 
 
-def all_names() -> list[str]:
-    return sorted(_REGISTRY)
-
-
 def available_arms() -> list[tuple[str, str]]:
     """Arms from settings.yaml whose provider key is actually present."""
     out = []

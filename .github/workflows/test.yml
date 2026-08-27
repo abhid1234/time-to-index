@@ -36,11 +36,36 @@ jobs:
       - name: The estimator must recover its own ground truth
         run: tti demo
 
-      # A dry probe walks discovery and scheduling without spending anything
-      # or calling any provider, so a change that breaks the CLI wiring fails
-      # here rather than at 3am in a cron job.
+      # Every command that needs neither keys nor network. A change that
+      # breaks CLI wiring fails here rather than at 3am in a cron job, which
+      # is how an undefined name in `tti report` once reached the repository
+      # with the whole unit suite green.
       - name: CLI smoke
         run: |
+          set -e
+          tti --version
           tti --run-dir "$RUNNER_TEMP/ledger" status
           tti --run-dir "$RUNNER_TEMP/ledger" probe --dry-run
-          tti --run-dir "$RUNNER_TEMP/ledger" sensitivity || true
+          tti --run-dir "$RUNNER_TEMP/ledger" score      || [ $? -eq 1 ]
+          tti --run-dir "$RUNNER_TEMP/ledger" regrade    || [ $? -eq 1 ]
+          tti --run-dir "$RUNNER_TEMP/ledger" sensitivity || [ $? -eq 1 ]
+          tti --run-dir "$RUNNER_TEMP/ledger" watch --report || [ $? -eq 1 ]
+          tti placeholder --out-dir "$RUNNER_TEMP/pages"
+          tti demo        --out-dir "$RUNNER_TEMP/pages"
+          tti --run-dir "$RUNNER_TEMP/ledger" report --out-dir "$RUNNER_TEMP/pages" \
+            || [ $? -eq 1 ]
+
+      # A configuration error must exit 2 — not crash, and not quietly
+      # substitute defaults. This once silently changed the daily spend cap.
+      - name: Configuration is validated, not defaulted
+        run: |
+          printf 'ladder: [300]\ndaily_usd_cap: -1\n' > data/settings.yaml
+          set +e
+          tti --run-dir "$RUNNER_TEMP/ledger" status
+          rc=$?
+          set -e
+          git checkout -- data/settings.yaml
+          if [ "$rc" -ne 2 ]; then
+            echo "expected exit 2 for a bad config, got $rc"
+            exit 1
+          fi

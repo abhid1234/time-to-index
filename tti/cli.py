@@ -23,7 +23,7 @@ import sys
 import time
 import urllib.parse
 
-from . import config, providers, report, sources
+from . import __version__, config, providers, report, sources
 from .budget import Budget, unit_cost, utc_day
 from .grader import grade
 from .ledger import Ledger
@@ -63,6 +63,18 @@ def _out_dir(args) -> pathlib.Path:
 # ---------------------------------------------------------------------------
 
 def cmd_doctor(args) -> int:
+    # Config first: every check below reads it, and a run that starts from a
+    # file nobody validated can be wrong in ways no probe would reveal.
+    problems = config.check_all()
+    if problems:
+        print("configuration")
+        for pr in problems:
+            print(f"  ✗ {pr}")
+        print("\nFix these before anything else. Nothing below is meaningful while")
+        print("the configuration is not.")
+        return 2
+    print("configuration  ✓ all files valid")
+
     ua = config.contact_ua()
     if "set TTI_USER_AGENT" in ua:
         # SEC's fair-access policy and arXiv's terms both require a real
@@ -767,6 +779,7 @@ def cmd_report(args) -> int:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="tti", description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--version", action="version", version=f"tti {__version__}")
     ap.add_argument("--run-dir", help="ledger directory (default: ./runs)")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
@@ -844,7 +857,13 @@ def main(argv: list[str] | None = None) -> int:
     rg.set_defaults(fn=cmd_regrade)
 
     args = ap.parse_args(argv)
-    return args.fn(args)
+    try:
+        return args.fn(args)
+    except config.ConfigError as exc:
+        # Exit 2, distinct from a command that ran and reported a problem, so
+        # a cron wrapper can tell "misconfigured" from "nothing to do".
+        print(f"\nconfiguration error\n  {exc}", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":
