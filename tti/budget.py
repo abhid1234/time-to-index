@@ -29,12 +29,42 @@ class Budget:
         self.spent = float(spent_today)
         self.day = day
         self.refused = 0
+        self.refunded = 0.0
 
     def remaining(self) -> float:
         return max(0.0, self.cap - self.spent)
 
     def can_afford(self, cost: float) -> bool:
         return self.spent + cost <= self.cap + 1e-9
+
+    def refund(self, cost: float) -> None:
+        """Give back a charge for a call that never completed.
+
+        The cap is reserved before the request and released if it fails,
+        because otherwise a provider having a bad hour consumes the whole
+        day's budget without spending a cent and healthy probes are refused
+        for money that was never billed. Measured: ten probes, a cap
+        affording five, every call returning 503 -- five errors, five refused,
+        $0.00 actually spent.
+
+        This assumes failed requests are not billed, which is what the one
+        vendor documentation we have says explicitly. Refunds are counted and
+        reported so the assumption is visible rather than buried.
+        """
+        self.spent = max(0.0, self.spent - cost)
+        self.refunded += cost
+
+    def roll_to(self, day: str, spent_today: float) -> None:
+        """Move to a new UTC day mid-run.
+
+        A run that starts at 23:50 with the day nearly exhausted would
+        otherwise keep refusing probes after midnight, against a cap that has
+        already reset. That loses data in the conservative direction, which
+        is still losing data.
+        """
+        if day != self.day:
+            self.day = day
+            self.spent = spent_today
 
     def charge(self, cost: float) -> None:
         if not self.can_afford(cost):

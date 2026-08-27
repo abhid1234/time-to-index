@@ -191,6 +191,11 @@ def cmd_probe(args) -> int:
     print(f"skipped: carry-forward {rep.skipped_carry} · budget {rep.skipped_budget} · "
           f"rung-slip {rep.dropped_slip}")
     print(f"spend ${rep.spend_usd:.4f} this run (cap ${rep.cap_usd:.2f}/day)")
+    if rep.refunded_usd:
+        print(f"  ${rep.refunded_usd:.4f} reserved and released for {rep.errors} failed "
+              f"call(s) — assumes failures are not billed")
+    if rep.days_crossed:
+        print(f"  crossed {rep.days_crossed} UTC day boundary; the cap reset mid-run")
     if rep.skipped_budget:
         print("  ! the daily cap refused probes; today's coverage is incomplete")
     return 0

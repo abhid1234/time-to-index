@@ -155,7 +155,9 @@ class RunReport:
     skipped_budget: int = 0
     dropped_slip: int = 0
     spend_usd: float = 0.0
+    refunded_usd: float = 0.0
     cap_usd: float = 0.0
+    days_crossed: int = 0
 
 
 def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
@@ -183,6 +185,14 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
     for probe in due:
         event = events[probe.event_id]
         lag = now - event.published_at
+
+        # A long run can cross midnight. Without this the second half keeps
+        # charging against a cap that has already reset, and refuses probes
+        # for a budget that is no longer spent.
+        today = utc_day(time.time())
+        if today != budget.day:
+            budget.roll_to(today, ledger.spent_on(today))
+            rep.days_crossed += 1
 
         # Carry-forward is per phrasing. A provider that answers one wording
         # and not another has not "already resolved" the others, and skipping
@@ -239,9 +249,14 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
                     question, probe.mode,
                     max_results=max_results, max_chars=max_chars)
         except Exception as exc:  # noqa: BLE001
+            # Release the reservation: nothing was billed for a call that
+            # never completed, and holding the charge would let a flaky
+            # provider exhaust the day's cap for free.
+            budget.refund(cost)
             out.append(ProbeResult(
                 probe_id=probe.probe_id, event_id=event.event_id,
                 provider=probe.provider, mode=probe.mode, rung=probe.rung,
+                phrasing=probe.phrasing,
                 requested_at=now, lag=lag, verdict=ERROR, cost_usd=0.0,
                 latency_ms=int((time.perf_counter() - t0) * 1000),
                 note=str(exc)[:400]))
@@ -288,6 +303,7 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
         else:
             rep.absent += 1
 
+    rep.refunded_usd = budget.refunded
     if not dry_run:
         ledger.add_results(out)
     return rep
