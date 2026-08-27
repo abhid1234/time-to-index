@@ -278,3 +278,67 @@ def test_the_test_suite_does_not_write_into_the_repo(tmp_path):
     dirty = subprocess.run(["git", "status", "--porcelain", "docs", "RESULTS.md"],
                            cwd=root, capture_output=True, text=True).stdout.strip()
     assert dirty == "", f"tests modified tracked files:\n{dirty}"
+
+
+def test_the_control_arm_never_appears_in_the_leaderboard(tmp_path, capsys):
+    """It fetches the canonical URL directly, so it has near-perfect recall
+    at zero cost by construction. Listing it beside the providers invites the
+    exact comparison it exists to make unnecessary.
+
+    This exclusion was written once and silently lost to a later edit, and
+    nothing caught it: the demo filters its own arms, so only a real run
+    would have shown the control sitting at the top of the table.
+    """
+    import json as _json
+
+    from tti import demo
+    demo.generate(tmp_path, [300, 900, 3600, 21600, 86400, 259200])
+
+    assert main(["--run-dir", str(tmp_path), "score", "--json"]) == 0
+    arms = _json.loads(capsys.readouterr().out)["arms"]
+    assert arms, "expected some provider arms"
+    assert not any(a["provider"] == "origin" for a in arms)
+
+    out_dir = tmp_path / "pages"
+    assert main(["--run-dir", str(tmp_path), "report",
+                 "--out-dir", str(out_dir)]) == 0
+    html = (out_dir / "index.html").read_text()
+    assert "origin/direct</td>" not in html
+    # ...but the control's own panel must still be there.
+    assert "The control arm" in html
+
+
+def test_score_json_is_strictly_parseable(tmp_path, capsys):
+    """`json.dumps` emits bare NaN and Infinity by default. Python reads them
+    back happily and almost nothing else does, so a consumer gets a parse
+    error or a silently coerced token."""
+    import json as _json
+
+    from tti import demo
+    demo.generate(tmp_path, [300, 900, 3600, 21600, 86400, 259200])
+    assert main(["--run-dir", str(tmp_path), "score", "--json"]) == 0
+    raw = capsys.readouterr().out
+    assert "NaN" not in raw and "Infinity" not in raw
+    doc = _json.loads(raw)          # strict by default in most other languages
+    arm = doc["arms"][0]
+    assert set(arm["median_time_to_index"]) == {"low_seconds", "high_seconds"}
+    assert set(arm["recall_24h"]) == {"point", "low", "high"}
+
+
+def test_status_json_reports_integrity(tmp_path, capsys):
+    import json as _json
+
+    from tti.models import FRESH, Event, ProbeResult
+    led = Ledger(tmp_path)
+    ev = Event(source="npm", source_class="package_registry", subject="p",
+               published_at=1.0, discovered_at=2.0, question="q", answer="1.0.1")
+    led.add_events([ev])
+    led.add_results([ProbeResult(probe_id="x", event_id=ev.event_id, provider="serper",
+                                 mode="search", rung=300, requested_at=300.0,
+                                 lag=300.0, verdict=FRESH, cost_usd=0.005)])
+    with open(led.events_path, "a", encoding="utf-8") as fh:
+        fh.write('{"torn": tru')
+    assert main(["--run-dir", str(tmp_path), "status", "--json"]) == 0
+    doc = _json.loads(capsys.readouterr().out)
+    assert doc["integrity"]["events.jsonl"]["unparseable"] == 1
+    assert doc["budget"]["cap_usd"] > 0

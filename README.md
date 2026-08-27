@@ -164,12 +164,17 @@ tti doctor                # is every source and provider reachable
 tti discover              # poll sources, enqueue the ladder
 tti probe                 # run whatever is due
 tti status                # queue depth and today's spend
-tti score                 # the leaderboard, as markdown
+tti score                 # the leaderboard, as markdown (or --json)
 tti power                 # can this run support the claim it invites?
 tti sensitivity           # does the ranking survive the rules that produced it?
 tti report                # write RESULTS.md and docs/index.html
 tti placeholder           # the pre-run docs/index.html, before any results exist
 ```
+
+`tti score`, `tti status`, `tti crawlability` and `tti survey` take `--json`.
+Nothing that is not a finite number is emitted as a bare `NaN` or `Infinity`
+token — those parse in Python and almost nowhere else — so a missing value
+arrives as `null` rather than as a parse error.
 
 Every command exits `2` on a configuration error — distinct from `1`, so a
 cron wrapper can tell "misconfigured" from "ran and found nothing". `tti

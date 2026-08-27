@@ -18,6 +18,8 @@ from __future__ import annotations
 import argparse
 import contextlib
 import datetime as dt
+import json
+import math
 import pathlib
 import sys
 import time
@@ -27,6 +29,7 @@ from . import __version__, config, providers, report, sources
 from .budget import Budget, unit_cost, utc_day
 from .grader import grade
 from .ledger import Ledger
+from .metrics import ORIGIN as metrics_origin
 from .metrics import (
     ProviderScore,
     fmt_duration,
@@ -45,6 +48,64 @@ def _ledger(args) -> Ledger:
 
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+
+# The control arm's name, taken from metrics rather than repeated, so an
+# exclusion cannot drift out of step with the thing it excludes.
+ORIGIN_ARM = metrics_origin
+
+
+def _n(v):
+    """JSON has no NaN or Infinity that a strict parser will accept.
+
+    `json.dumps` emits the bare tokens NaN and Infinity by default, which
+    Python reads back happily and almost nothing else does. Anything that is
+    not a finite number becomes null, so a consumer sees a missing value
+    rather than a parse error or, worse, a token it silently coerces.
+    """
+    if isinstance(v, (int, float)) and not isinstance(v, bool):
+        return v if math.isfinite(v) else None
+    return v
+
+
+def _interval(t) -> dict:
+    lo, hi = t
+    return {"low_seconds": _n(lo), "high_seconds": _n(hi)}
+
+
+def _rate(t) -> dict:
+    p, lo, hi = t
+    return {"point": _n(p), "low": _n(lo), "high": _n(hi)}
+
+
+def _score_json(sc) -> dict:
+    return {
+        "provider": sc.provider, "mode": sc.mode,
+        "events": sc.n_events, "indexed": sc.n_indexed,
+        "median_time_to_index": _interval(sc.median_bracket),
+        "median_ci": _interval(sc.median_ci),
+        "median_unreached_share": _n(sc.median_unreached),
+        "p90_time_to_index": _interval(sc.p90_bracket),
+        "recall_24h": _rate(sc.recall_24h),
+        "recall_24h_vs_origin": _rate(sc.conditional_recall_24h),
+        "recall_72h": _rate(sc.recall_72h),
+        "staleness": _rate(sc.staleness),
+        "staleness_opportunities": sc.n_stale_eligible,
+        "phrasing_agreement": _rate(sc.phrasing_agreement),
+        "phrasings_asked": sc.n_phrasings_asked,
+        "origin_confirmed_events": sc.n_origin_confirmed,
+        "spend_usd": _n(sc.spend_usd),
+        "cost_per_fresh_answer_usd": _n(sc.cost_per_fresh_24h),
+        "p50_latency_ms": _n(sc.p50_latency_ms),
+        "calls": sc.n_calls, "errors": sc.n_errors,
+        "skipped_budget": sc.n_skipped_budget,
+        "estimator_converged": sc.npmle.converged,
+        "observations_dropped": sc.npmle.dropped,
+    }
+
+
+def _emit(payload) -> int:
+    print(json.dumps(payload, indent=2, sort_keys=True, allow_nan=False))
+    return 0
 
 
 def _out_dir(args) -> pathlib.Path:
@@ -202,8 +263,18 @@ def cmd_probe(args) -> int:
 
 
 def _all_scores(led: Ledger, source_class: str | None = None) -> list[ProviderScore]:
+    """Scores for every paid arm.
+
+    The origin control is excluded. It is the yardstick, not a competitor:
+    it fetches the canonical URL directly, so it has near-perfect recall at
+    zero cost by construction, and listing it beside the providers invites
+    exactly the comparison it exists to make unnecessary. This exclusion was
+    written once and silently lost to a later edit, and nothing caught it —
+    the demo filters its own arms, so only a real run would have shown the
+    control sitting at the top of the leaderboard.
+    """
     events, results = led.events(), led.results()
-    arms = sorted({(r.provider, r.mode) for r in results})
+    arms = sorted({(r.provider, r.mode) for r in results if r.provider != ORIGIN_ARM})
     # Bootstrap only the top-level table; the per-source-class panels have
     # too few events per cell for a resample to mean much, and computing it
     # anyway would print an interval that looks authoritative and is not.
@@ -216,14 +287,37 @@ def cmd_score(args) -> int:
     led = _ledger(args)
     scores = _all_scores(led)
     if not scores:
+        if args.json:
+            return _emit({"arms": [], "note": "no results yet"})
         print("no results yet — run `tti discover` then `tti probe`")
         return 1
+    if args.json:
+        return _emit({"arms": [_score_json(sc) for sc in scores],
+                      "events": len(led.events())})
     print(report.leaderboard_md(scores))
     return 0
 
 
 def cmd_status(args) -> int:
     led = _ledger(args)
+    if args.json:
+        import time as _t
+        now = _t.time()
+        probes, done = led.probes(), led.completed_probe_ids()
+        pending = [p for p in probes.values() if p.probe_id not in done]
+        day = utc_day(now)
+        b = Budget(spent_today=led.spent_on(day))
+        return _emit({
+            "events": len(led.events()),
+            "probes": {"total": len(probes), "done": len(done),
+                       "pending": len(pending),
+                       "due_now": sum(1 for p in pending if p.due_at <= now)},
+            "next_due_at": _n(min((p.due_at for p in pending if p.due_at > now),
+                                  default=float("nan"))),
+            "budget": {"day": day, "cap_usd": b.cap, "spent_usd": b.spent,
+                       "remaining_usd": b.remaining()},
+            "integrity": led.integrity(),
+        })
     events, probes = led.events(), led.probes()
     done = led.completed_probe_ids()
     now = time.time()
@@ -329,7 +423,8 @@ def cmd_power(args) -> int:
 
     led = _ledger(args)
     events, results = led.events(), led.results()
-    arms = sorted({(r.provider, r.mode) for r in results if r.provider != "origin"})
+    arms = sorted({(r.provider, r.mode) for r in results
+                   if r.provider != ORIGIN_ARM})
     if len(arms) < 2:
         print("need at least two provider arms with results")
         return 1
@@ -794,7 +889,7 @@ def cmd_report(args) -> int:
     pairs, powers = [], []
     arms = [(s.provider, s.mode) for s in
             sorted(scores, key=lambda s: (s.median_ttl is None, s.median_ttl or 0))
-            if s.provider != "origin"]
+            if s.provider != ORIGIN_ARM]
     for i in range(len(arms)):
         for j in range(i + 1, len(arms)):
             a = observations(events, results, *arms[i])
@@ -857,8 +952,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--dry-run", action="store_true", help="print, do not call")
     p.set_defaults(fn=cmd_probe)
 
-    sub.add_parser("score", help="print the leaderboard").set_defaults(fn=cmd_score)
-    sub.add_parser("status", help="queue and budget state").set_defaults(fn=cmd_status)
+    scp = sub.add_parser("score", help="print the leaderboard")
+    scp.add_argument("--json", action="store_true")
+    scp.set_defaults(fn=cmd_score)
+    stp = sub.add_parser("status", help="queue and budget state")
+    stp.add_argument("--json", action="store_true")
+    stp.set_defaults(fn=cmd_status)
     rp = sub.add_parser("report", help="write RESULTS.md and docs/index.html")
     rp.add_argument("--out-dir", help="where to write rendered pages "
                     "(default: the repo's docs/)")
