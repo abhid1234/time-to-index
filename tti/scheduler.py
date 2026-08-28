@@ -53,15 +53,36 @@ class DiscoverReport:
     per_source: dict = None
     source_errors: dict = None
     broken_sources: list = None
+    dry_run: bool = False
+    preview: list = None
 
     def __post_init__(self):
         self.per_source = self.per_source or {}
         self.source_errors = self.source_errors or {}
         self.broken_sources = self.broken_sources or []
+        self.preview = self.preview or []
 
 
 def discover(ledger: Ledger, source_names: list[str] | None = None,
-             verbose: bool = True) -> DiscoverReport:
+             verbose: bool = True, dry_run: bool = False) -> DiscoverReport:
+    """Poll every configured source and enqueue the ladder for what is new.
+
+    With `dry_run`, the sources are still polled -- collection is reads, and
+    the only way to know what a source is emitting right now is to ask it --
+    but nothing is written: no events, no probes, and no advance of the
+    per-subject high-water mark. The same run repeated without `dry_run`
+    collects the same events.
+
+    Two things a dry run cannot promise, both of them about time:
+
+        The detection-lag filter is evaluated against the clock at the moment
+        of the call. An event that clears it now can exceed `max_detection_
+        lag_seconds` by the time a real run happens, and would then be
+        dropped. A dry run is a description of this instant, not a plan.
+
+        A source polled twice may answer differently in between; that is the
+        entire premise of the project.
+    """
     s = config.settings()
     names = source_names or s.get("sources", [])
     max_lag = float(s.get("max_detection_lag_seconds", config.MAX_DETECTION_LAG))
@@ -117,8 +138,19 @@ def discover(ledger: Ledger, source_names: list[str] | None = None,
             continue
         fresh_enough.append(e)
 
-    added = ledger.add_events(fresh_enough)
+    if dry_run:
+        # Same predicate `add_events` applies, without the append. Computed
+        # here rather than by calling and rolling back, because there is no
+        # rollback for an append-only file.
+        known = set(ledger.events())
+        added = [e for e in fresh_enough if e.event_id not in known]
+    else:
+        added = ledger.add_events(fresh_enough)
     rep.new_events = len(added)
+    rep.dry_run = dry_run
+    if dry_run:
+        rep.preview = [(e.source, e.subject, e.answer, e.detection_lag)
+                       for e in added]
 
     arms = providers.available_arms()
     if s.get("origin_control", True):
@@ -151,7 +183,12 @@ def discover(ledger: Ledger, source_names: list[str] | None = None,
                         queued.append(Probe(
                             event_id=e.event_id, provider=p, mode=m, rung=r,
                             due_at=e.published_at + r, phrasing=idx))
-    rep.probes_queued = len(ledger.add_probes(queued))
+    if dry_run:
+        known_p = set(ledger.probes())
+        rep.probes_queued = len([p for p in queued
+                                 if p.probe_id not in known_p])
+    else:
+        rep.probes_queued = len(ledger.add_probes(queued))
     return rep
 
 

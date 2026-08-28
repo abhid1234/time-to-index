@@ -215,3 +215,25 @@ def wired(origin, monkeypatch, tmp_path):
     monkeypatch.setattr(config, "RUNS", tmp_path)
     monkeypatch.setitem(config._cache, "watchlist", {"npm": [], "pypi": []})
     return origin
+
+
+# ---------------------------------------------------------------------------
+# Working-tree baseline
+# ---------------------------------------------------------------------------
+# Recorded at collection, before any test body runs, so the check for "did the
+# suite write into the repo?" can distinguish the suite's writes from edits the
+# author made and has not committed. Comparing against "clean" instead makes the
+# check fire on every legitimate docs edit, which teaches the author to ignore
+# it -- and an ignored guard is not a guard.
+
+def _porcelain() -> str:
+    import subprocess
+    root = pathlib.Path(__file__).resolve().parent.parent
+    if not (root / ".git").exists():
+        return ""
+    return subprocess.run(
+        ["git", "status", "--porcelain", "docs", "RESULTS.md"],
+        cwd=root, capture_output=True, text=True).stdout.strip()
+
+
+WORKING_TREE_AT_COLLECTION = _porcelain()

@@ -169,7 +169,9 @@ about the instrument, not about any product.
 cp .env.example .env      # add whichever provider keys you have
 export TTI_USER_AGENT="you@example.com"   # SEC and arXiv require a contact
 
+tti verify                # offline: is this installation's arithmetic sound
 tti doctor                # is every source and provider reachable
+tti discover --dry-run    # what would be collected right now, writing nothing
 tti discover              # poll sources, enqueue the ladder
 tti probe                 # run whatever is due
 tti status                # queue depth and today's spend
@@ -180,8 +182,8 @@ tti report                # write RESULTS.md and docs/index.html
 tti placeholder           # the pre-run docs/index.html, before any results exist
 ```
 
-Eight commands take `--json`: `score`, `status`, `power`, `sensitivity`,
-`forecast`, `watch`, `crawlability`, `survey`. Nothing that is not a finite
+Nine commands take `--json`: `score`, `status`, `power`, `sensitivity`,
+`forecast`, `watch`, `crawlability`, `survey`, `verify`. Nothing that is not a finite
 number is emitted as a bare `NaN` or `Infinity` token — those parse in Python
 and almost nowhere else — so a missing value arrives as `null` rather than as
 a parse error or a silently coerced token.
@@ -197,6 +199,33 @@ without a strictness check.
 Every command exits `2` on a configuration error — distinct from `1`, so a
 cron wrapper can tell "misconfigured" from "ran and found nothing". `tti
 doctor` validates every config file before it checks anything else.
+
+### `tti verify` — the check that does not need the network
+
+`doctor` asks whether five providers are up, which is somebody else's uptime.
+`verify` asks whether the numbers this installation would produce are right,
+which is ours, and it answers offline:
+
+```
+  ✓ config     settings, providers, watchlist and corpus parse and satisfy their invariants
+  ✓ estimator  Turnbull reproduces published Kaplan-Meier values on Freireich 1963 (worst disagreement 6.02e-11)
+  ✓ grader     4 version-boundary cases graded as expected
+  ✓ ledger     runs/: every line parses, 1,284 result(s), no duplicate probe ids
+  ✓ platform   advisory file locking available; overlapping discover/probe runs are prevented
+```
+
+The test suite proves the repository is correct at the commit CI ran. It says
+nothing about the copy on the box that will actually produce the numbers —
+its edited config, its collected ledger, its Python, its floating point. Each
+of the five checks exists because the failure it catches once produced a
+plausible answer rather than a crash: a config that silently defaulted a
+spend cap, a version prefix matching inside a longer version, two cron runs
+overlapping and double-counting every rate.
+
+Exit codes are graded, not binary. `0` clean; `1` warnings — nothing wrong
+yet, but a way this installation could become wrong without saying so (a
+platform with no advisory locking, a torn ledger line that reads will skip);
+`2` a failure that means the numbers are not publishable.
 
 The control arm runs automatically and costs nothing — it is a plain HTTP GET
 per event per rung, robots.txt honoured, and the spend cap never refuses it.

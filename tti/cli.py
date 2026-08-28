@@ -1,6 +1,7 @@
 """Command line.
 
     tti doctor              check every source and provider is reachable
+    tti verify              offline: config, estimator, grader, ledger, platform
     tti discover            poll sources, enqueue probes
     tti probe [--limit N]   run probes whose due time has arrived
     tti score               print the leaderboard
@@ -123,6 +124,46 @@ def _out_dir(args) -> pathlib.Path:
 
 # ---------------------------------------------------------------------------
 
+def cmd_verify(args) -> int:
+    """Offline: does this installation compute what it claims to compute?
+
+    Separate from `doctor` on purpose. Doctor asks whether the network is
+    reachable, which is somebody else's uptime. This asks whether the numbers
+    would be right, which is ours, and it can be answered on a plane.
+    """
+    from . import verify as _verify
+
+    checks = _verify.run_all(pathlib.Path(args.run_dir) if args.run_dir else None)
+    status = _verify.worst(checks)
+    if args.json:
+        _emit({"status": status,
+               "checks": [{"name": c.name, "status": c.status,
+                           "detail": c.detail, "notes": c.notes}
+                          for c in checks]})
+        return {"ok": 0, "warn": 1, "fail": 2}[status]
+
+    mark = {"ok": "✓", "warn": "!", "fail": "✗"}
+    for c in checks:
+        print(f"  {mark[c.status]} {c.name:10s} {c.detail}")
+        for n in c.notes:
+            print(f"      {n}")
+    print()
+    if status == "fail":
+        print("FAIL — do not publish numbers from this installation until the")
+        print("above is fixed. Each of these checks exists because the failure")
+        print("it catches produced a plausible answer rather than a crash.")
+        return 2
+    if status == "warn":
+        print("OK with warnings. Nothing here makes a number wrong on its own;")
+        print("each one describes a way this installation could become wrong")
+        print("without saying so.")
+        return 1
+    print("All checks passed. This says the arithmetic and the stored data are")
+    print("sound; it says nothing about whether any provider is reachable —")
+    print("that is `tti doctor`.")
+    return 0
+
+
 def cmd_doctor(args) -> int:
     # Config first: every check below reads it, and a run that starts from a
     # file nobody validated can be wrong in ways no probe would reveal.
@@ -208,12 +249,20 @@ def cmd_discover(args) -> int:
     from . import lock
 
     led = _ledger(args)
-    try:
-        with lock.exclusive(led.root, "discover"):
-            rep = discover(led, source_names=args.sources or None)
-    except lock.Busy as exc:
-        print(f"skipped: {exc}")
-        return 0
+    if args.dry_run:
+        # No lock. A dry run writes nothing, so it cannot collide with a real
+        # one -- and taking the lock would mean a dry run could block the
+        # scheduled job it exists to explain.
+        rep = discover(led, source_names=args.sources or None, dry_run=True)
+    else:
+        try:
+            with lock.exclusive(led.root, "discover"):
+                rep = discover(led, source_names=args.sources or None)
+        except lock.Busy as exc:
+            print(f"skipped: {exc}")
+            return 0
+    if rep.dry_run:
+        print("DRY RUN — sources were polled, nothing was written.\n")
     print(f"collected {rep.collected} · new {rep.new_events} · "
           f"dropped-late {rep.dropped_late} · probes queued {rep.probes_queued}")
     if rep.dropped_future:
@@ -223,6 +272,16 @@ def cmd_discover(args) -> int:
               "happened.")
     for k, v in sorted(rep.per_source.items()):
         print(f"  {k:18s} {v}")
+    if rep.dry_run and rep.preview:
+        print("\n  would enqueue a ladder for:")
+        for src, subj, ans, lag in rep.preview[:25]:
+            print(f"    {src:10s} {subj[:38]:38s} -> {ans[:22]:22s} "
+                  f"seen {fmt_duration(lag)} after publication")
+        if len(rep.preview) > 25:
+            print(f"    ... and {len(rep.preview) - 25} more")
+        print("\n  The detection-lag filter was applied against the clock as of")
+        print("  now. An event listed here can still be dropped by a later real")
+        print("  run if it has aged past the tolerance by then.")
     if rep.broken_sources:
         print(f"\n  UNREACHABLE: {', '.join(rep.broken_sources)}")
         print("  These contributed no events. A run with unreachable sources is a")
@@ -1051,8 +1110,16 @@ def main(argv: list[str] | None = None) -> int:
                      help="subjects to poll per source (default 2; 0 for all)")
     doc.set_defaults(fn=cmd_doctor)
 
+    v = sub.add_parser("verify", help="offline self-check: config, estimator, "
+                                      "grader, ledger, platform")
+    v.add_argument("--json", action="store_true", help="machine-readable")
+    v.set_defaults(fn=cmd_verify)
+
     d = sub.add_parser("discover", help="poll sources and enqueue probes")
     d.add_argument("--sources", nargs="*", help="limit to these sources")
+    d.add_argument("--dry-run", action="store_true",
+                   help="poll sources and print what would be enqueued, "
+                        "writing nothing")
     d.set_defaults(fn=cmd_discover)
 
     p = sub.add_parser("probe", help="run probes that are due")

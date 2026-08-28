@@ -92,7 +92,9 @@ are non-negotiable:
 
 - **Turnbull must still reduce to Kaplan–Meier** on right-censored data.
   That test runs against published Freireich 1963 values and is what ties the
-  estimator to something other than this repo's own arithmetic.
+  estimator to something other than this repo's own arithmetic. It also runs
+  outside the suite, as `tti verify`, because the installation that produces
+  the published numbers is not the checkout that CI ran.
 - **Nothing may report a point estimate the ladder cannot support.** Medians
   are brackets because the survival function is genuinely undefined inside a
   support interval. A change that prints a single number there is inventing
@@ -107,6 +109,7 @@ the tests here are about the refusals.
 pip install -e ".[dev]"
 pytest -q
 ruff check tti tests
+tti verify        # the five checks that must hold on any installation
 tti demo          # the estimator must recover the generator's own draws
 ```
 

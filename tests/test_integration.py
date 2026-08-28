@@ -55,6 +55,64 @@ def test_a_release_published_long_ago_is_dropped_not_probed(wired, tmp_path, mon
     assert (rep.collected, rep.new_events, rep.dropped_late) == (1, 0, 1)
 
 
+def test_a_dry_discover_reports_what_a_real_one_would_do_and_writes_nothing(
+        wired, tmp_path, monkeypatch):
+    """The test that matters is not "the files are empty" -- it is that the
+    real run afterwards is unchanged. A dry run that quietly advanced the
+    per-subject high-water mark would leave the files empty too, and the
+    event it described would never be collected."""
+    now = time.time()
+    wired.publish_npm("demo", [("1.0.0", now - 90_000), ("1.0.1", now - 20)])
+    monkeypatch.setitem(config._cache, "watchlist", {"npm": ["demo"], "pypi": []})
+    monkeypatch.setitem(config._cache, "settings", {
+        "sources": ["npm"], "max_detection_lag_seconds": 600,
+        "ladder": [300, 900], "origin_control": False,
+        "arms": [{"provider": "stub", "mode": "base"}]})
+
+    from tti import scheduler
+    monkeypatch.setattr(scheduler.providers, "available_arms",
+                        lambda: [("stub", "base")])
+    led = Ledger(tmp_path)
+    dry = scheduler.discover(led, verbose=False, dry_run=True)
+    assert dry.dry_run is True
+    assert (dry.collected, dry.new_events, dry.probes_queued) == (1, 1, 2)
+    assert [(src, subj, ans) for src, subj, ans, _ in dry.preview] \
+        == [("npm", "demo", "1.0.1")]
+
+    # Nothing on disk, and nothing remembered.
+    assert led.events() == {}
+    assert led.probes() == {}
+    assert led.seen_subjects() == {}
+
+    real = scheduler.discover(led, verbose=False)
+    assert (real.collected, real.new_events, real.probes_queued) == \
+        (dry.collected, dry.new_events, dry.probes_queued)
+    assert real.dry_run is False and real.preview == []
+
+
+def test_a_dry_discover_does_not_re_offer_events_already_in_the_ledger(
+        wired, tmp_path, monkeypatch):
+    """`new_events` in a dry run means "new to the ledger", the same thing it
+    means in a real one. If it counted everything collected, a second dry run
+    would claim work that a real run would skip."""
+    now = time.time()
+    wired.publish_npm("demo", [("1.0.0", now - 90_000), ("1.0.1", now - 20)])
+    monkeypatch.setitem(config._cache, "watchlist", {"npm": ["demo"], "pypi": []})
+    monkeypatch.setitem(config._cache, "settings", {
+        "sources": ["npm"], "max_detection_lag_seconds": 600,
+        "ladder": [300], "origin_control": False,
+        "arms": [{"provider": "stub", "mode": "base"}]})
+
+    from tti import scheduler
+    monkeypatch.setattr(scheduler.providers, "available_arms",
+                        lambda: [("stub", "base")])
+    led = Ledger(tmp_path)
+    assert scheduler.discover(led, verbose=False).new_events == 1
+    again = scheduler.discover(led, verbose=False, dry_run=True)
+    assert (again.new_events, again.probes_queued) == (0, 0)
+    assert again.preview == []
+
+
 def test_an_unreachable_source_is_reported_not_silently_empty(tmp_path, monkeypatch):
     from tti import scheduler
     from tti.sources import npm as npm_mod
@@ -271,13 +329,19 @@ def test_the_test_suite_does_not_write_into_the_repo(tmp_path):
     """A suite that dirties the working tree makes `git status` useless as a
     signal and will eventually commit a rendered page by accident."""
     import pathlib
-    import subprocess
+
+    from conftest import WORKING_TREE_AT_COLLECTION, _porcelain
     root = pathlib.Path(__file__).resolve().parent.parent
     if not (root / ".git").exists():
         pytest.skip("not a git checkout")
-    dirty = subprocess.run(["git", "status", "--porcelain", "docs", "RESULTS.md"],
-                           cwd=root, capture_output=True, text=True).stdout.strip()
-    assert dirty == "", f"tests modified tracked files:\n{dirty}"
+    now = _porcelain()
+    if now == WORKING_TREE_AT_COLLECTION:
+        return
+    before = set(WORKING_TREE_AT_COLLECTION.splitlines())
+    added = [ln for ln in now.splitlines() if ln not in before]
+    assert not added, (
+        "tests modified tracked files under docs/ or RESULTS.md:\n"
+        + "\n".join(added))
 
 
 def test_the_control_arm_never_appears_in_the_leaderboard(tmp_path, capsys):

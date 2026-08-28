@@ -160,8 +160,8 @@ hole.
 ## Refusing to answer
 
 A recurring shape in this repo: the failure that looks most like a finding is
-an infrastructure failure. Four guards exist because four different versions
-of that mistake were actually made here.
+an infrastructure failure. Every guard below exists because that mistake was
+actually made here, in this repository, in the form described.
 
 | what it looked like | what it was | guard |
 |---|---|---|
@@ -173,12 +173,23 @@ of that mistake were actually made here.
 | ">15m" on the dashboard | a NaN reaching a formatter | formatters render "—" for anything not a finite, non-negative number |
 | an unreadable month of data | one interrupted write | malformed lines are skipped and counted, and `tti status` names the damage |
 | twice the spend and every rate doubled | two cron runs overlapping | an advisory lock; a second run exits zero saying it was early |
+| "Eight commands take `--json`" | a sentence written once and never re-read | the README's list and its count are checked against the argument parser |
 
 The pattern is the same every time: something that is not a measurement
 classifies perfectly as one. Each guard costs data — dropped events, excluded
 routes, a smaller denominator — and the trade is deliberate. A benchmark that
 publishes an artifact of its own network has not measured anything and cannot
 tell that it has not.
+
+Five of these guards run as a command rather than only as tests. `tti verify`
+re-checks, offline and on the machine that will produce the numbers, that the
+config is valid, that Turnbull still reproduces published Kaplan-Meier values
+on Freireich 1963, that the version-boundary cases still grade correctly, that
+the ledger on disk parses with no duplicate probe ids, and that advisory
+locking is available on this platform. CI proves the repository was correct at
+a commit; this proves the installation is correct now. The distinction is not
+pedantic — the spend-cap bug and the overlapping-cron bug were both properties
+of a deployment, not of a diff.
 
 ## Statistics
 

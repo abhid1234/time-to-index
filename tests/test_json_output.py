@@ -32,6 +32,7 @@ COMMANDS = [
     (["power"], True),
     (["sensitivity"], True),
     (["watch", "--report"], False),
+    (["verify"], False),
 ]
 
 
@@ -187,3 +188,34 @@ def test_every_json_capable_command_is_covered_by_this_file():
     assert len(declared) >= 6, f"introspection looks broken: found {declared}"
     missing = declared - covered - elsewhere
     assert not missing, f"--json commands with no strictness test: {sorted(missing)}"
+
+
+def test_the_readme_names_the_same_json_commands_the_parser_declares():
+    """A hand-written sentence in the README is a claim like any other.
+
+    "Nine commands take --json" was typed by a person reading the parser
+    once. The tenth arrives, the sentence stays, and a reader who trusts it
+    plans around a flag that either does not exist or was never counted.
+    Both the count and the list are checked here.
+    """
+    import pathlib
+    import re
+
+    readme = (pathlib.Path(__file__).resolve().parent.parent / "README.md").read_text()
+    # `[^.]` rather than a lazy `.` under DOTALL: the list wraps across lines,
+    # and a lazy dot-all run happily swallows the paragraph after it.
+    m = re.search(r"^(\w+) commands take `--json`: ([^.]+)\.", readme,
+                  re.MULTILINE)
+    assert m, "the README no longer states which commands take --json"
+
+    words = {"Five": 5, "Six": 6, "Seven": 7, "Eight": 8, "Nine": 9,
+             "Ten": 10, "Eleven": 11, "Twelve": 12}
+    claimed_n = words.get(m.group(1))
+    assert claimed_n is not None, f"unhandled number word: {m.group(1)}"
+    named = set(re.findall(r"`([a-z-]+)`", m.group(2)))
+    declared = _subcommands_with_json()
+
+    assert named == declared, (
+        f"README lists {sorted(named)}, parser declares {sorted(declared)}")
+    assert claimed_n == len(declared), (
+        f"README says {claimed_n}, parser declares {len(declared)}")
