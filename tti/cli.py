@@ -400,13 +400,26 @@ def cmd_regrade(args) -> int:
             print(f"  {r.provider}/{r.mode} {ev.subject} @{r.rung}s: {r.verdict} -> {v}")
         r.verdict, r.matched_fresh, r.matched_stale, r.chars = v, fh, sh, chars
         rows.append(r)
-    if args.write:
-        led.results_path.write_text(
-            "".join(__import__("json").dumps(x.to_dict(), sort_keys=True) + "\n"
-                    for x in rows), encoding="utf-8")
-        print(f"rewrote {len(rows)} results ({changed} verdicts changed)")
-    else:
+    if not args.write:
         print(f"{changed} of {len(rows)} verdicts would change — pass --write to apply")
+        return 0
+
+    from . import lock
+    try:
+        # Held for the whole read-modify-write. A concurrent `tti probe`
+        # appending between them would have its rows silently discarded, and
+        # nothing would show it happened.
+        with lock.exclusive(led.root, "probe"):
+            backup = led.rewrite_results(rows)
+    except lock.Busy as exc:
+        print(f"refused: {exc}")
+        print("  Rewriting the ledger while a probe run is appending to it would")
+        print("  discard whatever that run wrote. Try again once it finishes.")
+        return 1
+
+    print(f"rewrote {len(rows)} results ({changed} verdicts changed)")
+    if backup:
+        print(f"  previous file kept at {backup.name}")
     return 0
 
 

@@ -14,9 +14,11 @@ which is the only way a single-author benchmark earns trust.
 
 from __future__ import annotations
 
+import datetime as dt
 import json
 import os
 import pathlib
+import shutil
 import time
 from collections.abc import Iterator
 
@@ -243,6 +245,49 @@ class Ledger:
             for d in self._read(self.results_path)
             if "requested_at" in d and utc_day(float(d["requested_at"])) == day
         )
+
+    def rewrite_results(self, rows: list[ProbeResult],
+                        keep_backup: bool = True) -> pathlib.Path | None:
+        """Replace results.jsonl atomically, keeping the previous file.
+
+        The only destructive operation in the project, and it was the least
+        protected: a direct write over the live file, so an interrupt --
+        Ctrl-C, a full disk, a power loss -- truncated weeks of collected
+        results with no way back. The command it backs is `tti regrade
+        --write`, which is precisely what a sceptical reader runs when they
+        take the README up on its invitation to re-grade the evidence. They
+        would have been the one to lose it.
+
+        Written to a sibling temp file, fsynced, then renamed over the
+        original: `os.replace` is atomic on POSIX, so a reader either sees
+        the whole old file or the whole new one and never a half-written
+        mixture. The previous file is kept alongside with a timestamp.
+
+        Callers must hold the probe lock. A concurrent `tti probe` appending
+        between the read and the write would have its rows silently dropped,
+        and no count anywhere would show it.
+        """
+        target = self.results_path
+        backup = None
+        if keep_backup and target.exists() and target.stat().st_size:
+            stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+            backup = target.with_name(f"{target.name}.{stamp}.bak")
+            shutil.copy2(target, backup)
+
+        tmp = target.with_name(f".{target.name}.tmp")
+        with open(tmp, "w", encoding="utf-8") as fh:
+            for r in rows:
+                fh.write(dumps(r.to_dict()) + "\n")
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(tmp, target)
+        # Fsync the directory too, so the rename itself survives a crash.
+        dfd = os.open(target.parent, os.O_RDONLY)
+        try:
+            os.fsync(dfd)
+        finally:
+            os.close(dfd)
+        return backup
 
     # -- raw payloads ------------------------------------------------------
     def store_raw(self, provider: str, probe_id: str, payload) -> str:

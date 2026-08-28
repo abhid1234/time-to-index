@@ -122,3 +122,6 @@ anyone else.
 - A metric without the case where it declines to answer.
 - Tuning one provider's call and not the others'.
 - Results published without the raw payloads that produced them.
+- A destructive write that is not atomic. `Ledger.rewrite_results` is the
+  only one, and it exists because the direct version could truncate a month
+  of collection when interrupted.

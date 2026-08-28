@@ -243,6 +243,12 @@ tti regrade --write       # apply the new verdicts
 tti sensitivity           # re-grade under seven rule variants and diff the ranking
 ```
 
+`--write` is the only destructive operation here, so it is the most careful:
+the new file is written alongside and renamed over the original, the previous
+one is kept with a timestamp, and it refuses to run while a probe run holds
+the lock — a concurrent append between the read and the write would be
+silently discarded.
+
 `tti sensitivity` is the one to run first. It re-scores everything under
 deliberately worse rules — plain substring matching, no `v` prefix, no
 aliases, titles only — and reports verdict churn, Kendall rank correlation

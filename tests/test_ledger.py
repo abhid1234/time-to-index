@@ -10,6 +10,7 @@ Skipping is the right behaviour and silence is not: reading 9,900 of 10,000
 records without saying so is its own wrong answer.
 """
 import json
+import os
 import pathlib
 import sys
 
@@ -148,3 +149,100 @@ def test_an_arm_missing_from_the_price_table_is_named_not_crashed(tmp_path, caps
     assert main(["--run-dir", str(tmp_path), "status"]) == 0
     out = capsys.readouterr().out
     assert "not in providers.yaml" in out and "gone/base" in out
+
+
+# ---------------------------------------------------------------------------
+# The one destructive operation
+# ---------------------------------------------------------------------------
+
+def _bulk(tmp_path, n=40, verdict="ABSENT"):
+    from tti.models import ProbeResult
+    led = Ledger(tmp_path)
+    ev = Event(source="npm", source_class="package_registry", subject="p",
+               published_at=1.0, discovered_at=2.0, question="q", answer="1.0.1")
+    led.add_events([ev])
+    rows = []
+    for i in range(n):
+        ref = led.store_raw("px", f"p{i}", {"results": [{"snippet": "now at 1.0.1"}]})
+        rows.append(ProbeResult(probe_id=f"p{i}", event_id=ev.event_id, provider="px",
+                                mode="base", rung=300, requested_at=300.0, lag=300.0,
+                                verdict=verdict, cost_usd=0.005, raw_ref=ref))
+    led.add_results(rows)
+    return led, ev
+
+
+def test_rewrite_is_atomic_and_leaves_no_temp_file(tmp_path):
+    led, _ = _bulk(tmp_path)
+    rows = led.results()
+    for r in rows:
+        r.verdict = FRESH
+    led.rewrite_results(rows)
+    fresh = Ledger(tmp_path)
+    assert len(fresh.results()) == 40
+    assert all(r.verdict == FRESH for r in fresh.results())
+    assert not any(p.name.startswith(".results") for p in tmp_path.iterdir())
+
+
+def test_rewrite_keeps_the_previous_file(tmp_path):
+    """The only destructive operation in the project, and the one a sceptical
+    reader runs when they take the README up on re-grading the evidence."""
+    led, _ = _bulk(tmp_path)
+    backup = led.rewrite_results([])
+    assert backup is not None and backup.exists()
+    assert backup.read_text().count("\n") == 40
+    assert Ledger(tmp_path).results() == []
+
+
+def test_an_interrupted_rewrite_leaves_the_original_intact(tmp_path, monkeypatch):
+    """A direct write over the live file truncated weeks of collection when
+    it was interrupted. With a temp file and a rename, a failure mid-write
+    leaves the original untouched."""
+    led, _ = _bulk(tmp_path)
+    original = led.results_path.read_bytes()
+
+    real_replace = os.replace
+
+    def die(*a, **k):
+        raise KeyboardInterrupt("interrupted mid-rewrite")
+
+    monkeypatch.setattr(os, "replace", die)
+    with pytest.raises(KeyboardInterrupt):
+        led.rewrite_results([])
+    monkeypatch.setattr(os, "replace", real_replace)
+
+    assert led.results_path.read_bytes() == original
+    assert len(Ledger(tmp_path).results()) == 40
+
+
+def test_regrade_write_refuses_while_a_probe_run_holds_the_lock(tmp_path, capsys):
+    """A concurrent probe appending between the read and the write would have
+    its rows silently discarded, and no count anywhere would show it."""
+    from tti import lock
+    from tti.cli import main
+    if not lock.SUPPORTED:
+        pytest.skip("advisory file locking needs fcntl")
+    _bulk(tmp_path)
+    with lock.exclusive(tmp_path, "probe"):
+        assert main(["--run-dir", str(tmp_path), "regrade", "--write"]) == 1
+    out = capsys.readouterr().out
+    assert "refused" in out and "discard whatever that run wrote" in out
+
+
+def test_regrade_without_write_changes_nothing(tmp_path, capsys):
+    from tti.cli import main
+    led, _ = _bulk(tmp_path)
+    before = led.results_path.read_bytes()
+    assert main(["--run-dir", str(tmp_path), "regrade"]) == 0
+    assert led.results_path.read_bytes() == before
+    assert "pass --write to apply" in capsys.readouterr().out
+
+
+def test_regrade_write_regrades_from_the_stored_payloads(tmp_path, capsys):
+    """The whole affordance: change the rules, re-score the evidence, see how
+    far the leaderboard actually moves — without a single API call."""
+    from tti.cli import main
+    _bulk(tmp_path, verdict="ABSENT")
+    assert main(["--run-dir", str(tmp_path), "regrade", "--write"]) == 0
+    assert all(r.verdict == FRESH for r in Ledger(tmp_path).results())
+    out = capsys.readouterr().out
+    assert "40 verdicts changed" in out and "previous file kept at" in out
