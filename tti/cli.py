@@ -431,10 +431,34 @@ def cmd_power(args) -> int:
     arms = sorted({(r.provider, r.mode) for r in results
                    if r.provider != ORIGIN_ARM})
     if len(arms) < 2:
+        if args.json:
+            return _emit({"comparisons": [],
+                          "note": "need at least two provider arms with results"})
         print("need at least two provider arms with results")
         return 1
 
     rate = _events_per_day(led)
+    if args.json:
+        rows = []
+        for i in range(len(arms)):
+            for j in range(i + 1, len(arms)):
+                a, b = arms[i], arms[j]
+                oa = observations(events, results, *a)
+                ob = observations(events, results, *b)
+                _, pv = logrank(oa, ob)
+                r = analyse(f"{a[0]}/{a[1]}", oa, f"{b[0]}/{b[1]}", ob, pv, rate)
+                rows.append({
+                    "a": r.a, "b": r.b,
+                    "hazard_ratio": _n(r.hazard_ratio),
+                    "events_observed": r.events_observed,
+                    "p_value": _n(r.p_value),
+                    "power": _n(r.power_now),
+                    "events_for_80_percent": _n(r.events_for_80),
+                    "further_events_needed": _n(r.events_needed),
+                    "further_days_needed": _n(r.days_needed),
+                    "verdict": r.verdict})
+        return _emit({"events": len(events), "events_per_day": _n(rate),
+                      "comparisons": rows})
     print(f"{len(events)} events, {rate:.1f}/day observed\n")
     hdr = f"{'comparison':38s} {'HR':>6s} {'events':>7s} {'power':>7s} {'need':>7s} {'days':>6s}  verdict"
     print(hdr)
@@ -469,6 +493,18 @@ def cmd_sensitivity(args) -> int:
 
     led = _ledger(args)
     rows = sensitivity.run(led)
+    if args.json:
+        return _emit({
+            "verdict": sensitivity.verdict(rows) if rows else "no results",
+            "variants": [{
+                "name": r.name, "evaluated": r.regraded, "note": r.note,
+                "verdict_churn": _n(r.churn),
+                "verdicts_changed": r.verdict_changes,
+                "verdicts_total": r.verdicts_total,
+                "rank_correlation": _n(r.tau),
+                "medians_moved": r.median_changes,
+                "arms_lost": r.arms_lost, "arms": r.n_arms,
+                "ordering": r.order} for r in rows]})
     if not rows:
         print("no results to re-grade — run `tti probe` first")
         return 1
@@ -682,6 +718,20 @@ def cmd_watch(args) -> int:
         hist = w.history(run_dir)
 
     cov = w.coverage(hist)
+    if args.json:
+        ch_all = w.changes(hist)
+        return _emit({
+            "urls": cov.urls, "runs": cov.runs,
+            "span_days": _n(cov.span_days),
+            "judged_rate": _n(cov.judged_rate),
+            "never_judged": cov.never_judged,
+            "changes": [{"url": c.url, "at": c.at, "previous_at": c.prev_at,
+                         "kind": c.kind, "before": c.before, "after": c.after,
+                         "before_chars": c.before_chars,
+                         "after_chars": c.after_chars,
+                         "regression": c.worsened,
+                         "description": c.describe()} for c in ch_all],
+        })
     ch: list = []
     if not cov.runs:
         print("no history yet — run `tti watch` at least twice, days apart")
@@ -835,6 +885,21 @@ def cmd_forecast(args) -> int:
 
     fc = fc_mod.run(args.sources or None)
     ok, bad = fc.readable, [r for r in fc.rows if r.error]
+    if args.json:
+        top, eff = fc.concentration()
+        return _emit({
+            "window_days": fc.window_days,
+            "subjects_readable": len(ok), "subjects_unreachable": len(bad),
+            "events_per_day": _n(fc.per_day),
+            "superseding_events_per_day": _n(fc.superseding_per_day),
+            "concentration": {"top_subject_share": _n(top),
+                              "effective_subjects": _n(eff)},
+            "days_to_detect": {str(hr): _n(fc.days_for(hr))
+                               for hr in (2.0, 1.5, 1.2)},
+            "subjects": [{"source": r.source, "subject": r.subject,
+                          "releases": r.releases, "per_day": _n(r.per_day),
+                          "error": r.error} for r in fc.rows],
+        })
     print(f"{len(ok)} subjects readable over the last {fc.window_days} days"
           + (f" · {len(bad)} unreachable" if bad else ""))
     print(f"observed rate   {fc.per_day:6.1f} events/day")
@@ -1022,6 +1087,7 @@ def main(argv: list[str] | None = None) -> int:
     wt.add_argument("--repeat", type=int, default=2)
     wt.add_argument("--workers", type=int, default=12)
     wt.add_argument("--out-dir", help="also render corpus.html here")
+    wt.add_argument("--json", action="store_true")
     wt.set_defaults(fn=cmd_watch)
 
     sv = sub.add_parser("survey",
@@ -1037,11 +1103,15 @@ def main(argv: list[str] | None = None) -> int:
 
     fx = sub.add_parser("forecast", help="days until this run can support a claim")
     fx.add_argument("--sources", nargs="*", help="limit to these sources")
+    fx.add_argument("--json", action="store_true")
     fx.set_defaults(fn=cmd_forecast)
-    sub.add_parser("power", help="can this run support the claim it invites?"
-                   ).set_defaults(fn=cmd_power)
-    sub.add_parser("sensitivity", help="how much does the ranking depend on grading rules?"
-                   ).set_defaults(fn=cmd_sensitivity)
+    pw = sub.add_parser("power", help="can this run support the claim it invites?")
+    pw.add_argument("--json", action="store_true")
+    pw.set_defaults(fn=cmd_power)
+    sn = sub.add_parser("sensitivity",
+                        help="how much does the ranking depend on grading rules?")
+    sn.add_argument("--json", action="store_true")
+    sn.set_defaults(fn=cmd_sensitivity)
 
     rg = sub.add_parser("regrade", help="re-grade stored payloads, no API calls")
     rg.add_argument("--write", action="store_true", help="apply the new verdicts")

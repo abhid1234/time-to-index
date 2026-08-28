@@ -180,10 +180,19 @@ tti report                # write RESULTS.md and docs/index.html
 tti placeholder           # the pre-run docs/index.html, before any results exist
 ```
 
-`tti score`, `tti status`, `tti crawlability` and `tti survey` take `--json`.
-Nothing that is not a finite number is emitted as a bare `NaN` or `Infinity`
-token — those parse in Python and almost nowhere else — so a missing value
-arrives as `null` rather than as a parse error.
+Eight commands take `--json`: `score`, `status`, `power`, `sensitivity`,
+`forecast`, `watch`, `crawlability`, `survey`. Nothing that is not a finite
+number is emitted as a bare `NaN` or `Infinity` token — those parse in Python
+and almost nowhere else — so a missing value arrives as `null` rather than as
+a parse error or a silently coerced token.
+
+Whatever a command declines to claim in its human output it declines in JSON
+too: an unreachable median is `null` on both ends, a sensitivity variant that
+could not be evaluated says so rather than reporting perfect agreement, and
+every command returns a parseable document on an empty ledger, because a
+monitoring wrapper polls from the first minute. The set of commands carrying
+the flag is read from the argument parser in a test, so a new one cannot ship
+without a strictness check.
 
 Every command exits `2` on a configuration error — distinct from `1`, so a
 cron wrapper can tell "misconfigured" from "ran and found nothing". `tti
