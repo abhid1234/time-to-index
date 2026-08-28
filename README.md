@@ -304,6 +304,11 @@ matter:
   outlasts its interval the next run starts alongside it. Measured: six
   queued probes became twelve provider calls, six duplicate rows, and exactly
   double the spend, with every later rate counting one observation twice.
+- **A hostile origin cannot exhaust memory.** Nothing capped response size,
+  so a 200 MB chunked body took the process from 28 MB resident to 432 MB —
+  and the existing caps truncated only after the whole thing was in memory.
+  Reads are now capped as they stream, which is the difference between a
+  truncated page and a dead unattended job.
 - **Malformed API responses never crash a run or invent an event.** 38 cases
   across all six collectors — null documents, error objects returned where a
   list was expected, unparseable dates, and EDGAR's parallel arrays
