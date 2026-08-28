@@ -319,6 +319,12 @@ matter:
   outlasts its interval the next run starts alongside it. Measured: six
   queued probes became twelve provider calls, six duplicate rows, and exactly
   double the spend, with every later rate counting one observation twice.
+- **A dashboard of em dashes says so.** A run where every probe errored still
+  produces arms, because arms come from the results file and an error is a
+  result. The formatters correctly refuse to invent numbers, so every cell
+  reads "—" and the page is not lying — but a rendered dashboard reads as
+  results, so it now says at the top that the table is a list of arms rather
+  than a set of them.
 - **A hostile origin cannot exhaust memory.** Nothing capped response size,
   so a 200 MB chunked body took the process from 28 MB resident to 432 MB —
   and the existing caps truncated only after the whole thing was in memory.

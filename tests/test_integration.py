@@ -342,3 +342,111 @@ def test_status_json_reports_integrity(tmp_path, capsys):
     doc = _json.loads(capsys.readouterr().out)
     assert doc["integrity"]["events.jsonl"]["unparseable"] == 1
     assert doc["budget"]["cap_usd"] > 0
+
+
+def test_a_report_rendered_from_a_real_collected_run(wired, tmp_path, monkeypatch,
+                                                     capsys):
+    """Discover from a live registry response, walk the ladder, fetch the
+    origin over HTTP, then render the dashboard — the whole path, with no
+    demo data anywhere.
+
+    The demo generates its own arms and filters them itself, so it cannot
+    catch a bug in how a real run reaches the report. That is exactly where
+    the origin control once ended up sitting at the top of the leaderboard.
+    """
+    from tti import scheduler
+
+    now = time.time()
+    wired.publish_npm("demo", [("9.9.8", now - 90_000), ("9.9.9", now - 5)])
+    monkeypatch.setitem(config._cache, "watchlist", {"npm": ["demo"], "pypi": []})
+    monkeypatch.setitem(config._cache, "settings", {
+        "sources": ["npm"], "max_detection_lag_seconds": 600,
+        "max_clock_skew_seconds": 120,
+        "ladder": [300, 900, 3600], "origin_control": True,
+        "max_results": 5, "max_chars_per_result": 500,
+        "max_rung_slip_seconds": 10 ** 9, "daily_usd_cap": 100.0,
+        "arms": [{"provider": "stub", "mode": "base"}]})
+    monkeypatch.setitem(config._cache, "providers", {"providers": {"stub": {"modes": {
+        "base": {"usd_per_1k_requests": 1.0, "results_included": 5}}}}})
+    monkeypatch.setattr(scheduler.providers, "available_arms",
+                        lambda: [("stub", "base")])
+
+    led = Ledger(tmp_path)
+    assert scheduler.discover(led, verbose=False).new_events == 1
+    ev = next(iter(led.events().values()))
+    ev.origins = [wired.base + "/page/ssr"]
+    led.events_path.write_text(json.dumps(ev.to_dict()) + "\n")
+
+    Stub = _stub_provider(monkeypatch, {300: "still on 9.9.8", 900: "still on 9.9.8",
+                                        3600: "now at 9.9.9"})
+    for rung in (300, 900, 3600):
+        Stub._rung = rung
+        scheduler.run_due(led, now=ev.published_at + rung, verbose=False)
+
+    out_dir = tmp_path / "pages"
+    assert main(["--run-dir", str(tmp_path), "report",
+                 "--out-dir", str(out_dir)]) == 0
+    html = (out_dir / "index.html").read_text()
+
+    # The paid arm is on the leaderboard; the control is not.
+    assert "stub/base</td>" in html
+    assert "origin/direct</td>" not in html
+    # ...but the control's own panel is, with its outcome counted.
+    assert "The control arm" in html
+    # The page renders class names with underscores replaced, so assert what
+    # a reader actually sees.
+    assert "server html" in html, "the render class the origin actually returned"
+    assert "Where the fact lived" in html
+    # The staleness the run really produced, not a placeholder.
+    assert "Staleness" in html
+    assert "<!doctype html>" in html.lower()
+
+    results_md = (out_dir / "RESULTS.md").read_text()
+    assert "stub/base" in results_md and "origin" not in results_md
+
+
+def test_a_report_from_a_run_where_every_probe_failed(wired, tmp_path, monkeypatch):
+    """A provider that was down for the whole window must render a page that
+    says so, not one that quietly reports perfect freshness over zero
+    observations."""
+    from tti import scheduler
+
+    now = time.time()
+    wired.publish_npm("demo", [("9.9.8", now - 90_000), ("9.9.9", now - 5)])
+    monkeypatch.setitem(config._cache, "watchlist", {"npm": ["demo"], "pypi": []})
+    monkeypatch.setitem(config._cache, "settings", {
+        "sources": ["npm"], "max_detection_lag_seconds": 600,
+        "max_clock_skew_seconds": 120, "ladder": [300], "origin_control": False,
+        "max_results": 5, "max_chars_per_result": 500,
+        "max_rung_slip_seconds": 10 ** 9, "daily_usd_cap": 100.0,
+        "arms": [{"provider": "stub", "mode": "base"}]})
+    monkeypatch.setitem(config._cache, "providers", {"providers": {"stub": {"modes": {
+        "base": {"usd_per_1k_requests": 1.0, "results_included": 5}}}}})
+    monkeypatch.setattr(scheduler.providers, "available_arms",
+                        lambda: [("stub", "base")])
+
+    class Dead:
+        name = "stub"
+        def modes(self): return ["base"]
+        def available(self): return True
+        def search(self, *a, **k):
+            raise RuntimeError("provider 503")
+
+    monkeypatch.setattr(scheduler.providers, "get", lambda n: Dead())
+
+    led = Ledger(tmp_path)
+    scheduler.discover(led, verbose=False)
+    ev = next(iter(led.events().values()))
+    rep = scheduler.run_due(led, now=ev.published_at + 300, verbose=False)
+    assert rep.errors == 1 and rep.spend_usd == 0.0
+
+    # Every observation errored. The page is still drawn — "every probe
+    # failed" is itself the finding, and withholding the report would hide it
+    # — but it must say plainly that the table is a list of arms rather than
+    # a set of results.
+    out_dir = tmp_path / "pages"
+    assert main(["--run-dir", str(tmp_path), "report",
+                 "--out-dir", str(out_dir)]) == 0
+    html = (out_dir / "index.html").read_text()
+    assert "No arm produced a scoreable observation" in html
+    assert "a list of arms, not a set of results" in html

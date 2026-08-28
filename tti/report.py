@@ -594,6 +594,21 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
                    "rate on this row, so it is stated rather than left as an "
                    "unexplained gap.</p>")
 
+    # A run where every probe errored still produces arms, because arms are
+    # derived from the results file and an ERROR is a result. The formatters
+    # correctly refuse to invent numbers, so every cell reads "—" and the
+    # page is not lying. It is, however, a rendered dashboard, and a rendered
+    # dashboard reads as results. Say so at the top instead.
+    scoreable = [s for s in scores if s.n_events]
+    empty_note = ("" if scoreable else
+                  "<div class='panel'><p style='margin-top:0'><b>No arm produced a "
+                  "scoreable observation.</b> Every probe in this run errored, was "
+                  "refused by the spend cap, or was skipped. The table below is a "
+                  "list of arms, not a set of results.</p>"
+                  "<p class='note'>Rendered rather than withheld, because "
+                  "\"every probe failed\" is itself the finding and refusing to "
+                  "draw the page would hide it.</p></div>")
+
     non_converged = [f"{s.provider}/{s.mode}" for s in scores
                      if s.npmle.n and not s.npmle.converged]
     converge_note = ("" if not non_converged else
@@ -768,6 +783,8 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
 <p class="sub">How long a newly published fact takes to become retrievable through each
 web-search API, and how often the API confidently returns the answer it replaced.
 Generated {gen}.</p>
+
+{empty_note}
 
 <div class="panel">
   <div class="scroll"><table>
