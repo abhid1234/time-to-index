@@ -44,11 +44,27 @@ CLASSES = [
 ]
 
 
+# Presence of this file in a run directory means the ledger was produced by
+# the generator below, not by probing anything.
+DEMO_MARKER = "SYNTHETIC"
+
+
 def generate(run_dir: pathlib.Path, ladder: list[int], seed: int = 7
              ) -> tuple[Ledger, dict[str, list[float]]]:
     rng = random.Random(seed)
     led = Ledger(run_dir)
     now = time.time()
+
+    # Mark the run as synthetic. Pre-registration is a claim about a
+    # measurement of somebody's product, and this run measures a generator
+    # whose answers are already known. Without the marker the arms here read
+    # as five undeclared providers and the five real ones read as having
+    # failed everywhere -- both true statements about the ledger, and both
+    # nonsense as statements about the world.
+    led.root.mkdir(parents=True, exist_ok=True)
+    (led.root / DEMO_MARKER).write_text(
+        "Synthetic run from `tti demo`. Not a measurement of any product.\n",
+        encoding="utf-8")
 
     events: list[Event] = []
     for source_class, source, has_predecessor, n in CLASSES:
@@ -206,7 +222,8 @@ def render(run_dir: pathlib.Path, out: pathlib.Path, ladder: list[int]) -> str:
                     for sc in scores}
     render_table = {k: v for k, v in render_table.items() if v}
     html = report.dashboard_html(scores, events, results, by_class, pairs, powers,
-                                 stale_series, (), render_table or None)
+                                 stale_series, (), render_table or None,
+                                 prereg_panel=report.prereg_panel_html("synthetic"))
     html = html.replace("<h1>Time to Index</h1>", "<h1>Time to Index</h1>" + BANNER)
     html = html.replace("<title>Time to Index</title>",
                         "<title>Time to Index — synthetic demo</title>")

@@ -567,7 +567,8 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
                    powers: list = (),
                    stale_series: list = (),
                    sensitivity_rows: list = (),
-                   render_table: dict | None = None) -> str:
+                   render_table: dict | None = None,
+                   prereg_panel: str = "") -> str:
     e = html.escape
     gen = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     ordered = sorted(scores, key=lambda s: (s.median_ttl is None, s.median_ttl or 0))
@@ -785,6 +786,7 @@ web-search API, and how often the API confidently returns the answer it replaced
 Generated {gen}.</p>
 
 {empty_note}
+{prereg_panel}
 
 <div class="panel">
   <div class="scroll"><table>
@@ -923,3 +925,81 @@ Re-grade the raw payloads with different matching rules and you will get a diffe
 number out of the same evidence &#8212; which is the only reason to believe this one.
 </footer>
 </div>"""
+
+
+def prereg_panel_html(ps) -> str:
+    """The pre-registration banner for the dashboard.
+
+    `ps` is whatever `cli._plan_status` returned: the string "synthetic", None
+    for an unreadable plan, or (plan, classification, lock status).
+
+    Deliberately at the top of the page rather than in a footnote. The whole
+    value of pre-registering is that a reader learns, before reading a single
+    number, which of them were promised in advance — a disclosure at the
+    bottom is one the reader reaches only after forming a view.
+    """
+    e = html.escape
+    if ps == "synthetic":
+        return ("<div class='panel'><p style='margin-top:0'><b>Synthetic run.</b> "
+                "These arms are a generator whose latencies are already known. "
+                "The pre-registered plan does not apply, because nothing here is "
+                "a measurement of anybody's product.</p></div>")
+    if ps is None:
+        return ("<div class='panel' style='border-color:var(--bad)'>"
+                "<p style='margin-top:0'><b>No analysis plan.</b> "
+                "<code>docs/PREREGISTRATION.md</code> could not be read, so every "
+                "quantity on this page is exploratory: nothing constrains which "
+                "comparisons were chosen, or when.</p></div>")
+
+    plan, cls, st = ps
+    rows = []
+    if st.drifted:
+        rows.append(
+            "<p style='margin-top:0'><b>The analysis plan changed after "
+            f"collection began.</b> Locked <code>{e(st.locked or '')}</code>, "
+            f"now <code>{e(st.current)}</code>.</p>"
+            "<p class='note'>Not forbidden and not necessarily wrong — plans are "
+            "sometimes wrong. Printed every time, because a plan edited after the "
+            "data exists is a different kind of claim from one written before it, "
+            "and only one of those two facts survives if nobody says which.</p>")
+    elif st.locked:
+        rows.append(
+            "<p style='margin-top:0'><b>Pre-registered.</b> Plan "
+            f"<code>{e(plan.hash)}</code> (v{plan.version}, registered "
+            f"{e(plan.registered)}) was locked to this run on its first probe "
+            "and has not changed since.</p>")
+    elif st.started:
+        rows.append(
+            "<p style='margin-top:0'><b>No plan lock.</b> This run has results, "
+            "but nothing records that the plan predates them.</p>")
+    else:
+        rows.append(
+            "<p style='margin-top:0'><b>Plan registered, collection not "
+            f"started.</b> <code>{e(plan.hash)}</code>, v{plan.version}.</p>")
+
+    if cls.exploratory:
+        rows.append("<p class='note' style='border-color:var(--bad)'><b>Exploratory, "
+                    "not pre-registered:</b> " + e(", ".join(cls.exploratory)) +
+                    ". These arms appear in the data and not in the plan. They are "
+                    "shown, not hidden — the useful thing is the label.</p>")
+    if cls.declared_but_silent:
+        rows.append("<p class='note'><b>Declared in the plan, produced nothing:</b> " +
+                    e(", ".join(cls.declared_but_silent)) +
+                    ". Named because a table is built from what is in the ledger, so "
+                    "an arm that failed everywhere is otherwise simply not a row — "
+                    "which is how a benchmark loses its worst result without anybody "
+                    "deciding to.</p>")
+
+    hyp = "".join(
+        f"<tr><td><code>{e(h.id)}</code></td><td>{e(h.statement)}</td>"
+        f"<td>{e(h.threshold)}</td><td>{e(h.falsified_if)}</td></tr>"
+        for h in plan.hypotheses)
+    rows.append(
+        "<details><summary>The plan: what was promised, and what would falsify it"
+        "</summary><div class='scroll'><table><thead><tr><th>id</th>"
+        "<th>hypothesis</th><th>threshold</th><th>falsified if</th></tr></thead>"
+        f"<tbody>{hyp}</tbody></table></div>"
+        f"<p class='note'><b>Primary endpoint.</b> {e(plan.primary_endpoint)}</p>"
+        f"<p class='note'><b>Stopping rule.</b> {e(plan.stopping_rule)}</p>"
+        "</details>")
+    return "<div class='panel'>" + "".join(rows) + "</div>"

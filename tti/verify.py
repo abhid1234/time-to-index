@@ -24,6 +24,9 @@ Five checks, in the order in which a failure is worth knowing:
     platform    advisory locking is available. Without it two overlapping
                 cron runs double-spend and double-count, and nothing in the
                 output would say so.
+    prereg      the analysis plan parses, every hypothesis carries a
+                falsification condition, and the plan has not changed since
+                this run's first probe.
 
 Nothing here touches the network, nothing costs money, and nothing writes.
 """
@@ -194,9 +197,58 @@ def check_platform() -> Check:
                   "fcntl.flock."])
 
 
+def check_prereg(run_dir=None) -> Check:
+    """The plan parses, and it has not moved under the data.
+
+    Not a FAIL when the plan is missing: a fork is allowed to run this
+    instrument without pre-registering anything, and refusing to verify would
+    punish the fork rather than the omission. It is a WARN, because a run with
+    no plan produces numbers that nothing constrains, and that is worth saying
+    out loud rather than inferring from an absence.
+    """
+    from . import prereg
+    from .demo import DEMO_MARKER
+    from .ledger import Ledger
+
+    try:
+        plan = prereg.parse()
+    except prereg.PreregError as exc:
+        return Check("prereg", WARN, "no usable analysis plan", [str(exc),
+                     "Every reported quantity is exploratory by default."])
+
+    led = Ledger(run_dir)
+    if (led.root / DEMO_MARKER).exists():
+        return Check("prereg", OK,
+                     f"plan {plan.hash} parses; this run is synthetic, so the "
+                     f"plan does not apply to it")
+
+    started = bool(led.results())
+    st = prereg.status(led.root, plan, started=started)
+    detail = (f"plan {plan.hash} · v{plan.version} · "
+              f"{len(plan.hypotheses)} hypotheses, each with a falsification "
+              f"condition")
+    if st.drifted:
+        return Check("prereg", FAIL,
+                     f"the plan changed after collection began "
+                     f"(locked {st.locked}, now {st.current})",
+                     [prereg.DRIFT_NOTE,
+                      "Re-lock deliberately by recording the new hash, or "
+                      "restore the plan that was registered."])
+    if started and st.locked is None:
+        return Check("prereg", WARN,
+                     "results exist but no lock file; the plan cannot be "
+                     "shown to predate them",
+                     ["Either collection began before locking existed, or "
+                      f"{prereg.LOCK_NAME} was removed."])
+    if not started:
+        return Check("prereg", OK,
+                     detail + " — locks on the first dispatched probe")
+    return Check("prereg", OK, detail + f" — locked {st.locked}, unchanged")
+
+
 def run_all(run_dir=None) -> list[Check]:
     return [check_config(), check_estimator(), check_grader(),
-            check_ledger(run_dir), check_platform()]
+            check_ledger(run_dir), check_platform(), check_prereg(run_dir)]
 
 
 def worst(checks: list[Check]) -> str:

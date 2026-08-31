@@ -174,6 +174,7 @@ actually made here, in this repository, in the form described.
 | an unreadable month of data | one interrupted write | malformed lines are skipped and counted, and `tti status` names the damage |
 | twice the spend and every rate doubled | two cron runs overlapping | an advisory lock; a second run exits zero saying it was early |
 | "Eight commands take `--json`" | a sentence written once and never re-read | the README's list and its count are checked against the argument parser |
+| an analysis plan declaring `exa/base` | the runner dispatches `exa/auto`; every real arm would have read "exploratory" and every declared arm "produced nothing" | the plan's arms and ladder are asserted equal to `data/settings.yaml` |
 
 The pattern is the same every time: something that is not a measurement
 classifies perfectly as one. Each guard costs data — dropped events, excluded
@@ -190,6 +191,34 @@ locking is available on this platform. CI proves the repository was correct at
 a commit; this proves the installation is correct now. The distinction is not
 pedantic — the spend-cap bug and the overlapping-cron bug were both properties
 of a deployment, not of a diff.
+
+## Pre-registration
+
+See [PREREGISTRATION.md](PREREGISTRATION.md) for the plan itself. The
+mechanism, and why it is a mechanism rather than a promise:
+
+The plan lives in one fenced block that the human document renders — the same
+bytes serve both readers, so there is no second copy to fall out of date.
+`tti prereg` hashes its *canonical* form (sorted keys, collapsed whitespace),
+which means re-wrapping a sentence leaves the hash alone while moving a
+threshold does not. That distinction is the whole design: a lock that fires on
+typo fixes gets ignored, and an ignored lock is not a lock.
+
+The hash is written into the run directory by the first probe that is actually
+dispatched. Editing the plan before that point is writing it; editing it after
+is revising it in the light of data, and only the second is worth flagging.
+From then on every `score`, `report` and `verify` reports the comparison.
+
+One subtlety was a bug. Whether collection has started is normally read from
+`bool(ledger.results())` — which is empty when *every* line of the results file
+is torn, because the reader skips malformed lines by design. The run would look
+like it never began, the drift check would be skipped, and a plan edited after
+the data would pass silently, at exactly the moment ledger damage should be
+making everyone more careful. The lock file only exists because a probe ran, so
+its presence now outranks the inference.
+
+Nothing here forbids changing the plan. It makes the change visible, which is
+the only property that was ever actually needed.
 
 ## Statistics
 

@@ -229,6 +229,18 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
     if limit:
         due = due[:limit]
 
+    # Lock the analysis plan to this run, on the first probe that will
+    # actually be dispatched. Before there is data there is nothing to be
+    # tempted by, so a plan edited up to this moment is a plan being written,
+    # not a plan being revised in the light of results.
+    if due and not dry_run:
+        try:
+            from . import prereg
+            prereg.lock(ledger.root, prereg.parse())
+        except Exception as exc:      # never block collection on the plan
+            if verbose:
+                print(f"  ! could not lock the analysis plan: {exc}")
+
     out: list[ProbeResult] = []
     for probe in due:
         event = events[probe.event_id]

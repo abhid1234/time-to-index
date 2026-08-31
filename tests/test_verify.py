@@ -20,7 +20,7 @@ from tti.cli import main
 def test_a_clean_installation_passes_every_check(tmp_path):
     checks = verify.run_all(tmp_path)
     assert [c.name for c in checks] == [
-        "config", "estimator", "grader", "ledger", "platform"]
+        "config", "estimator", "grader", "ledger", "platform", "prereg"]
     bad = [(c.name, c.status, c.notes) for c in checks if c.status != verify.OK]
     assert bad == [], bad
     assert verify.worst(checks) == verify.OK

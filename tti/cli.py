@@ -2,6 +2,7 @@
 
     tti doctor              check every source and provider is reachable
     tti verify              offline: config, estimator, grader, ledger, platform
+    tti prereg              the analysis plan, its hash, and whether it has drifted
     tti discover            poll sources, enqueue probes
     tti probe [--limit N]   run probes whose due time has arrived
     tti score               print the leaderboard
@@ -123,6 +124,142 @@ def _out_dir(args) -> pathlib.Path:
 
 
 # ---------------------------------------------------------------------------
+
+def _plan_status(led, scores):
+    """The plan, the lock, and how this run's arms line up with both.
+
+    Returns None if there is no readable plan — a repo can be forked without
+    one, and refusing to score in that case would punish the fork rather than
+    the omission. Everything downstream treats None as "unregistered" and says
+    so, which is the honest label.
+    """
+    from . import prereg
+    from .demo import DEMO_MARKER
+
+    if (led.root / DEMO_MARKER).exists():
+        return "synthetic"
+    try:
+        plan = prereg.parse()
+    except prereg.PreregError:
+        return None
+    present = sorted({(sc.provider, sc.mode) for sc in scores if sc.n_events})
+    cls = prereg.classify(plan, present, control=ORIGIN_ARM)
+    st = prereg.status(led.root, plan, started=bool(led.results()))
+    return plan, cls, st
+
+
+def _plan_lines(ps) -> list[str]:
+    """Human-readable plan notes, or the note that there is no plan."""
+    if ps == "synthetic":
+        return ["  Synthetic run. The pre-registered plan does not apply: "
+                "these arms are a",
+                "  generator whose latencies are already known, not a "
+                "measurement of anything."]
+    if ps is None:
+        return ["  ! No analysis plan (docs/PREREGISTRATION.md unreadable).",
+                "    Every number below is exploratory by default."]
+    plan, cls, st = ps
+    out = [f"  plan {plan.hash} · v{plan.version} · registered {plan.registered}"]
+    if st.drifted:
+        out.append(f"  ! PLAN CHANGED SINCE COLLECTION BEGAN "
+                   f"(locked {st.locked}, now {st.current})")
+        out.append("    Reported every time. A plan edited after the data "
+                   "exists is a")
+        out.append("    different kind of claim from one written before it.")
+    elif st.locked is None and st.started:
+        out.append("  ! This run has results but no plan lock. It began before "
+                   "locking existed,")
+        out.append("    or the lock file was removed; either way the plan "
+                   "cannot be shown to")
+        out.append("    predate the data.")
+    if cls.exploratory:
+        out.append(f"  ! EXPLORATORY, not pre-registered: "
+                   f"{', '.join(cls.exploratory)}")
+    if cls.declared_but_silent:
+        out.append(f"  ! Declared in the plan, produced nothing: "
+                   f"{', '.join(cls.declared_but_silent)}")
+        out.append("    Listed because an arm that fails everywhere is "
+                   "otherwise just an absent row.")
+    return out
+
+
+def cmd_prereg(args) -> int:
+    """Print the analysis plan, its hash, and whether a run has locked it."""
+    from . import prereg
+
+    try:
+        plan = prereg.parse()
+    except prereg.PreregError as exc:
+        print(f"✗ {exc}")
+        return 2
+
+    led = _ledger(args)
+    st = prereg.status(led.root, plan, started=bool(led.results()))
+    if args.json:
+        return _emit({
+            "hash": plan.hash, "version": plan.version,
+            "registered": plan.registered,
+            "primary_endpoint": plan.primary_endpoint,
+            "secondary_endpoints": plan.secondary_endpoints,
+            "arms": plan.arms, "ladder_seconds": plan.ladder,
+            "hypotheses": [{"id": h.id, "statement": h.statement,
+                            "test": h.test, "threshold": h.threshold,
+                            "falsified_if": h.falsified_if}
+                           for h in plan.hypotheses],
+            "exclusions": plan.exclusions,
+            "stopping_rule": plan.stopping_rule,
+            "lock": {"locked_hash": st.locked, "current_hash": st.current,
+                     "collection_started": st.started, "drifted": st.drifted},
+        })
+
+    print(f"plan {plan.hash}  ·  version {plan.version}  ·  "
+          f"registered {plan.registered}\n")
+    print("primary endpoint")
+    for line in _wrap(plan.primary_endpoint, 74):
+        print(f"  {line}")
+    if plan.secondary_endpoints:
+        print("\nsecondary endpoints")
+        for sec in plan.secondary_endpoints:
+            for i, line in enumerate(_wrap(sec, 72)):
+                print(f"  {'- ' if i == 0 else '  '}{line}")
+    print(f"\narms declared in advance   {', '.join(plan.arms)}")
+    print(f"ladder (seconds)           {plan.ladder}")
+    print("\nhypotheses")
+    for h in plan.hypotheses:
+        for i, line in enumerate(_wrap(h.statement, 68)):
+            print(f"  {h.id + '  ' if i == 0 else '    '}{line}")
+        if h.threshold:
+            print(f"      threshold     {h.threshold}")
+        for i, line in enumerate(_wrap(h.falsified_if, 60)):
+            print(f"      {'falsified if  ' if i == 0 else '              '}{line}")
+        print()
+    print(f"exclusions declared in advance  "
+          f"{', '.join(str(e.get('id', '?')) for e in plan.exclusions)}")
+    print("\nstopping rule")
+    for line in _wrap(plan.stopping_rule, 74):
+        print(f"  {line}")
+
+    print("\nlock")
+    if not st.started:
+        print("  no results yet — the plan locks on the first dispatched probe")
+    elif st.locked is None:
+        print("  ! results exist but no lock file; the plan cannot be shown "
+              "to predate them")
+    elif st.drifted:
+        print(f"  ! CHANGED SINCE COLLECTION BEGAN: locked {st.locked}, "
+              f"now {st.current}")
+        for line in _wrap(prereg.DRIFT_NOTE, 74):
+            print(f"    {line}")
+        return 1
+    else:
+        print(f"  ✓ locked {st.locked} — unchanged since collection began")
+    return 0
+
+
+def _wrap(text: str, width: int) -> list[str]:
+    import textwrap
+    return textwrap.wrap(" ".join(str(text).split()), width) or [""]
+
 
 def cmd_verify(args) -> int:
     """Offline: does this installation compute what it claims to compute?
@@ -355,10 +492,35 @@ def cmd_score(args) -> int:
             return _emit({"arms": [], "note": "no results yet"})
         print("no results yet — run `tti discover` then `tti probe`")
         return 1
+    ps = _plan_status(led, scores)
     if args.json:
-        return _emit({"arms": [_score_json(sc) for sc in scores],
-                      "events": len(led.events())})
+        payload = {"arms": [_score_json(sc) for sc in scores],
+                   "events": len(led.events())}
+        if ps == "synthetic":
+            payload["preregistration"] = {"synthetic": True}
+        elif ps is None:
+            payload["preregistration"] = {"registered": False}
+        else:
+            plan, cls, st = ps
+            payload["preregistration"] = {
+                "registered": True, "hash": plan.hash, "version": plan.version,
+                "locked_hash": st.locked, "drifted": st.drifted,
+                "declared": cls.declared, "exploratory": cls.exploratory,
+                "declared_but_silent": cls.declared_but_silent,
+            }
+            # Per-arm, so a consumer reading one row does not have to
+            # cross-reference a list at the top of the document to learn that
+            # the row was not pre-registered.
+            for row in payload["arms"]:
+                arm = f"{row['provider']}/{row['mode']}"
+                row["preregistered"] = arm in plan.arms
+        return _emit(payload)
     print(report.leaderboard_md(scores))
+    lines = _plan_lines(ps)
+    if lines:
+        print()
+        for line in lines:
+            print(line)
     return 0
 
 
@@ -1085,14 +1247,19 @@ def cmd_report(args) -> int:
                     for sc in scores}
     render_table = {k: v for k, v in render_table.items() if v}
 
+    panel = report.prereg_panel_html(_plan_status(led, scores))
     html = report.full_page(
         report.dashboard_html(scores, events, results, by_class, pairs, powers,
-                              stale_series, sens_rows, render_table or None))
+                              stale_series, sens_rows, render_table or None,
+                              prereg_panel=panel))
     (out_dir / "index.html").write_text(html, encoding="utf-8")
     results_md = (out_dir.parent / "RESULTS.md" if out_dir.name == "docs"
                   else out_dir / "RESULTS.md")
+    plan_md = "\n".join(_plan_lines(_plan_status(led, scores)))
     results_md.write_text(
-        "# Results\n\n" + report.summary_md(scores, events, results) + "\n",
+        "# Results\n\n" + report.summary_md(scores, events, results) + "\n"
+        + ("\n## Pre-registration\n\n```\n" + plan_md + "\n```\n"
+           if plan_md.strip() else ""),
         encoding="utf-8")
     print(f"wrote {out_dir / 'index.html'} ({len(html)//1024}KB) and {results_md}")
     return 0
@@ -1109,6 +1276,10 @@ def main(argv: list[str] | None = None) -> int:
     doc.add_argument("--subjects", type=int, default=2,
                      help="subjects to poll per source (default 2; 0 for all)")
     doc.set_defaults(fn=cmd_doctor)
+
+    pr = sub.add_parser("prereg", help="the analysis plan, its hash, and its lock")
+    pr.add_argument("--json", action="store_true", help="machine-readable")
+    pr.set_defaults(fn=cmd_prereg)
 
     v = sub.add_parser("verify", help="offline self-check: config, estimator, "
                                       "grader, ledger, platform")

@@ -103,13 +103,30 @@ are non-negotiable:
 If you add a metric, add the case where it should refuse to answer. Most of
 the tests here are about the refusals.
 
+## Changing the analysis plan
+
+`docs/PREREGISTRATION.md` is not documentation. It is hashed, and the hash is
+locked into every run on its first probe. Before collection starts, edit it
+freely — that is writing the plan. Once a run has results, any edit shows up in
+`tti score`, `tti report` and `tti verify` until somebody deliberately re-locks.
+
+Two invariants are enforced by tests rather than by review:
+
+- **Every hypothesis needs a `falsified_if`.** `prereg.parse` refuses a plan
+  without one. A hypothesis that cannot come out false is not pre-registered,
+  it is pre-assumed.
+- **The declared arms and ladder must match `data/settings.yaml`.** A plan that
+  names arms the runner never dispatches inverts the labelling: every real arm
+  reads as exploratory and every declared arm as silent.
+
 ## Running the tests
 
 ```bash
 pip install -e ".[dev]"
 pytest -q
 ruff check tti tests
-tti verify        # the five checks that must hold on any installation
+tti verify        # the six checks that must hold on any installation
+tti prereg        # the analysis plan, and whether it has moved under the data
 tti demo          # the estimator must recover the generator's own draws
 ```
 

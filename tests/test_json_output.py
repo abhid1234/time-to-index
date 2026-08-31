@@ -33,6 +33,7 @@ COMMANDS = [
     (["sensitivity"], True),
     (["watch", "--report"], False),
     (["verify"], False),
+    (["prereg"], False),
 ]
 
 

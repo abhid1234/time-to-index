@@ -169,6 +169,7 @@ about the instrument, not about any product.
 cp .env.example .env      # add whichever provider keys you have
 export TTI_USER_AGENT="you@example.com"   # SEC and arXiv require a contact
 
+tti prereg                # the analysis plan, its hash, and whether it drifted
 tti verify                # offline: is this installation's arithmetic sound
 tti doctor                # is every source and provider reachable
 tti discover --dry-run    # what would be collected right now, writing nothing
@@ -182,8 +183,8 @@ tti report                # write RESULTS.md and docs/index.html
 tti placeholder           # the pre-run docs/index.html, before any results exist
 ```
 
-Nine commands take `--json`: `score`, `status`, `power`, `sensitivity`,
-`forecast`, `watch`, `crawlability`, `survey`, `verify`. Nothing that is not a finite
+Ten commands take `--json`: `score`, `status`, `power`, `sensitivity`,
+`forecast`, `watch`, `crawlability`, `survey`, `verify`, `prereg`. Nothing that is not a finite
 number is emitted as a bare `NaN` or `Infinity` token — those parse in Python
 and almost nowhere else — so a missing value arrives as `null` rather than as
 a parse error or a silently coerced token.
@@ -200,6 +201,48 @@ Every command exits `2` on a configuration error — distinct from `1`, so a
 cron wrapper can tell "misconfigured" from "ran and found nothing". `tti
 doctor` validates every config file before it checks anything else.
 
+### Pre-registration
+
+The analysis plan is in [docs/PREREGISTRATION.md](docs/PREREGISTRATION.md),
+written before the first probe was ever dispatched. It names the primary
+endpoint, the arms, three hypotheses with the condition that would falsify
+each, six exclusion rules, and a stopping rule.
+
+The point is not the document. Benchmarks have had methodology sections for
+decades, and they are written after the fact as often as not. The point is
+that the plan is **locked to the data**:
+
+- The plan and the machine's copy are the same bytes — one fenced block that
+  the document itself renders — so the two cannot drift apart.
+- `tti prereg` hashes the *canonical* form: sorted keys, whitespace collapsed.
+  Rewording a sentence does not move the hash. Moving a threshold, adding an
+  arm, or dropping a rung does.
+- The hash is written into the run directory on the first dispatched probe.
+  Before that there is nothing to be tempted by, so a plan edited up to that
+  moment is a plan being *written*, not one revised in the light of results.
+- Afterwards, every `tti score`, `tti report` and `tti verify` says whether the
+  plan has changed — in the output, unprompted, at the top of the page.
+
+Editing the plan is not forbidden. Plans are sometimes wrong. It is made
+**visible**, which is the property that was actually needed.
+
+Three labels follow onto every leaderboard:
+
+| label | meaning |
+|---|---|
+| pre-registered | declared before collection began |
+| exploratory | in the data and not in the plan — shown, not hidden |
+| declared, produced nothing | the plan named it and it never scored |
+
+The last one matters as much as the others. A leaderboard is built from what
+is in the ledger, so an arm that failed everywhere is simply not a row — which
+is how a benchmark loses its worst result without anybody deciding to.
+
+A test asserts that the plan's declared arms and ladder match `data/settings.yaml`.
+A plan naming arms the runner never dispatches would invert the whole
+mechanism: every real arm would read as exploratory and every declared arm as
+silent. That was a real defect here, and that test is what caught it.
+
 ### `tti verify` — the check that does not need the network
 
 `doctor` asks whether five providers are up, which is somebody else's uptime.
@@ -212,6 +255,7 @@ which is ours, and it answers offline:
   ✓ grader     4 version-boundary cases graded as expected
   ✓ ledger     runs/: every line parses, 1,284 result(s), no duplicate probe ids
   ✓ platform   advisory file locking available; overlapping discover/probe runs are prevented
+  ✓ prereg     plan c4ab4846c25aa81b · v1 · 3 hypotheses, each with a falsification condition — locked, unchanged
 ```
 
 The test suite proves the repository is correct at the commit CI ran. It says
