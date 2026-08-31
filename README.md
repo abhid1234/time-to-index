@@ -179,12 +179,14 @@ tti status                # queue depth and today's spend
 tti score                 # the leaderboard, as markdown (or --json)
 tti power                 # can this run support the claim it invites?
 tti sensitivity           # does the ranking survive the rules that produced it?
+tti decoy                 # how often does this pipeline say FRESH about a
+                          #   version that was never published? (no API calls)
 tti report                # write RESULTS.md and docs/index.html
 tti placeholder           # the pre-run docs/index.html, before any results exist
 ```
 
-Ten commands take `--json`: `score`, `status`, `power`, `sensitivity`,
-`forecast`, `watch`, `crawlability`, `survey`, `verify`, `prereg`. Nothing that is not a finite
+Eleven commands take `--json`: `score`, `status`, `power`, `sensitivity`,
+`forecast`, `watch`, `crawlability`, `survey`, `verify`, `prereg`, `decoy`. Nothing that is not a finite
 number is emitted as a bare `NaN` or `Infinity` token — those parse in Python
 and almost nowhere else — so a missing value arrives as `null` rather than as
 a parse error or a silently coerced token.
@@ -200,6 +202,53 @@ without a strictness check.
 Every command exits `2` on a configuration error — distinct from `1`, so a
 cron wrapper can tell "misconfigured" from "ran and found nothing". `tti
 doctor` validates every config file before it checks anything else.
+
+### The instrument's own false-positive rate
+
+Every recall number rests on one unchecked assumption: that when the pipeline
+says FRESH, the provider really surfaced the new fact. Two ways that fails, and
+neither shows up anywhere in a leaderboard — the grader matching a
+version-shaped token in unrelated prose (`15.4.1` inside `15.4.10` was exactly
+this, and it shipped), or a generative answer layer inventing a plausible
+version number.
+
+`tti decoy` measures it. For every event it mints a **counterfactual** — a
+token of the same shape as the real answer, for the same subject, that the
+registry confirms was never published — and re-grades every stored payload
+against it. A FRESH verdict for a version that does not exist is a false
+positive by construction.
+
+```
+| arm | payloads re-graded | false positives | rate (95% CI) |
+|---|---|---|---|
+| `guesser/base` | 40 | 4 | 10.0% (4–23) |
+| `honest/base`  | 40 | 0 |  0.0% (0–9)  |
+
+Each arm's recall carries its own upper error bar from the column above:
+  guesser/base: up to 23% of its FRESH verdicts could be spurious.
+  honest/base: up to 9% of its FRESH verdicts could be spurious.
+```
+
+Two properties make it worth running rather than merely worth describing:
+
+- **It costs nothing.** The payloads are already stored; `tti decoy` makes zero
+  provider calls. There is no budget argument for skipping it, so it can run
+  beside every published number.
+- **It cannot be gamed by tuning the grader.** Loosening the rules to raise
+  recall raises the false-positive rate in the same motion, and both numbers
+  are printed side by side.
+
+The counterfactual is minted deterministically, not randomly — two people
+running this against the same ledger must get the same number or it is not a
+measurement. A fixed offset occasionally lands on a version that really was
+released; the registry check catches those and they are dropped and counted,
+because grading against a real release would score true retrieval as a false
+positive. Where the publisher cannot be asked, the counterfactual is used and
+tallied separately: weaker evidence, labelled as such.
+
+When no false positive is observed, the reported number is **not** 0%. It is
+the Wilson upper bound, which at small n is large — and that bound is the
+figure that belongs beside the recall numbers.
 
 ### Pre-registration
 
@@ -255,7 +304,7 @@ which is ours, and it answers offline:
   ✓ grader     4 version-boundary cases graded as expected
   ✓ ledger     runs/: every line parses, 1,284 result(s), no duplicate probe ids
   ✓ platform   advisory file locking available; overlapping discover/probe runs are prevented
-  ✓ prereg     plan c4ab4846c25aa81b · v1 · 3 hypotheses, each with a falsification condition — locked, unchanged
+  ✓ prereg     plan 1257222a75b5735c · v1 · 4 hypotheses, each with a falsification condition — locked, unchanged
 ```
 
 The test suite proves the repository is correct at the commit CI ran. It says

@@ -8,6 +8,8 @@
     tti score               print the leaderboard
     tti report              write RESULTS.md and docs/index.html
     tti regrade             re-grade stored raw payloads without new calls
+    tti decoy               how often does this pipeline say FRESH about a
+                            version that was never published?
     tti status              what is queued, what is due, what is spent
 
 `discover` and `probe` are the two that run on a timer. Everything else is
@@ -592,6 +594,96 @@ def cmd_status(args) -> int:
         print("  a month of collection unreadable. But they are records that no")
         print("  longer count, so every rate computed from this ledger is over a")
         print("  smaller denominator than the file length suggests.")
+    return 0
+
+
+def cmd_decoy(args) -> int:
+    """Measure the pipeline's false-positive rate. Zero provider calls.
+
+    Re-grades every stored payload against a counterfactual answer — a
+    version-shaped token, same shape as the real one, that was never
+    published. A FRESH verdict against a version that does not exist is a
+    false positive by construction.
+    """
+    from . import decoy as decoy_mod
+    from .metrics import wilson
+
+    led = _ledger(args)
+    if not led.results():
+        # A monitoring wrapper polls from the first minute, so the JSON form
+        # owes it a document rather than a bare exit code. Same contract every
+        # other --json command here keeps.
+        if args.json:
+            return _emit({"arms": [], "events_decoyed": 0, "events_skipped": 0,
+                          "skip_reasons": {}, "unverified_counterfactuals": 0,
+                          "note": "no results yet — nothing to re-grade"})
+        print("no results yet — nothing to re-grade")
+        return 1
+
+    verify = None if args.no_verify else decoy_mod.npm_absent
+    rep = decoy_mod.run(led, verify_absent=verify, verbose=not args.json)
+
+    if args.json:
+        return _emit({
+            "events_decoyed": rep.events_decoyed,
+            "events_skipped": rep.events_skipped,
+            "skip_reasons": rep.skip_reasons,
+            "unverified_counterfactuals": rep.unverified,
+            "arms": [{"provider": a.provider, "mode": a.mode,
+                      "graded": a.graded, "false_positives": a.hits,
+                      "rate": _n(a.rate),
+                      "rate_ci": _rate(wilson(a.hits, a.graded))
+                      if a.graded else _rate((float("nan"),) * 3),
+                      "examples": [{"subject": s, "counterfactual": t,
+                                    "matched": m} for s, t, m in a.examples]}
+                     for a in rep.arms],
+        })
+
+    print(f"\ncounterfactual answers minted for {rep.events_decoyed} event(s); "
+          f"{rep.events_skipped} skipped")
+    for reason, n in sorted(rep.skip_reasons.items()):
+        print(f"  {n:4d}  {reason}")
+    if rep.unverified:
+        print(f"  {rep.unverified:4d}  counterfactual not confirmed absent with "
+              f"the publisher (weaker evidence, counted anyway)")
+    if not rep.any_graded:
+        print("\nNo payload could be re-graded. Either nothing stored a raw "
+              "payload, or\nno event had a semver-shaped answer to build a "
+              "counterfactual from.")
+        return 1
+
+
+    print("\n| arm | payloads re-graded | false positives | rate (95% CI) |")
+    print("|---|---|---|---|")
+    for a in rep.arms:
+        p_, lo, hi = wilson(a.hits, a.graded)
+        print(f"| `{a.provider}/{a.mode}` | {a.graded} | {a.hits} | "
+              f"{p_*100:.1f}% ({lo*100:.0f}–{hi*100:.0f}) |")
+
+    print("\nA false positive here is the pipeline reporting FRESH for a version")
+    print("that was never published. Two causes, both invisible in a leaderboard:")
+    print("the grader matching a version-shaped token in unrelated prose, or a")
+    print("provider's answer layer inventing one.")
+    # Per-arm, not pooled. The first version printed the worst arm's bound as
+    # if it applied to every row, which overstates it for the clean arms —
+    # the same "one number for everybody" mistake this project exists to
+    # object to.
+    hi_by_arm = sorted(((wilson(a.hits, a.graded)[2], a) for a in rep.arms),
+                       key=lambda t: -t[0])
+    print("\nEach arm's recall carries its own upper error bar from the column "
+          "above:")
+    for hi, a in hi_by_arm:
+        print(f"  {a.provider}/{a.mode}: up to {hi*100:.0f}% of its FRESH "
+              f"verdicts could be spurious.")
+    if not any(a.hits for a in rep.arms):
+        # Keyed off the observed count, not the interval. Keying off the upper
+        # bound was the first version and the note could never fire: the whole
+        # point of a Wilson interval is that its upper edge is not zero when
+        # the observed count is.
+        print("\nNo false positive was observed. That is not a 0% rate — at "
+              "this sample\nsize the upper bound above is what the evidence "
+              "actually supports, and it\nis the number that belongs beside "
+              "the recall figures.")
     return 0
 
 
@@ -1276,6 +1368,14 @@ def main(argv: list[str] | None = None) -> int:
     doc.add_argument("--subjects", type=int, default=2,
                      help="subjects to poll per source (default 2; 0 for all)")
     doc.set_defaults(fn=cmd_doctor)
+
+    dc = sub.add_parser("decoy", help="false-positive rate against "
+                                      "counterfactual answers (no API calls)")
+    dc.add_argument("--json", action="store_true", help="machine-readable")
+    dc.add_argument("--no-verify", action="store_true",
+                    help="skip asking the registry whether each counterfactual "
+                         "really is absent (offline; weaker evidence)")
+    dc.set_defaults(fn=cmd_decoy)
 
     pr = sub.add_parser("prereg", help="the analysis plan, its hash, and its lock")
     pr.add_argument("--json", action="store_true", help="machine-readable")

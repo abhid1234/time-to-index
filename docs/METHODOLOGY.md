@@ -174,6 +174,7 @@ actually made here, in this repository, in the form described.
 | an unreadable month of data | one interrupted write | malformed lines are skipped and counted, and `tti status` names the damage |
 | twice the spend and every rate doubled | two cron runs overlapping | an advisory lock; a second run exits zero saying it was early |
 | "Eight commands take `--json`" | a sentence written once and never re-read | the README's list and its count are checked against the argument parser |
+| 78% recall | possibly 78% minus an unmeasured false-positive rate | every payload is re-graded against a counterfactual answer that was never published |
 | an analysis plan declaring `exa/base` | the runner dispatches `exa/auto`; every real arm would have read "exploratory" and every declared arm "produced nothing" | the plan's arms and ladder are asserted equal to `data/settings.yaml` |
 
 The pattern is the same every time: something that is not a measurement
@@ -191,6 +192,44 @@ locking is available on this platform. CI proves the repository was correct at
 a commit; this proves the installation is correct now. The distinction is not
 pedantic — the spend-cap bug and the overlapping-cron bug were both properties
 of a deployment, not of a diff.
+
+## Measuring our own false positives
+
+A leaderboard can only be read if the FRESH verdicts in it are real. Two ways
+they are not, both of which leave the payload looking entirely ordinary: the
+grader matches a version-shaped token that is not the answer, or the provider
+invents one. Neither is visible in any statistic this project otherwise
+computes, and both inflate recall in the same direction.
+
+`tti decoy` re-grades every stored payload against a **counterfactual**: a
+token of the same shape as the real answer, for the same subject, confirmed
+absent from the publisher. A hit is a false positive by construction, and the
+rate is the error bar that belongs on every recall figure.
+
+Three details that decide whether the number means anything:
+
+**Same shape as the real answer.** A decoy that does not look like a plausible
+release measures the decoy — the grader declines it for the wrong reason and
+the false-positive rate is an artifact of the decoy's weirdness. So the
+counterfactual is a semantic version derived from the real one, and events
+whose answers are not semver (SEC filings, arXiv identifiers) are skipped with
+a stated reason rather than given an invented token.
+
+**Deterministic, not random.** Two people running this against the same ledger
+must get the same number. A random offset would make the check unreproducible,
+which is the property it exists to supply.
+
+**Verified absent, or labelled unverified.** A fixed offset lands on a real
+release occasionally. Grading against one would score true retrieval as a false
+positive, so it is dropped and counted. Where the publisher cannot be asked,
+the counterfactual is used and tallied separately — an unverified
+counterfactual is weaker evidence, and pretending otherwise would overstate the
+check that exists to keep us honest.
+
+The reported figure at zero observed hits is not 0%. It is the Wilson upper
+bound, which at small n is large, and that is the number that goes beside the
+recall column. Reporting 0% would be the same mistake as reporting a median
+from the events that happened to index.
 
 ## Pre-registration
 

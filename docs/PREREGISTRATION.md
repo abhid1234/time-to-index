@@ -44,6 +44,12 @@ primary_endpoint: >
 
 secondary_endpoints:
   - >
+    Pipeline false-positive rate: the proportion of stored payloads that grade
+    FRESH against a counterfactual answer of the same shape, confirmed never
+    published, per arm, with Wilson score intervals. Reported alongside recall
+    rather than as a footnote, because it is recall's error bar.
+
+  - >
     Staleness rate: of the observations that were not FRESH, the proportion
     that returned the superseded answer (STALE) rather than nothing (ABSENT),
     per arm per rung, with Wilson score intervals.
@@ -104,6 +110,22 @@ hypotheses:
     falsified_if: >
       p >= 0.05, or fewer than 15 events land in any class being compared, in
       which case the comparison is reported as underpowered rather than null.
+
+  - id: H4
+    statement: >
+      The pipeline's own false-positive rate is small enough that the recall
+      ordering between arms is not an artifact of it.
+    test: >
+      `tti decoy` per arm; compare each arm's Wilson upper bound on the
+      false-positive rate against the recall gaps in the leaderboard.
+    threshold: >
+      the upper bound is below half the smallest recall gap that the
+      leaderboard is used to claim
+    falsified_if: >
+      Any arm's false-positive upper bound exceeds a recall difference the
+      leaderboard reports as meaningful. In that case the ordering is reported
+      as unresolved rather than as a result, and the grader is the thing that
+      needs work, not the write-up.
 
 exclusions_declared_in_advance:
   - id: X1

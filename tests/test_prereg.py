@@ -244,7 +244,7 @@ def test_prereg_json_carries_the_hypotheses_and_the_lock(tmp_path, capsys):
     assert payload["lock"]["collection_started"] is False
     assert payload["lock"]["drifted"] is False
     ids = [h["id"] for h in payload["hypotheses"]]
-    assert ids == ["H1", "H2", "H3"]
+    assert ids == ["H1", "H2", "H3", "H4"]
     assert all(h["falsified_if"] for h in payload["hypotheses"])
 
 

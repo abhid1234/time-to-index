@@ -34,6 +34,7 @@ COMMANDS = [
     (["watch", "--report"], False),
     (["verify"], False),
     (["prereg"], False),
+    (["decoy"], False),
 ]
 
 
