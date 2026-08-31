@@ -610,6 +610,21 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
                   "\"every probe failed\" is itself the finding and refusing to "
                   "draw the page would hide it.</p></div>")
 
+    from .multiplicity import family_error_rate
+    m_comparisons = sum(1 for r in powers if r.p_value == r.p_value)
+    multiplicity_note = "" if m_comparisons <= 1 else (
+        "<p class='note'><b>" + str(m_comparisons) + " comparisons, so the "
+        "adjusted column is the one to read.</b> Judging each pair against a raw "
+        "&alpha; = 0.05 would give a "
+        f"{family_error_rate(m_comparisons) * 100:.0f}% chance that at least one "
+        "pair is called different when neither is &#8212; a leaderboard with six "
+        "arms invites fifteen comparisons, and that is how a benchmark ships a "
+        "difference it invented. Holm&#8211;Bonferroni rather than plain "
+        "Bonferroni: same control of the family-wise error rate, uniformly more "
+        "power, and no independence assumption, which matters because pairs "
+        "sharing an arm are correlated. The <b>read</b> column uses the adjusted "
+        "value.</p>")
+
     non_converged = [f"{s.provider}/{s.mode}" for s in scores
                      if s.npmle.n and not s.npmle.converged]
     converge_note = ("" if not non_converged else
@@ -664,6 +679,7 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
             f"<td class='k'>{'—' if r.hazard_ratio != r.hazard_ratio else f'{r.hazard_ratio:.2f}'}</td>",
             f"<td class='k'>{r.events_observed}</td>",
             f"<td class='k'>{'—' if r.p_value != r.p_value else f'{r.p_value:.4f}'}</td>",
+            f"<td class='k'>{'—' if r.p_adjusted != r.p_adjusted else f'{r.p_adjusted:.4f}'}</td>",
             f"<td class='k'>{'—' if r.power_now != r.power_now else f'{r.power_now*100:.0f}%'}</td>",
         ]
         if r.verdict == "distinguishable":
@@ -677,10 +693,10 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
 
     pair_rows = "".join(_pw(r) for r in powers) or (
         "".join(
-            f"<tr><td class='k'>{e(a)} vs {e(b)}</td><td colspan='4' class='k'>p = {p:.4f}</td>"
+            f"<tr><td class='k'>{e(a)} vs {e(b)}</td><td colspan='5' class='k'>p = {p:.4f} (uncorrected)</td>"
             f"<td>{'distinguishable' if p < 0.05 else 'not distinguishable at this n'}</td></tr>"
-            for a, b, p in pairs)
-        or "<tr><td colspan='6'>not enough events yet</td></tr>")
+            for a, b, p in pairs)   # fallback only; `powers` carries the adjusted verdict
+        or "<tr><td colspan='7'>not enough events yet</td></tr>")
 
     km_rows = "".join(
         f"<tr><td class='k'>{e(sc.provider)}/{e(sc.mode)}</td>"
@@ -907,8 +923,10 @@ Generated {gen}.</p>
 <div class="panel">
   <div class="scroll"><table>
     <thead><tr><th>comparison</th><th>hazard ratio</th><th>events</th><th>log-rank p</th>
+    <th>p adjusted<br><span style="text-transform:none;letter-spacing:0">Holm–Bonferroni</span></th>
     <th>power</th><th>read</th></tr></thead>
     <tbody>{pair_rows}</tbody></table></div>
+  {multiplicity_note}
   <p class="note">Log-rank rather than a t-test on the indexed subset, because most
   observations are censored and a test that ignores censoring finds differences that are
   artefacts of who ran out of window first. The power column is here because the honest

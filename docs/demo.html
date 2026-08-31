@@ -71,7 +71,7 @@ nothing here is a finding about any product. Real runs are published at
 
 <p class="sub">How long a newly published fact takes to become retrievable through each
 web-search API, and how often the API confidently returns the answer it replaced.
-Generated 2026-08-31 01:37 UTC.</p>
+Generated 2026-08-31 01:46 UTC.</p>
 
 
 <div class='panel'><p style='margin-top:0'><b>Synthetic run.</b> These arms are a generator whose latencies are already known. The pre-registered plan does not apply, because nothing here is a measurement of anybody's product.</p></div>
@@ -288,8 +288,10 @@ Generated 2026-08-31 01:37 UTC.</p>
 <div class="panel">
   <div class="scroll"><table>
     <thead><tr><th>comparison</th><th>hazard ratio</th><th>events</th><th>log-rank p</th>
+    <th>p adjusted<br><span style="text-transform:none;letter-spacing:0">Holm–Bonferroni</span></th>
     <th>power</th><th>read</th></tr></thead>
-    <tbody><tr><td class='k'>provider-a/fast vs provider-b/base</td><td class='k'>2.77</td><td class='k'>205</td><td class='k'>0.0000</td><td class='k'>100%</td><td class='good'>distinguishable</td></tr><tr><td class='k'>provider-a/fast vs provider-c/base</td><td class='k'>4.68</td><td class='k'>177</td><td class='k'>0.0000</td><td class='k'>100%</td><td class='good'>distinguishable</td></tr><tr><td class='k'>provider-b/base vs provider-c/base</td><td class='k'>2.80</td><td class='k'>172</td><td class='k'>0.0000</td><td class='k'>100%</td><td class='good'>distinguishable</td></tr></tbody></table></div>
+    <tbody><tr><td class='k'>provider-a/fast vs provider-b/base</td><td class='k'>2.77</td><td class='k'>205</td><td class='k'>0.0000</td><td class='k'>—</td><td class='k'>100%</td><td class='good'>distinguishable</td></tr><tr><td class='k'>provider-a/fast vs provider-c/base</td><td class='k'>4.68</td><td class='k'>177</td><td class='k'>0.0000</td><td class='k'>—</td><td class='k'>100%</td><td class='good'>distinguishable</td></tr><tr><td class='k'>provider-b/base vs provider-c/base</td><td class='k'>2.80</td><td class='k'>172</td><td class='k'>0.0000</td><td class='k'>—</td><td class='k'>100%</td><td class='good'>distinguishable</td></tr></tbody></table></div>
+  <p class='note'><b>3 comparisons, so the adjusted column is the one to read.</b> Judging each pair against a raw &alpha; = 0.05 would give a 14% chance that at least one pair is called different when neither is &#8212; a leaderboard with six arms invites fifteen comparisons, and that is how a benchmark ships a difference it invented. Holm&#8211;Bonferroni rather than plain Bonferroni: same control of the family-wise error rate, uniformly more power, and no independence assumption, which matters because pairs sharing an arm are correlated. The <b>read</b> column uses the adjusted value.</p>
   <p class="note">Log-rank rather than a t-test on the indexed subset, because most
   observations are censored and a test that ignores censoring finds differences that are
   artefacts of who ran out of window first. The power column is here because the honest

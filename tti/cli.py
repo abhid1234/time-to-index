@@ -44,6 +44,8 @@ from .metrics import (
     staleness_by_rung,
 )
 from .models import ERROR, SKIPPED
+from .multiplicity import family_error_rate
+from .multiplicity import note as multiplicity_note
 from .scheduler import _count_results, discover, run_due
 
 
@@ -744,13 +746,36 @@ def _events_per_day(led: Ledger) -> float:
     return (len(evs) / (span / 86_400.0)) if span > 3600 else 0.0
 
 
+def _pairwise_family(events, results, arms, rate):
+    """Every pairwise comparison, Holm-adjusted as one family.
+
+    One function because there were two copies of this loop — the JSON branch
+    and the text branch of `tti power` — and a correction applied to one of
+    them would have produced two different verdicts for the same data
+    depending on which flag the reader passed.
+    """
+    from .multiplicity import holm
+    from .power import analyse
+
+    raw = []
+    for i in range(len(arms)):
+        for j in range(i + 1, len(arms)):
+            a, b = arms[i], arms[j]
+            oa = observations(events, results, *a)
+            ob = observations(events, results, *b)
+            _, pv = logrank(oa, ob)
+            raw.append((f"{a[0]}/{a[1]}", oa, f"{b[0]}/{b[1]}", ob, pv))
+    adj = holm([(f"{na} vs {nb}", pv) for na, _, nb, _, pv in raw])
+    return [analyse(na, oa, nb, ob, pv, rate, p_adjusted=ad.adjusted)
+            for (na, oa, nb, ob, pv), ad in zip(raw, adj, strict=True)]
+
+
 def cmd_power(args) -> int:
     """Can this run support the claim its leaderboard invites?
 
     Printed as its own command rather than buried in the report, because the
     honest answer early in a run is "no", and that is the moment it matters.
     """
-    from .power import analyse
 
     led = _ledger(args)
     events, results = led.events(), led.results()
@@ -764,44 +789,44 @@ def cmd_power(args) -> int:
         return 1
 
     rate = _events_per_day(led)
+    rows = _pairwise_family(events, results, arms, rate)
+    m = sum(1 for r in rows if r.p_value == r.p_value)
+
     if args.json:
-        rows = []
-        for i in range(len(arms)):
-            for j in range(i + 1, len(arms)):
-                a, b = arms[i], arms[j]
-                oa = observations(events, results, *a)
-                ob = observations(events, results, *b)
-                _, pv = logrank(oa, ob)
-                r = analyse(f"{a[0]}/{a[1]}", oa, f"{b[0]}/{b[1]}", ob, pv, rate)
-                rows.append({
-                    "a": r.a, "b": r.b,
-                    "hazard_ratio": _n(r.hazard_ratio),
-                    "events_observed": r.events_observed,
-                    "p_value": _n(r.p_value),
-                    "power": _n(r.power_now),
-                    "events_for_80_percent": _n(r.events_for_80),
-                    "further_events_needed": _n(r.events_needed),
-                    "further_days_needed": _n(r.days_needed),
-                    "verdict": r.verdict})
-        return _emit({"events": len(events), "events_per_day": _n(rate),
-                      "comparisons": rows})
+        return _emit({
+            "events": len(events), "events_per_day": _n(rate),
+            "multiplicity": {"method": "holm-bonferroni", "comparisons": m,
+                             "uncorrected_family_error_rate":
+                                 _n(family_error_rate(m))},
+            "comparisons": [{
+                "a": r.a, "b": r.b,
+                "hazard_ratio": _n(r.hazard_ratio),
+                "events_observed": r.events_observed,
+                "p_value": _n(r.p_value),
+                "p_value_adjusted": _n(r.p_adjusted),
+                "power": _n(r.power_now),
+                "events_for_80_percent": _n(r.events_for_80),
+                "further_events_needed": _n(r.events_needed),
+                "further_days_needed": _n(r.days_needed),
+                "verdict": r.verdict} for r in rows]})
+
     print(f"{len(events)} events, {rate:.1f}/day observed\n")
-    hdr = f"{'comparison':38s} {'HR':>6s} {'events':>7s} {'power':>7s} {'need':>7s} {'days':>6s}  verdict"
+    if m > 1:
+        for line in _wrap(multiplicity_note(m), 78):
+            print(line)
+        print()
+    hdr = (f"{'comparison':38s} {'HR':>6s} {'events':>7s} {'p':>7s} "
+           f"{'p adj':>7s} {'power':>6s} {'need':>7s}  verdict")
     print(hdr)
     print("-" * len(hdr))
-    for i in range(len(arms)):
-        for j in range(i + 1, len(arms)):
-            a, b = arms[i], arms[j]
-            oa = observations(events, results, *a)
-            ob = observations(events, results, *b)
-            _, pv = logrank(oa, ob)
-            r = analyse(f"{a[0]}/{a[1]}", oa, f"{b[0]}/{b[1]}", ob, pv, rate)
-            hr = "—" if r.hazard_ratio != r.hazard_ratio else f"{r.hazard_ratio:.2f}"
-            pw = "—" if r.power_now != r.power_now else f"{r.power_now*100:.0f}%"
-            need = "—" if r.events_for_80 is None else f"{r.events_for_80:.0f}"
-            days = "—" if r.days_needed is None else f"{r.days_needed:.0f}"
-            print(f"{r.a + ' vs ' + r.b:38s} {hr:>6s} {r.events_observed:>7d} "
-                  f"{pw:>7s} {need:>7s} {days:>6s}  {r.verdict}")
+    for r in rows:
+        hr = "—" if r.hazard_ratio != r.hazard_ratio else f"{r.hazard_ratio:.2f}"
+        pw = "—" if r.power_now != r.power_now else f"{r.power_now*100:.0f}%"
+        need = "—" if r.events_for_80 is None else f"{r.events_for_80:.0f}"
+        pv = "—" if r.p_value != r.p_value else f"{r.p_value:.4f}"
+        pa = "—" if r.p_adjusted != r.p_adjusted else f"{r.p_adjusted:.4f}"
+        print(f"{r.a + ' vs ' + r.b:38s} {hr:>6s} {r.events_observed:>7d} "
+              f"{pv:>7s} {pa:>7s} {pw:>6s} {need:>7s}  {r.verdict}")
     print("\nHR > 1 means the first arm indexes faster. `need` is the Schoenfeld")
     print("event count for 80% power at the observed hazard ratio; `days` is how")
     print("much more collection that is at the current rate.")
@@ -1311,6 +1336,12 @@ def cmd_report(args) -> int:
     arms = [(s.provider, s.mode) for s in
             sorted(scores, key=lambda s: (s.median_ttl is None, s.median_ttl or 0))
             if s.provider != ORIGIN_ARM]
+    # Every pair is computed first, then the whole family is Holm-adjusted
+    # together. Adjusting as we go would make each comparison's verdict depend
+    # on the order the loop happened to visit them in.
+    from .multiplicity import holm
+
+    raw: list[tuple[str, str, float, list, list]] = []
     for i in range(len(arms)):
         for j in range(i + 1, len(arms)):
             a = observations(events, results, *arms[i])
@@ -1318,9 +1349,12 @@ def cmd_report(args) -> int:
             _, p = logrank(a, b)
             na = f"{arms[i][0]}/{arms[i][1]}"
             nb = f"{arms[j][0]}/{arms[j][1]}"
-            if p == p:
-                pairs.append((na, nb, p))
-            powers.append(analyse(na, a, nb, b, p, rate))
+            raw.append((na, nb, p, a, b))
+    adj = holm([(f"{na} vs {nb}", p) for na, nb, p, _, _ in raw])
+    for (na, nb, p, a, b), ad in zip(raw, adj, strict=True):
+        if p == p:
+            pairs.append((na, nb, p))
+        powers.append(analyse(na, a, nb, b, p, rate, p_adjusted=ad.adjusted))
 
     out_dir = _out_dir(args)
     stale_series = [(f"{sc.provider}/{sc.mode}",

@@ -203,6 +203,30 @@ Every command exits `2` on a configuration error — distinct from `1`, so a
 cron wrapper can tell "misconfigured" from "ran and found nothing". `tti
 doctor` validates every config file before it checks anything else.
 
+### Fifteen comparisons, one α
+
+Six arms make fifteen pairwise comparisons. Judging each against a raw
+α = 0.05 gives a **54%** chance that at least one pair is called different when
+neither is. That was this repository's behaviour in two places, and it is the
+most ordinary statistical mistake there is — ordinary enough that a project
+built around not over-claiming had it anyway.
+
+Every pairwise log-rank p-value is now Holm–Bonferroni adjusted across the
+whole family, both values are reported, and the verdict column uses the
+adjusted one:
+
+```
+comparison                              HR  events       p   p adj  power  verdict
+provider-a/fast vs provider-b/base    2.77     205  0.0000  0.0000   100%  distinguishable
+```
+
+Holm rather than plain Bonferroni: same control of the family-wise error rate,
+uniformly more power, and no independence assumption — which matters, because
+pairs sharing an arm are correlated. Benjamini–Hochberg is deliberately not the
+default: it controls the false discovery rate, which suits a screen producing
+candidates for follow-up. A leaderboard is not a screen. Somebody reads one row
+and picks a vendor.
+
 ### The instrument's own false-positive rate
 
 Every recall number rests on one unchecked assumption: that when the pipeline

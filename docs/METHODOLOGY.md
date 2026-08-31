@@ -174,6 +174,7 @@ actually made here, in this repository, in the form described.
 | an unreadable month of data | one interrupted write | malformed lines are skipped and counted, and `tti status` names the damage |
 | twice the spend and every rate doubled | two cron runs overlapping | an advisory lock; a second run exits zero saying it was early |
 | "Eight commands take `--json`" | a sentence written once and never re-read | the README's list and its count are checked against the argument parser |
+| "distinguishable, p = 0.03" | one of fifteen pairwise tests, each judged against a raw 0.05 — a 54% chance of at least one spurious call | Holm–Bonferroni across the whole family; the verdict uses the adjusted value |
 | 78% recall | possibly 78% minus an unmeasured false-positive rate | every payload is re-graded against a counterfactual answer that was never published |
 | an analysis plan declaring `exa/base` | the runner dispatches `exa/auto`; every real arm would have read "exploratory" and every declared arm "produced nothing" | the plan's arms and ladder are asserted equal to `data/settings.yaml` |
 
@@ -192,6 +193,39 @@ locking is available on this platform. CI proves the repository was correct at
 a commit; this proves the installation is correct now. The distinction is not
 pedantic — the spend-cap bug and the overlapping-cron bug were both properties
 of a deployment, not of a diff.
+
+## The number of comparisons a leaderboard invites
+
+Six arms make fifteen pairwise comparisons. Testing each at α = 0.05 and
+calling anything below it "distinguishable" gives a family-wise error rate of
+1 − 0.95¹⁵ = **54%**: more likely than not, at least one pair is reported as
+different when neither is.
+
+That was this repository's behaviour, in two places — the dashboard's pairwise
+panel and the power table — and it is the most ordinary statistical mistake
+there is. Ordinary enough that a project built entirely around not
+over-claiming had it anyway, which is the useful part of writing it down.
+
+Holm–Bonferroni, not plain Bonferroni: a step-down procedure that controls the
+family-wise error rate exactly as strictly, is uniformly more powerful, and —
+the reason it matters here — assumes nothing about independence. Pairwise
+comparisons share arms, so their p-values are correlated, and a procedure that
+needed independence would be the wrong tool.
+
+Benjamini–Hochberg is deliberately not the default. It controls the false
+discovery rate, which is right when a screen produces candidates for follow-up.
+A leaderboard is not a screen. Somebody reads one row and picks a vendor, so
+the quantity to control is the chance that *any* claimed difference is
+spurious, not the expected share of them.
+
+Both p-values are reported, raw and adjusted. Publishing only the adjusted one
+would make the correction unauditable; the verdict column uses the adjusted
+one, and says so.
+
+A comparison that could not be computed — too few events, an arm with nothing
+in it — carries through as no value and is excluded from the family size.
+Counting a test that never ran would shrink every other comparison's adjusted
+value for nothing.
 
 ## Measuring our own false positives
 

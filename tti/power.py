@@ -44,12 +44,13 @@ class PairPower:
     b: str
     hazard_ratio: float           # >1 means `a` indexes faster
     events_observed: int
-    p_value: float
-    power_now: float
-    events_for_80: float | None
-    events_needed: float | None   # additional events required
-    days_needed: float | None
-    verdict: str
+    p_value: float                # raw, uncorrected
+    p_adjusted: float = float("nan")   # Holm-Bonferroni across the family
+    power_now: float = float("nan")
+    events_for_80: float | None = None
+    events_needed: float | None = None   # additional events required
+    days_needed: float | None = None
+    verdict: str = ""
 
 
 def _norm_cdf(x: float) -> float:
@@ -147,14 +148,21 @@ def proportions_n(p1: float, p2: float, power: float = 0.8) -> float | None:
 
 def analyse(a_name: str, a: list[Observation],
             b_name: str, b: list[Observation],
-            p_value: float, events_per_day: float = 0.0) -> PairPower:
+            p_value: float, events_per_day: float = 0.0,
+            p_adjusted: float = float("nan")) -> PairPower:
     hr, n_events = hazard_ratio(a, b)
     need = events_for_power(hr)
     power_now = achieved_power(hr, n_events)
     extra = max(0.0, need - n_events) if need else None
     days = (extra / events_per_day) if (extra and events_per_day > 0) else None
 
-    if p_value == p_value and p_value < 0.05:
+    # The verdict uses the *adjusted* p-value when one has been supplied. A
+    # leaderboard with six arms invites fifteen comparisons, and judging each
+    # against a raw 0.05 gives a 54% chance that at least one pair is called
+    # different when neither is. `analyse` is also called for a single pair,
+    # where there is no family and the raw value is the right one.
+    p_used = p_adjusted if (p_adjusted == p_adjusted) else p_value
+    if p_used == p_used and p_used < 0.05:
         verdict = "distinguishable"
     elif need is None:
         verdict = "no difference to detect"
@@ -164,5 +172,6 @@ def analyse(a_name: str, a: list[Observation],
         verdict = "well powered, no difference found"
 
     return PairPower(a=a_name, b=b_name, hazard_ratio=hr, events_observed=n_events,
-                     p_value=p_value, power_now=power_now, events_for_80=need,
-                     events_needed=extra, days_needed=days, verdict=verdict)
+                     p_value=p_value, p_adjusted=p_adjusted, power_now=power_now,
+                     events_for_80=need, events_needed=extra, days_needed=days,
+                     verdict=verdict)
