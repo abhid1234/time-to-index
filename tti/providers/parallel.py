@@ -11,8 +11,8 @@ The request carries an `objective` (what the caller is trying to learn) and
 every other provider here -- the API is built to be called by an agent that
 knows its own goal, not by a person typing keywords.
 
-That distinction matters for this benchmark, and it is resolved in the
-direction of comparability, not in Parallel's favour. Sending only
+That distinction matters for this benchmark, and it is resolved toward
+comparability rather than toward any one vendor's strengths. Sending only
 `objective` would let Parallel rewrite the query internally and compare its
 rewriter against other providers' raw matching. Sending only the literal
 question would throw away the thing the product is for. We send both, and
