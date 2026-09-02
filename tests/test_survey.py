@@ -161,3 +161,16 @@ def test_the_corpus_page_escapes_hostile_urls():
     html = report.corpus_html(sv)
     assert "<img" not in html            # no element was created
     assert "&lt;img src=x onerror=alert(1)&gt;" in html   # it is inert text
+
+
+def test_an_unfetched_robots_txt_is_not_rendered_as_a_count():
+    """Live corpus page, 2026-09-02: two rows read "0/0" in the robots column,
+    beside rows reading "0/12". The first means robots.txt could not be
+    fetched; the second means it was and blocks nobody. Same glyphs."""
+    from tti.report import corpus_html
+    sv = Survey(results=[r("https://a.example/p", SSR, checked=12),
+                         r("https://b.example/p", SSR, checked=0)])
+    page = corpus_html(sv)
+    assert "0/12" in page
+    assert "0/0" not in page
+    assert "not checked" in page

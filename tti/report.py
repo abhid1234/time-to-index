@@ -363,8 +363,11 @@ def corpus_html(sv, hist=None, changes=(), coverage=None) -> str:
         f"<td class='k'>{r.prof.visible_chars:,}</td>"
         f"<td class='k'>{esc(r.prof.framework)}</td>"
         f"<td class='k{'' if r.readable else ' bad'}'>{esc(r.prof.posture)}</td>"
-        f"<td class='k'>{len(r.robots_blocked)}/{r.robots_checked}</td>"
-        "</tr>"
+        # "0/12" is a checked robots.txt that blocks nobody. "0/0" would be a
+        # robots.txt that could not be fetched, printed as if it had been.
+        + (f"<td class='k'>{len(r.robots_blocked)}/{r.robots_checked}</td>" if r.robots_checked
+           else "<td class='k' title='robots.txt could not be fetched'>not checked</td>")
+        + "</tr>"
         for r in sorted(sv.usable, key=lambda x: x.prof.text_ratio))
 
     posture_rows = "".join(

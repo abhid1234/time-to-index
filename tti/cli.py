@@ -1340,7 +1340,8 @@ def cmd_survey(args) -> int:
             "visible_chars": r.prof.visible_chars if r.prof else 0,
             "bytes": r.prof.bytes_total if r.prof else 0,
             "text_ratio": round(r.prof.text_ratio, 5) if r.prof else 0,
-            "robots_blocked": r.robots_blocked, "error": r.error,
+            "robots_blocked": r.robots_blocked, "robots_checked": r.robots_checked,
+            "error": r.error,
         } for r in sorted(sv.results, key=lambda r: r.url)], indent=2))
         return 0
 
