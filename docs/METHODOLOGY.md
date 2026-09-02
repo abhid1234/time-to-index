@@ -184,6 +184,7 @@ actually made here, in this repository, in the form described.
 | "Uniformly readable across the sample" | one route, after seven were excluded as a challenge interstitial | no site-level sentence below three usable routes; the exclusion names the body's size and title |
 | 78% recall | possibly 78% minus an unmeasured false-positive rate | every payload is re-graded against a counterfactual answer that was never published |
 | an analysis plan declaring `exa/base` | the runner dispatches `exa/auto`; every real arm would have read "exploratory" and every declared arm "produced nothing" | the plan's arms and ladder are asserted equal to `data/settings.yaml` |
+| "36 control probes graded, 0 confirmed retrievable, and every provider arm produced nothing" | 28 carry-forward rows counted as observations, a confirmed-count read off a provider score that did not exist, and six arms that were never asked | control tables skip carry-forward rows; the confirmed count is taken from the control rows themselves; provider and control counts are printed separately; a declared arm with no key is "not enabled", never "produced nothing" |
 
 The pattern is the same every time: something that is not a measurement
 classifies perfectly as one. Each guard costs data — dropped events, excluded

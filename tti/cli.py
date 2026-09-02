@@ -152,7 +152,11 @@ def _plan_status(led, scores):
     except prereg.PreregError:
         return None
     present = sorted({(sc.provider, sc.mode) for sc in scores if sc.n_events})
-    cls = prereg.classify(plan, present, control=ORIGIN_ARM)
+    try:
+        enabled = providers.available_arms()
+    except Exception:  # noqa: BLE001  -- a broken adapter must not hide the plan
+        enabled = None
+    cls = prereg.classify(plan, present, control=ORIGIN_ARM, enabled=enabled)
     st = prereg.status(led.root, plan, started=bool(led.results()))
     return plan, cls, st
 
@@ -185,10 +189,13 @@ def _plan_lines(ps) -> list[str]:
         out.append(f"  ! EXPLORATORY, not pre-registered: "
                    f"{', '.join(cls.exploratory)}")
     if cls.declared_but_silent:
-        out.append(f"  ! Declared in the plan, produced nothing: "
+        out.append(f"  ! Declared in the plan, enabled, produced nothing: "
                    f"{', '.join(cls.declared_but_silent)}")
         out.append("    Listed because an arm that fails everywhere is "
                    "otherwise just an absent row.")
+    if cls.declared_not_enabled:
+        out.append(f"  · Declared in the plan, not enabled in this run (no key): "
+                   f"{', '.join(cls.declared_not_enabled)}")
     return out
 
 
@@ -588,6 +595,7 @@ def cmd_score(args) -> int:
                 "locked_hash": st.locked, "drifted": st.drifted,
                 "declared": cls.declared, "exploratory": cls.exploratory,
                 "declared_but_silent": cls.declared_but_silent,
+                "declared_not_enabled": cls.declared_not_enabled,
             }
             # Per-arm, so a consumer reading one row does not have to
             # cross-reference a list at the top of the document to learn that

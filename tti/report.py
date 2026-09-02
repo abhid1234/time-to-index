@@ -229,10 +229,14 @@ def summary_md(scores: list[ProviderScore], events: dict[str, Event],
                results: list[ProbeResult]) -> str:
     total_spend = sum(s.spend_usd for s in scores)
     skipped = sum(s.n_skipped_budget for s in scores)
+    graded_provider = sum(s.n_calls for s in scores)
+    graded_control = sum(1 for r in results
+                         if r.provider == "origin" and r.verdict not in ("ERROR", "SKIPPED"))
     lines = [
         f"_Generated {dt.datetime.now(dt.timezone.utc):%Y-%m-%d %H:%M UTC} · "
-        f"{len(events)} events · {sum(s.n_calls for s in scores)} graded probes · "
-        f"${total_spend:.2f} spent_",
+        f"{len(events)} events · {graded_provider} provider probes graded"
+        + (f" · {graded_control} control probes" if graded_control else "")
+        + f" · ${total_spend:.2f} spent_",
         "",
         leaderboard_md(scores),
     ]
@@ -722,10 +726,14 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
         for sc in ordered)
 
     origin_counts: dict[str, int] = {}
+    confirmed_events: set[str] = set()
     for r in results:
-        if r.provider == "origin":
-            key = (r.note or "origin:unknown").split()[0].replace("origin:", "")
-            origin_counts[key] = origin_counts.get(key, 0) + 1
+        if r.provider != "origin" or r.verdict == "SKIPPED":
+            continue  # a carry-forward row is bookkeeping, not a control observation
+        key = (r.note or "origin:unknown").split()[0].replace("origin:", "")
+        origin_counts[key] = origin_counts.get(key, 0) + 1
+        if key == "found" and r.rung <= 86_400:
+            confirmed_events.add(r.event_id)
     MEANING = {
         "found": "fetchable, and the answer was in the served bytes",
         "not_found": "page fetched, answer not in it — nobody could index it from here",
@@ -738,7 +746,7 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
         f"<td>{e(MEANING.get(k, ''))}</td></tr>"
         for k, v in sorted(origin_counts.items(), key=lambda kv: -kv[1])
     ) or "<tr><td colspan='3'>control arm not run</td></tr>"
-    n_confirmed = max((s.n_origin_confirmed for s in scores), default=0)
+    n_confirmed = len(confirmed_events)  # counted from the control rows, not from a provider score
     RENDER_MEANING = {
         "server_html": "in the page's visible text — readable without executing anything",
         "embedded_json": "only inside a script or data blob — needs a renderer to surface",
@@ -1017,12 +1025,18 @@ def prereg_panel_html(ps) -> str:
                     ". These arms appear in the data and not in the plan. They are "
                     "shown, not hidden — the useful thing is the label.</p>")
     if cls.declared_but_silent:
-        rows.append("<p class='note'><b>Declared in the plan, produced nothing:</b> " +
+        rows.append("<p class='note'><b>Declared in the plan, enabled, produced nothing:</b> " +
                     e(", ".join(cls.declared_but_silent)) +
                     ". Named because a table is built from what is in the ledger, so "
                     "an arm that failed everywhere is otherwise simply not a row — "
                     "which is how a benchmark loses its worst result without anybody "
                     "deciding to.</p>")
+    if getattr(cls, "declared_not_enabled", None):
+        rows.append("<p class='note'><b>Declared in the plan, not enabled in this run:</b> " +
+                    e(", ".join(cls.declared_not_enabled)) +
+                    ". No key was set, so no probe was ever dispatched to these arms. "
+                    "That is a configuration state, not a result — they did not fail, "
+                    "they were never asked.</p>")
 
     hyp = "".join(
         f"<tr><td><code>{e(h.id)}</code></td><td>{e(h.statement)}</td>"

@@ -283,30 +283,41 @@ def test_an_unreadable_plan_warns_rather_than_failing_verify(tmp_path, monkeypat
     assert "exploratory by default" in out
 
 
-def test_score_labels_undeclared_arms_as_exploratory(tmp_path, capsys):
-    from tti import demo
+def test_score_labels_undeclared_arms_as_exploratory(tmp_path, capsys, monkeypatch):
+    from tti import demo, providers
     demo.generate(tmp_path, [300, 900, 3600])
     # Strip the synthetic marker so the run is treated as a real collection.
     (tmp_path / demo.DEMO_MARKER).unlink()
+    # Every declared arm had a key: silence is then a result, not a config state.
+    monkeypatch.setattr(providers, "available_arms",
+                        lambda: [("exa", "auto"), ("parallel", "advanced"),
+                                 ("parallel", "fast"), ("tavily", "basic"),
+                                 ("brave", "web"), ("serper", "search")])
 
     assert main(["--run-dir", str(tmp_path), "score"]) == 0
     out = capsys.readouterr().out
     assert "EXPLORATORY, not pre-registered" in out
     assert "provider-a/fast" in out
-    assert "Declared in the plan, produced nothing" in out
+    assert "Declared in the plan, enabled, produced nothing" in out
     assert "exa/auto" in out
+    assert "not enabled in this run" not in out
 
 
-def test_score_json_labels_each_arm_individually(tmp_path, capsys):
-    from tti import demo
+def test_score_json_labels_each_arm_individually(tmp_path, capsys, monkeypatch):
+    from tti import demo, providers
     demo.generate(tmp_path, [300, 900, 3600])
     (tmp_path / demo.DEMO_MARKER).unlink()
 
+    # Only exa had a key. It is the one declared arm whose silence is a finding;
+    # the rest were never dispatched and say so under their own heading.
+    monkeypatch.setattr(providers, "available_arms", lambda: [("exa", "auto")])
     assert main(["--run-dir", str(tmp_path), "score", "--json"]) == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["preregistration"]["registered"] is True
     assert all(row["preregistered"] is False for row in payload["arms"])
-    assert "exa/auto" in payload["preregistration"]["declared_but_silent"]
+    assert payload["preregistration"]["declared_but_silent"] == ["exa/auto"]
+    not_enabled = payload["preregistration"]["declared_not_enabled"]
+    assert "parallel/advanced" in not_enabled and "exa/auto" not in not_enabled
 
 
 def test_a_synthetic_run_is_not_judged_against_the_plan(tmp_path, capsys):

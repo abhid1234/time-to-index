@@ -191,7 +191,12 @@ def parse(path: pathlib.Path | None = None) -> Plan:
 class Classification:
     declared: list[str] = field(default_factory=list)
     exploratory: list[str] = field(default_factory=list)
+    # Enabled in this run (a key was present) and produced no scoreable row.
     declared_but_silent: list[str] = field(default_factory=list)
+    # Declared, but never enabled here -- no key -- so no probe was dispatched.
+    # A different fact from silence: the first real dashboard listed all six
+    # provider arms as "produced nothing" on a run where none had a key.
+    declared_not_enabled: list[str] = field(default_factory=list)
 
     @property
     def clean(self) -> bool:
@@ -199,21 +204,28 @@ class Classification:
 
 
 def classify(plan: Plan, present: list[tuple[str, str]],
-             control: str = "origin") -> Classification:
+             control: str = "origin",
+             enabled: list[tuple[str, str]] | None = None) -> Classification:
     """Sort the arms in a run against the arms in the plan.
 
     `present` is (provider, mode) for every arm that produced at least one
-    scoreable observation. The control arm is declared in the plan and excluded
-    from the leaderboard, so it is neither exploratory nor missing -- it is
-    simply not the subject of this comparison.
+    scoreable observation. `enabled` is (provider, mode) for every arm the
+    runner could dispatch -- configured, with a key; None means "treat every
+    declared arm as enabled", which is the pre-existing behaviour. The control
+    arm is declared in the plan and excluded from the leaderboard, so it is
+    neither exploratory nor missing -- it is simply not the subject of this
+    comparison.
     """
     seen = {f"{p}/{m}" for p, m in present}
+    on = None if enabled is None else {f"{p}/{m}" for p, m in enabled}
     declared = [a for a in plan.arms if not a.startswith(f"{control}/")]
+    silent = [a for a in declared if a not in seen]
     return Classification(
         declared=sorted(a for a in declared if a in seen),
         exploratory=sorted(a for a in seen
                            if a not in plan.arms and not a.startswith(f"{control}/")),
-        declared_but_silent=sorted(a for a in declared if a not in seen),
+        declared_but_silent=sorted(a for a in silent if on is None or a in on),
+        declared_not_enabled=sorted(a for a in silent if on is not None and a not in on),
     )
 
 

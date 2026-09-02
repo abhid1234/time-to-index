@@ -338,3 +338,29 @@ ledger. It was `head` closing the pipe and Python dying on BrokenPipeError;
 unpiped it exits 0 with the lock unchanged. Recorded so the next person who
 sees it does not spend the twenty minutes.
 
+**2026-09-02, the first real dashboard, four sentences.** Rendered from the
+control-only ledger (8 events, 36 rows, no provider key), the page said four
+things that were false and one of them was the headline. "36 control probes
+graded": 28 of those rows are carry-forward SKIPPED rows — an event that was
+already confirmed at rung one is not re-fetched at rungs two through five,
+and the ledger records that as a row so the ladder stays complete. The
+origin table now skips them, and the found count went from 36 to 8, which is
+the number of pages actually fetched. "0 were confirmed retrievable": that
+number was read off `max(score.n_origin_confirmed)`, and with no provider
+arm there is no score. It is now counted from the control rows directly, and
+reads 8. "36 graded probes" in RESULTS.md summed provider calls; it now says
+"0 provider probes graded · 8 control probes", because a reader should not
+have to know which of those a bare number meant. And the plan panel listed
+every declared arm under "produced nothing", which describes a provider that
+was asked and failed everywhere — none was asked. `classify` now takes the
+set of enabled arms from `providers.available_arms()` and splits the silent
+ones: enabled-and-silent is a finding; not-enabled is a configuration state,
+and the panel says "no key was set, so no probe was ever dispatched".
+
+None of the four was a wrong number in the analysis. Each was a true number
+under a false heading, produced by code written before there was a real
+ledger to render, on the assumption that a run always has a provider arm.
+The first thing a real run did was violate the assumption. This is the same
+lesson as the control-only branch in score and report the night before, one
+layer up: it is not enough to detect the state, every sentence on the page
+has to have been written knowing the state exists.
