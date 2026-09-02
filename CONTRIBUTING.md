@@ -103,6 +103,17 @@ are non-negotiable:
 If you add a metric, add the case where it should refuse to answer. Most of
 the tests here are about the refusals.
 
+## Changing the dashboard
+
+`tti/report.py` renders three pages, and two of them are committed:
+`docs/demo.html` and `docs/index.html`. After any change to the renderer, run
+`python -m tti demo` and `python -m tti placeholder --out-dir docs` and commit
+the result. A test compares the committed files to a fresh render (timestamps
+masked) and fails if they drift, because a reader opening `docs/` sees the
+file, not the code. Then look at the pages in a browser at 1280 pixels wide,
+in both themes — the string tests cannot see an overflowing table or an
+empty panel shaped like a finding, and both have shipped.
+
 ## Changing the analysis plan
 
 `docs/PREREGISTRATION.md` is not documentation. It is hashed, and the hash is
