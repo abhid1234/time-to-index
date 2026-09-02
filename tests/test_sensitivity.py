@@ -193,3 +193,19 @@ def test_verdict_names_every_destructive_variant_not_only_the_worst(tmp_path):
     assert "'titles-only' (3 of 3)" in line
     assert "'snippet-window' (2 of 3)" in line
     assert "make arms unmeasurable" in line
+
+
+def test_the_docs_do_not_count_the_variants_wrong():
+    """README and CONTRIBUTING each state how many rule variants there are.
+    The sentence said seven for a day after the eighth landed."""
+    import pathlib
+    import re
+
+    from tti.grader import VARIANTS
+    words = {"five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10}
+    root = pathlib.Path(__file__).resolve().parent.parent
+    for name in ("README.md", "CONTRIBUTING.md"):
+        text = (root / name).read_text()
+        for m in re.finditer(r"\((\w+) now[;)]", text):
+            assert words[m.group(1)] == len(VARIANTS), (name, m.group(0), len(VARIANTS))
+        assert re.search(r"\((\w+) now[;)]", text), f"{name} lost its variant-count sentence"
