@@ -70,7 +70,7 @@ publication, per provider, per mode.
 Geometric spacing, because indexing latency spans four orders of magnitude
 and a linear ladder spends its whole budget resolving the tail.
 
-Three rules discard data to keep the rest honest:
+Three rules discard data to keep the rest honest, and a fourth stops spending:
 
 **Detection lag.** An event our collector noticed 40 minutes after
 publication cannot be probed at the 5-minute rung. Rather than record it at
@@ -243,12 +243,13 @@ routes, a smaller denominator — and the trade is deliberate. A benchmark that
 publishes an artifact of its own network has not measured anything and cannot
 tell that it has not.
 
-Five of these guards run as a command rather than only as tests. `tti verify`
+Six of these guards run as a command rather than only as tests. `tti verify`
 re-checks, offline and on the machine that will produce the numbers, that the
 config is valid, that Turnbull still reproduces published Kaplan-Meier values
 on Freireich 1963, that the version-boundary cases still grade correctly, that
-the ledger on disk parses with no duplicate probe ids, and that advisory
-locking is available on this platform. CI proves the repository was correct at
+the ledger on disk parses with no duplicate probe ids, that advisory locking
+is available on this platform, and that the analysis plan parses with a
+falsification condition on every hypothesis and has not moved under the data. CI proves the repository was correct at
 a commit; this proves the installation is correct now. The distinction is not
 pedantic — the spend-cap bug and the overlapping-cron bug were both properties
 of a deployment, not of a diff.
@@ -499,18 +500,18 @@ one confusion this project cannot afford to introduce.
 Stated up front, because a benchmark that only lists its strengths is a
 marketing page.
 
-- **Watchlist composition.** Twenty npm packages and twelve issuers is not
-  the web. A provider tuned for developer content will look better here than
-  it would on a general corpus. The watchlist is a YAML file; fork it and
-  find out.
+- **Watchlist composition.** 46 npm packages, 48 PyPI projects, 30 GitHub
+  repositories and a handful of filers and feeds is not the web. A provider
+  tuned for developer content will look better here than it would on a
+  general corpus. The watchlist is a YAML file; fork it and find out.
 - **Ladder resolution.** Anything faster than 5 minutes reads as "≤5m".
   Providers may differ meaningfully inside that bracket.
 - **Single-query retrieval.** One query per event, five results. A real agent
   reformulates and re-queries. This measures the first shot, which is the
   floor rather than the ceiling.
-- **Question phrasing.** Questions come from templates, and the phrasing arm
-  below is off by default and rung-limited when on, so most runs measure a
-  single wording per event.
+- **Question phrasing.** Questions come from templates, and the phrasing axis
+  described above is off by default and rung-limited when on, so most runs
+  measure a single wording per event.
 - **Provider request shape.** Each adapter sends what that vendor's own
   documentation describes as the standard call. Parallel's API takes an
   objective plus literal queries, which is a different contract from the
