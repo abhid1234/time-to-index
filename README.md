@@ -417,7 +417,7 @@ Every provider response is stored verbatim under `runs/raw/`.
 ```bash
 tti regrade               # re-score stored payloads, no API calls
 tti regrade --write       # apply the new verdicts
-tti sensitivity           # re-grade under seven rule variants and diff the ranking
+tti sensitivity           # re-grade under every rule variant (eight now) and diff the ranking
 ```
 
 `--write` is the only destructive operation here, so it is the most careful:

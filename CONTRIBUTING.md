@@ -11,7 +11,7 @@ Start here rather than with code. Every provider response is on disk under
 
 ```bash
 tti regrade               # re-score stored payloads under the current rules
-tti sensitivity           # re-score under seven deliberately different rule sets
+tti sensitivity           # re-score under every rule variant (eight now; VARIANTS in tti/grader.py)
 ```
 
 If you think the matching rules are wrong, edit `tti/grader.py`, run
