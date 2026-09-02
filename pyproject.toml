@@ -9,9 +9,11 @@ description = "A freshness and staleness benchmark for web-search APIs"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
-# Two runtime dependencies on purpose. A benchmark nobody can install is a
-# blog post; every extra dep is another reason a fork does not happen.
-dependencies = ["requests>=2.31", "PyYAML>=6.0"]
+# Two runtime code dependencies on purpose. A benchmark nobody can install is
+# a blog post; every extra dep is another reason a fork does not happen.
+# tzdata is data, not code: the IANA zone database, for the EDGAR and Federal
+# Register collectors on systems that ship without one (slim containers).
+dependencies = ["requests>=2.31", "PyYAML>=6.0", "tzdata>=2024.1"]
 
 [project.optional-dependencies]
 dev = ["pytest>=7.4", "ruff>=0.6"]

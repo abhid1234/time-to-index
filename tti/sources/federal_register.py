@@ -22,11 +22,11 @@ from __future__ import annotations
 
 import datetime as dt
 import time
-from zoneinfo import ZoneInfo
 
 from .. import http
 from ..models import Event
 from . import BaseSource, register
+from .tz import eastern
 
 API = "https://www.federalregister.gov/api/v1/documents.json"
 
@@ -60,7 +60,7 @@ class FederalRegister(BaseSource):
             # 8 a.m. Eastern on the issue date, in Eastern time -- not a fixed
             # UTC hour, which was wrong by one for five months of the year.
             published = dt.datetime.strptime(date, "%Y-%m-%d").replace(
-                hour=8, tzinfo=ZoneInfo("America/New_York")).timestamp()
+                hour=8, tzinfo=eastern()).timestamp()
             out.append(Event(
                 source=self.name,
                 source_class=self.source_class,
