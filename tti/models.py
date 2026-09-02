@@ -27,7 +27,7 @@ FRESH = "FRESH"        # the new answer is present in the response
 STALE = "STALE"        # the superseded answer is present and the new one is not
 ABSENT = "ABSENT"      # neither answer is present
 ERROR = "ERROR"        # the call failed; excluded from all rates
-SKIPPED = "SKIPPED"    # never dispatched (budget cap, or already resolved FRESH)
+SKIPPED = "SKIPPED"    # never dispatched: budget cap, carry-forward, rung slip, unpriced arm
 
 VERDICTS = (FRESH, STALE, ABSENT, ERROR, SKIPPED)
 
