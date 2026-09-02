@@ -169,9 +169,9 @@ placeholder: under the `snippet-window` variant the snippet arm overtakes the
 excerpt arm, which is the text-volume effect described above, made visible.
 
 ```
-OK  provider-a/fast: estimated     5m–15m  true      7m  (n=106, indexed 105)
-OK  provider-b/base: estimated   60m–6.0h  true    2.2h  (n=106, indexed 100)
-OK  provider-c/base: estimated 24.0h–3.0d  true   40.3h  (n=106, indexed 65)
+OK  provider-a/fast: estimated     5m–15m  true      8m  (n=106, indexed 105)
+OK  provider-b/base: estimated  1.0h–6.0h  true    1.7h  (n=106, indexed 100)
+OK  provider-c/base: estimated 24.0h–3.0d  true   34.3h  (n=106, indexed 72)
 ```
 
 The demo writes `docs/demo.html` and never `docs/index.html`. It is evidence
@@ -230,9 +230,12 @@ whole family, both values are reported, and the verdict column uses the
 adjusted one:
 
 ```
-comparison                              HR  events       p   p adj  power  verdict
-provider-a/fast vs provider-b/base    2.77     205  0.0000  0.0000   100%  distinguishable
+comparison                              HR  events        p    p adj  power   need  days  verdict
+provider-a/fast vs provider-b/base    2.77     205  <0.0001  <0.0001   100%     30     0  distinguishable
 ```
+
+A p-value below the printed precision reads `<0.0001`, never `0.0000`: no
+finite sample supports a probability of exactly zero.
 
 Holm rather than plain Bonferroni: same control of the family-wise error rate,
 uniformly more power, and no independence assumption — which matters, because
@@ -286,7 +289,10 @@ tallied separately: weaker evidence, labelled as such.
 
 When no false positive is observed, the reported number is **not** 0%. It is
 the Wilson upper bound, which at small n is large — and that bound is the
-figure that belongs beside the recall numbers.
+figure that belongs beside the recall numbers. So that is where it is: the
+dashboard carries this table directly under the leaderboard, computed offline
+from the stored payloads on every `tti report`, with a line saying that render
+did not ask the registries and that `tti decoy` is the verified figure.
 
 ### Where the cost column comes from
 
