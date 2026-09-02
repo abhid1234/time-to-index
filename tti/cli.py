@@ -45,7 +45,7 @@ from .metrics import (
 from .models import ERROR, SKIPPED
 from .multiplicity import family_error_rate
 from .multiplicity import note as multiplicity_note
-from .scheduler import _count_results, discover, run_due
+from .scheduler import _count_results, discover, error_body, run_due
 
 
 def _ledger(args) -> Ledger:
@@ -392,8 +392,23 @@ def cmd_doctor(args) -> int:
             payload = prov.search("what is the latest version of the npm package next",
                                   m, max_results=3, max_chars=500)
             ms = (time.perf_counter() - t0) * 1000
-            print(f"  ✓ {arm:18s} {_count_results(payload):2d} results  {ms:6.0f}ms  "
-                  f"${unit_cost(p, m, 3):.4f}/call")
+            err = error_body(payload)
+            n_res = _count_results(payload)
+            if err:
+                # 200 with an error body. The runner would record an ERROR
+                # row; doctor should not print a tick over it.
+                print(f"  ✗ {arm:18s} error body with HTTP 200: {err[:60]}")
+                bad += 1
+            elif n_res == 0:
+                # A query every general index answers came back empty. Not
+                # a failure the harness can prove, but the first real run
+                # should not start on it without somebody looking.
+                print(f"  ! {arm:18s}  0 results  {ms:6.0f}ms  "
+                      f"${unit_cost(p, m, 3):.4f}/call — check the key's plan and "
+                      f"the raw response before running")
+            else:
+                print(f"  ✓ {arm:18s} {n_res:2d} results  {ms:6.0f}ms  "
+                      f"${unit_cost(p, m, 3):.4f}/call")
         except Exception as exc:  # noqa: BLE001
             print(f"  ✗ {arm:18s} {type(exc).__name__}: {str(exc)[:70]}")
             bad += 1

@@ -101,3 +101,45 @@ def test_every_subject_failing_is_unreachable_not_a_zero(monkeypatch, capsys):
     out = capsys.readouterr().out
     assert "unreachable (2/2)" in out
     assert "subjects reachable" not in out
+
+
+def _wire_provider(monkeypatch, payload):
+    from tti import providers as prov_mod
+
+    class Prov:
+        name = "stub"
+        def modes(self): return ["base"]
+        def available(self): return True
+        def search(self, q, mode, *, max_results, max_chars): return payload
+
+    src = _FanOut(attempted=1, errors=0, events=1)
+    _wire(monkeypatch, src)
+    monkeypatch.setitem(config._cache, "settings", {
+        "sources": ["stub"], "arms": [{"provider": "stub", "mode": "base"}],
+        "ladder": [300], "origin_control": False})
+    monkeypatch.setitem(config._cache, "providers", {"providers": {"stub": {
+        "env": "STUB_KEY", "modes": {"base": {"usd_per_1k_requests": 1.0,
+                                             "results_included": 5}}}}})
+    monkeypatch.setattr(prov_mod, "get", lambda name: Prov())
+
+
+def test_doctor_does_not_tick_a_provider_that_returned_an_error_body(monkeypatch, capsys, tmp_path):
+    _wire_provider(monkeypatch, {"error": {"type": "invalid_api_key"}})
+    code = main(["--run-dir", str(tmp_path), "doctor"])
+    out = capsys.readouterr().out
+    assert "✗ stub/base" in out and "error body with HTTP 200" in out and "invalid_api_key" in out
+    assert code == 1
+
+
+def test_doctor_flags_zero_results_without_failing(monkeypatch, capsys, tmp_path):
+    _wire_provider(monkeypatch, {"results": []})
+    code = main(["--run-dir", str(tmp_path), "doctor"])
+    out = capsys.readouterr().out
+    assert "! stub/base" in out and "0 results" in out and "check the key" in out
+    assert code == 0
+
+
+def test_doctor_ticks_a_provider_that_answered(monkeypatch, capsys, tmp_path):
+    _wire_provider(monkeypatch, {"results": [{"snippet": "a"}, {"snippet": "b"}]})
+    assert main(["--run-dir", str(tmp_path), "doctor"]) == 0
+    assert "✓ stub/base" in capsys.readouterr().out
