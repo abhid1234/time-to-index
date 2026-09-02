@@ -60,3 +60,19 @@ def test_the_human_line_appears_only_when_something_was_reported(tmp_path, monke
     assert "1 vendor-reported row(s)" in out
     assert "reported minus list = +$0.0050" in out
     assert "has drifted" in out
+
+
+def test_status_on_a_ledger_with_results_but_no_queue_does_not_say_zero_total(tmp_path, capsys):
+    """`tti demo` ledgers have results and no probes.jsonl; status said
+    "0 total · 1430 done · 0 pending"."""
+    import json
+
+    from tti import config, demo
+    from tti.cli import main
+    demo.generate(tmp_path, config.ladder())
+    assert main(["--run-dir", str(tmp_path), "status"]) == 0
+    out = capsys.readouterr().out
+    assert "0 total" not in out and "no queue on disk" in out
+    assert main(["--run-dir", str(tmp_path), "status", "--json"]) == 0
+    probes = json.loads(capsys.readouterr().out)["probes"]
+    assert probes["total"] == 0 and probes["done"] == 0 and probes["results"] > 1000
