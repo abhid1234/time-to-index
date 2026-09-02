@@ -96,6 +96,7 @@ def test_power_names_the_control_results_it_is_not_counting(wired, tmp_path, mon
     assert "need at least two provider arms with results" in out
     assert "1 control-arm result(s) exist" in out
     capsys.readouterr()
-    assert main(["--run-dir", str(tmp_path), "power", "--json"]) == 1
+    # --json exits zero with a note, as every command's JSON path does
+    assert main(["--run-dir", str(tmp_path), "power", "--json"]) == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["comparisons"] == [] and payload["control_results"] == 1
