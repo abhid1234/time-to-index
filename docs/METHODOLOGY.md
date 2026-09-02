@@ -515,8 +515,13 @@ marketing page.
   objective plus literal queries, which is a different contract from the
   others; sending only the objective would compare its rewriter against other
   providers' raw matching, and sending only the literal query would discard
-  what the product is for. Both are sent. Reasonable people could set that
-  dial differently, and the adapter is twenty lines.
+  what the product is for. Both are sent, and the literal query is the same
+  twelve-word sentence every other arm receives — not the three-to-six
+  keywords Parallel's guidance suggests, because the moment this harness
+  hand-tunes one vendor's query it is measuring its own tuning. A
+  Parallel-optimal query would very likely do better, and nobody should read
+  the number as that vendor's ceiling. Reasonable people could set that dial
+  differently, and the adapter is twenty lines.
 - **Geography and time of day.** All probes run from one region on one
   schedule. Crawl cadence is not uniform across either.
 - **Origin verification is not universal.** Where an origin blocks
