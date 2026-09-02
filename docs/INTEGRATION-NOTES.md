@@ -62,8 +62,9 @@ anything already written here.
 - **Cost tables drift.** `data/providers.yaml` carries a `pricing_checked`
   date per provider for this reason. Any published cost-per-event number is
   only as current as that field, and a stale one is worse than none.
-- **Mode naming is not comparable across vendors.** "basic/advanced",
-  "turbo/fast/base/pro", "auto/keyword/neural" are not a shared axis. The
+- **Mode naming is not comparable across vendors.** Tavily's
+  "basic/advanced", Parallel's "turbo/fast/basic/advanced", Exa's
+  "auto/fast/instant/deep…" are not a shared axis. The
   leaderboard lists arms as `provider/mode` and never aggregates a provider's
   modes into one row, because averaging a cheap mode with an expensive one
   produces a number that describes no purchasable product.
