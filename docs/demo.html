@@ -71,7 +71,7 @@ nothing here is a finding about any product. Real runs are published at
 
 <p class="sub">How long a newly published fact takes to become retrievable through each
 web-search API, and how often the API confidently returns the answer it replaced.
-Generated 2026-09-02 07:42 UTC.</p>
+Generated 2026-09-02 07:55 UTC.</p>
 
 
 <div class='panel'><p style='margin-top:0'><b>Synthetic run.</b> These arms are a generator whose latencies are already known. The pre-registered plan does not apply, because nothing here is a measurement of anybody's product.</p></div>
@@ -120,6 +120,22 @@ Generated 2026-09-02 07:42 UTC.</p>
   as faster than it is, and unevenly, since the bias is largest for whoever has the
   most un-indexed events. <b>&gt;72h</b> means the arm never accumulated half its mass
   inside the window, which is a different statement from "slow".</p>
+</div>
+
+<h2>Pipeline false-positive rate</h2>
+<div class="panel">
+  <p style="margin-top:0">Every stored payload re-graded against a <b>counterfactual</b>
+  answer: a version-shaped token of the same form as the real one that was never
+  published. A FRESH verdict against it is a false positive by construction. This is
+  recall's error bar, which is why it sits here and not in a footnote.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>arm</th><th>payloads re-graded</th><th>false positives</th>
+    <th>rate (95% CI)</th><th>of this arm's FRESH verdicts<br><span style="text-transform:none;letter-spacing:0">that could be spurious</span></th></tr></thead>
+    <tbody><tr><td class='k'>provider-a/fast</td><td class='k'>220</td><td class='k'>0</td><td class='k'>0.0% (0–2)</td><td class='k'>up to 2%</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>404</td><td class='k'>0</td><td class='k'>0.0% (0–1)</td><td class='k'>up to 1%</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>562</td><td class='k'>0</td><td class='k'>0.0% (0–1)</td><td class='k'>up to 1%</td></tr></tbody></table></div>
+  <p class="note">Two causes, both invisible in a leaderboard: the grader matching a
+  version-shaped token in unrelated prose, or a provider's answer layer inventing one.
+  Zero observed is not a zero rate — the last column is the Wilson upper bound, and
+  it is the number that belongs beside each arm's recall. Counterfactuals are unpublished by construction on a synthetic run; no registry was asked.</p>
 </div>
 
 <h2>Time to index</h2>

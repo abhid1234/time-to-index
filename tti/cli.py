@@ -1538,17 +1538,29 @@ def cmd_report(args) -> int:
                     for sc in scores}
     render_table = {k: v for k, v in render_table.items() if v}
 
-    panel = report.prereg_panel_html(_plan_status(led, scores))
+    ps = _plan_status(led, scores)
+    panel = report.prereg_panel_html(ps)
+    # The false-positive pass, offline: no registry is asked here, and the
+    # panel says so. `tti decoy` is the verified figure.
+    from . import decoy as _decoy
+    try:
+        fp_rep = _decoy.run(led, verify_absent=None, verbose=False)
+    except Exception as exc:  # noqa: BLE001
+        print(f"  ! false-positive pass skipped: {exc}")
+        fp_rep = None
+    synthetic = ps == "synthetic"
     html = report.full_page(
         report.dashboard_html(scores, events, results, by_class, pairs, powers,
                               stale_series, sens_rows, render_table or None,
-                              prereg_panel=panel))
+                              prereg_panel=panel,
+                              fp_panel=report.fp_panel_html(fp_rep, synthetic=synthetic)))
     (out_dir / "index.html").write_text(html, encoding="utf-8")
     results_md = (out_dir.parent / "RESULTS.md" if out_dir.name == "docs"
                   else out_dir / "RESULTS.md")
-    plan_md = "\n".join(_plan_lines(_plan_status(led, scores)))
+    plan_md = "\n".join(_plan_lines(ps))
     results_md.write_text(
         "# Results\n\n" + report.summary_md(scores, events, results) + "\n"
+        + report.fp_md(fp_rep, synthetic=synthetic)
         + ("\n## Pre-registration\n\n```\n" + plan_md + "\n```\n"
            if plan_md.strip() else ""),
         encoding="utf-8")

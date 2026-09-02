@@ -602,7 +602,8 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
                    stale_series: list = (),
                    sensitivity_rows: list = (),
                    render_table: dict | None = None,
-                   prereg_panel: str = "") -> str:
+                   prereg_panel: str = "",
+                   fp_panel: str = "") -> str:
     e = html.escape
     gen = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     ordered = sorted(scores, key=lambda s: (s.median_ttl is None, s.median_ttl or 0))
@@ -917,7 +918,7 @@ Generated {gen}.</p>
   most un-indexed events. <b>&gt;72h</b> means the arm never accumulated half its mass
   inside the window, which is a different statement from "slow".</p>
 </div>
-
+{fp_panel}
 <h2>Time to index</h2>
 <div class="panel">
   {(survival_svg(ordered, "time to index, all sources") + f'<div class="legend">{legend}</div>')
@@ -1019,6 +1020,92 @@ Re-grade the raw payloads with different matching rules and you will get a diffe
 number out of the same evidence &#8212; which is the only reason to believe this one.
 </footer>
 </div>"""
+
+
+def fp_panel_html(rep, verified: bool = False, synthetic: bool = False) -> str:
+    """The pipeline's false-positive rate, per arm, beside the leaderboard.
+
+    The plan lists this as a secondary endpoint "reported alongside recall
+    rather than as a footnote, because it is recall's error bar". Until this
+    panel existed it was a footnote: a separate command's stdout.
+    """
+    from .metrics import wilson
+    e = html.escape
+    # The control arm is re-graded too, but it is not a leaderboard row: its
+    # figure is the grader's own rate on page bytes, and it goes in a sentence.
+    arms = [a for a in (rep.arms if rep is not None else []) if a.provider != "origin"]
+    control = next((a for a in (rep.arms if rep is not None else []) if a.provider == "origin"), None)
+    control_note = ""
+    if control is not None and control.graded:
+        _, _, chi = wilson(control.hits, control.graded)
+        control_note = (f" The origin control's own re-grade: {control.hits} of "
+                        f"{control.graded} page fetches matched the counterfactual "
+                        f"(upper bound {chi*100:.0f}%) — the grader's rate on raw page "
+                        f"bytes, with no provider in the loop.")
+    if not any(a.graded for a in arms):
+        why = (NO_ARMS if not arms else
+               "No stored payload could be re-graded: either nothing wrote a raw "
+               "payload, or no event had a version-shaped answer to build a "
+               "counterfactual from.")
+        rows = f"<tr><td colspan='5'>{e(why)}</td></tr>"
+    else:
+        rows = ""
+        for a in arms:
+            p_, lo, hi = wilson(a.hits, a.graded)
+            rows += (f"<tr><td class='k'>{e(a.provider)}/{e(a.mode)}</td>"
+                     f"<td class='k'>{a.graded}</td>"
+                     f"<td class='k{' bad' if a.hits else ''}'>{a.hits}</td>"
+                     f"<td class='k'>{p_*100:.1f}% ({lo*100:.0f}–{hi*100:.0f})</td>"
+                     f"<td class='k'>up to {hi*100:.0f}%</td></tr>")
+    if synthetic:
+        prov = ("Counterfactuals are unpublished by construction on a synthetic run; "
+                "no registry was asked.")
+    elif verified:
+        prov = "Each counterfactual was confirmed absent with its registry before grading."
+    else:
+        prov = ("This render did not ask any registry whether the counterfactuals are "
+                "really unpublished — the page is built offline. <code>tti decoy</code> "
+                "does, and its figure is the one to quote.")
+    skipped = ""
+    if rep is not None and rep.events_skipped:
+        reasons = "; ".join(f"{n} {e(r)}" for r, n in sorted(rep.skip_reasons.items()))
+        skipped = f" {rep.events_skipped} event(s) could not be decoyed: {reasons}."
+    return f"""
+<h2>Pipeline false-positive rate</h2>
+<div class="panel">
+  <p style="margin-top:0">Every stored payload re-graded against a <b>counterfactual</b>
+  answer: a version-shaped token of the same form as the real one that was never
+  published. A FRESH verdict against it is a false positive by construction. This is
+  recall's error bar, which is why it sits here and not in a footnote.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>arm</th><th>payloads re-graded</th><th>false positives</th>
+    <th>rate (95% CI)</th><th>of this arm's FRESH verdicts<br><span style="text-transform:none;letter-spacing:0">that could be spurious</span></th></tr></thead>
+    <tbody>{rows}</tbody></table></div>
+  <p class="note">Two causes, both invisible in a leaderboard: the grader matching a
+  version-shaped token in unrelated prose, or a provider's answer layer inventing one.
+  Zero observed is not a zero rate — the last column is the Wilson upper bound, and
+  it is the number that belongs beside each arm's recall. {prov}{e(skipped)}{e(control_note)}</p>
+</div>
+"""
+
+
+def fp_md(rep, verified: bool = False, synthetic: bool = False) -> str:
+    from .metrics import wilson
+    arms = [a for a in (rep.arms if rep is not None else []) if a.provider != "origin"]
+    if not any(a.graded for a in arms):
+        return ""
+    lines = ["", "## Pipeline false-positive rate", "",
+             "| arm | payloads re-graded | false positives | rate (95% CI) | upper bound |",
+             "|---|---|---|---|---|"]
+    for a in arms:
+        p_, lo, hi = wilson(a.hits, a.graded)
+        lines.append(f"| `{a.provider}/{a.mode}` | {a.graded} | {a.hits} | "
+                     f"{p_*100:.1f}% ({lo*100:.0f}–{hi*100:.0f}) | {hi*100:.0f}% |")
+    tail = ("Counterfactuals unpublished by construction (synthetic run)." if synthetic else
+            "Counterfactuals confirmed absent with their registries." if verified else
+            "Counterfactuals not registry-verified in this render; `tti decoy` verifies them.")
+    lines += ["", f"_{tail} Zero observed is not a zero rate; quote the upper bound._"]
+    return "\n".join(lines)
 
 
 def prereg_panel_html(ps) -> str:

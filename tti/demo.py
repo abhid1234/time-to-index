@@ -278,10 +278,12 @@ def render(run_dir: pathlib.Path, out: pathlib.Path, ladder: list[int]) -> str:
     render_table = {k: v for k, v in render_table.items() if v}
     # The demo stores a payload per provider probe, so the sensitivity pass
     # runs for real here rather than rendering "not evaluated".
-    from . import sensitivity
+    from . import decoy, sensitivity
     sens_rows = sensitivity.run(led)
+    fp_rep = decoy.run(led, verify_absent=None, verbose=False)
     html = report.dashboard_html(scores, events, results, by_class, pairs, powers,
                                  stale_series, sens_rows, render_table or None,
+                                 fp_panel=report.fp_panel_html(fp_rep, synthetic=True),
                                  prereg_panel=report.prereg_panel_html("synthetic"))
     html = html.replace("<h1>Time to Index</h1>", "<h1>Time to Index</h1>" + BANNER)
     html = html.replace("<title>Time to Index</title>",
