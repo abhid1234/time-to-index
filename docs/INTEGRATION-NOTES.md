@@ -232,3 +232,41 @@ Federal Register source now states the public-inspection caveat: documents
 are on the web before the issue time this source anchors to, so any error
 flatters providers rather than penalising them.
 
+**2026-09-02, live re-verification from a cloud container.** Two things that
+had only ever run against the fixture server ran against the web.
+
+*The origin control, end to end.* Three real PyPI events built from the live
+registry (anthropic 1.3.0, requests 2.34.2, uv 0.12.9). Each probed
+`found` on the canonical human page at origin rank 0 — not the API fallback
+— classified `server_html`, and graded FRESH on the exact token with no
+stale hit. The stored payload is the 1,601-character excerpt window by
+design; the grader read that, not a full body. First real control-arm
+result the project has produced.
+
+*The crawlability figures the pitch memo cites*, each fetched three times
+with agreement required:
+
+| page | posture | visible / served |
+|---|---|---|
+| crates.io/crates/serde | sveltekit · client_shell | 32 / 5,056 |
+| bitbucket.org/atlassian/aui/src/master/ | client_shell | 9 / 14,535 |
+| gitlab.com/gitlab-org/gitlab | metadata_only | 469 / 63,132 |
+| pkg.go.dev/…/gin-gonic/gin | static_html | 93,012 / 429,377 |
+| packagist.org/packages/laravel/framework | static_html | 20,618 / 1,161,270 |
+| pypi.org/project/requests/ | static_html | 13,494 / 251,342 |
+| hex.pm/packages/phoenix | static_html | 3,309 / 149,712 |
+| rubygems.org/gems/rails | static_html | 2,377 / 63,794 |
+
+All eight allow all twelve AI crawler user-agents in robots.txt. The three
+numbers the memo leads with — 32, 9, 93,012 — reproduce to the character.
+
+One behaviour worth knowing about crates.io: with no `User-Agent` header at
+all it returns 403; with a UA but no `Accept: text/html` it returned 404 on
+one fetch tonight; with both it returns the 5,056-byte shell. A collector
+that sends neither reads the site as refusing, not as a shell. The harness
+sends both.
+
+*Unreachable from this host, so not re-verified here:* www.npmjs.com (403),
+github.com pages (403), arxiv.org, and every vercel.com / nextjs.org /
+ai-sdk.dev / v0.app property. Those need a residential connection.
+
