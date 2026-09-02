@@ -186,26 +186,35 @@ def verdict(results: list[VariantResult]) -> str:
     # so it is checked first: a table where half the arms became unmeasurable
     # is not "stable", it is empty.
     destructive = [r for r in others if r.n_arms and r.arms_lost >= r.n_arms / 2]
+    lead = ""
     if destructive:
-        worst_d = max(destructive, key=lambda r: r.arms_lost)
-        return (f"'{worst_d.name}' makes {worst_d.arms_lost} of {worst_d.n_arms} arms "
-                f"unmeasurable rather than reordering them — the ranking looks stable "
-                f"under it only because there is nothing left to rank")
+        # Every destructive variant is named, not only the worst: the demo
+        # had two, and naming one hid the other behind "looks stable".
+        destructive.sort(key=lambda r: -r.arms_lost)
+        named = ", ".join(f"'{r.name}' ({r.arms_lost} of {r.n_arms})" for r in destructive)
+        verb = "makes" if len(destructive) == 1 else "make"
+        lead = (f"{named} {verb} arms unmeasurable rather than reordering them — "
+                f"the ranking looks stable under {'it' if len(destructive) == 1 else 'them'} "
+                f"only because there is nothing left to rank")
+        others = [r for r in others if r not in destructive]
+        if not others:
+            return lead
+        lead += ". Among the variants that keep the arms: "
 
     worst = min(others, key=lambda r: r.tau)
     shifted = max(others, key=lambda r: r.median_changes)
     if worst.tau >= 0.99:
         if shifted.median_changes:
-            return (f"the ranking is identical under every variant tested, though "
+            return lead + (f"the ranking is identical under every variant tested, though "
                     f"'{shifted.name}' moves {shifted.median_changes} of "
                     f"{shifted.n_arms} median brackets — the order is robust, the "
                     f"absolute latencies are less so")
-        return ("the ranking is identical under every rule variant tested; "
+        return lead + ("the ranking is identical under every rule variant tested; "
                 "the grading choices did not decide it")
     if worst.tau >= 0.6:
-        return (f"the ranking survives every variant except '{worst.name}' "
+        return lead + (f"the ranking survives every variant except '{worst.name}' "
                 f"(tau {worst.tau:.2f}) — read the top of the table as robust "
                 f"and the middle as provisional")
-    return (f"'{worst.name}' reorders the leaderboard (tau {worst.tau:.2f}). "
+    return lead + (f"'{worst.name}' reorders the leaderboard (tau {worst.tau:.2f}). "
             f"The ranking is partly an artefact of the grading rules and should "
             f"be published with that stated, not without it")

@@ -181,3 +181,15 @@ def test_kendall_tau_edges():
     assert sensitivity.kendall_tau([], []) == 1.0
     assert sensitivity.kendall_tau(["a", "b"], ["b", "a"]) == -1.0
     assert sensitivity.kendall_tau(["a", "b", "c"], ["a", "b"]) == 1.0
+
+
+def test_verdict_names_every_destructive_variant_not_only_the_worst(tmp_path):
+    """The demo has two: titles-only loses all three arms, snippet-window
+    loses two and reorders the survivors. Naming only the worst hid the
+    variant that actually says something about text volume."""
+    from tti import config, demo
+    led, _ = demo.generate(tmp_path, config.ladder())
+    line = sensitivity.verdict(sensitivity.run(led))
+    assert "'titles-only' (3 of 3)" in line
+    assert "'snippet-window' (2 of 3)" in line
+    assert "make arms unmeasurable" in line

@@ -71,7 +71,7 @@ nothing here is a finding about any product. Real runs are published at
 
 <p class="sub">How long a newly published fact takes to become retrievable through each
 web-search API, and how often the API confidently returns the answer it replaced.
-Generated 2026-09-02 07:39 UTC.</p>
+Generated 2026-09-02 07:42 UTC.</p>
 
 
 <div class='panel'><p style='margin-top:0'><b>Synthetic run.</b> These arms are a generator whose latencies are already known. The pre-registered plan does not apply, because nothing here is a measurement of anybody's product.</p></div>
@@ -279,7 +279,7 @@ Generated 2026-09-02 07:39 UTC.</p>
     <thead><tr><th>rule variant</th><th>verdict churn</th><th>rank correlation</th>
     <th>medians moved</th><th>arms lost</th></tr></thead>
     <tbody><tr><td class='k'>strict<span style='color:var(--muted)'> (reported)</span></td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/3</td><td class='k'>0</td></tr><tr><td class='k'>naive-substring</td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/3</td><td class='k'>0</td></tr><tr><td class='k'>no-v-prefix</td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/3</td><td class='k'>0</td></tr><tr><td class='k'>canonical-token-only</td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/3</td><td class='k'>0</td></tr><tr><td class='k'>urls-count-as-evidence</td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/3</td><td class='k'>0</td></tr><tr><td class='k'>titles-only</td><td class='k'>55.1%</td><td class='k'>1.00</td><td class='k'>3/3</td><td class='k bad'>3</td></tr><tr><td class='k'>shallow-walk</td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/3</td><td class='k'>0</td></tr><tr><td class='k'>snippet-window</td><td class='k'>27.3%</td><td class='k'>0.33</td><td class='k'>2/3</td><td class='k bad'>2</td></tr></tbody></table></div>
-  <p class="note">&#x27;titles-only&#x27; makes 3 of 3 arms unmeasurable rather than reordering them — the ranking looks stable under it only because there is nothing left to rank</p>
+  <p class="note">&#x27;titles-only&#x27; (3 of 3), &#x27;snippet-window&#x27; (2 of 3) make arms unmeasurable rather than reordering them — the ranking looks stable under them only because there is nothing left to rank. Among the variants that keep the arms: the ranking is identical under every rule variant tested; the grading choices did not decide it</p>
   <p class="note" style="border-color:var(--muted)">Every grading rule here is a
   judgement call: match on token boundaries or not, count a <code>v</code> prefix,
   trust aliases, treat a URL as evidence. Each variant re-grades the stored payloads
