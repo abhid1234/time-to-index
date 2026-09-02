@@ -107,6 +107,7 @@ def _score_json(sc) -> dict:
         "spend_usd": _n(sc.spend_usd),
         "cost_per_fresh_answer_usd": _n(sc.cost_per_fresh_24h),
         "p50_latency_ms": _n(sc.p50_latency_ms),
+        "chars_per_result_p50": _n(sc.chars_per_result_p50),
         "calls": sc.n_calls, "errors": sc.n_errors,
         "skipped_budget": sc.n_skipped_budget,
         "estimator_converged": sc.npmle.converged,

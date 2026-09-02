@@ -196,6 +196,21 @@ def _cpf(v: float) -> str:
     return f"${v*1000:.2f}"
 
 
+def fmt_chars(v: float) -> str:
+    """Characters the grader read per result, as a short number.
+
+    Formatter contract as everywhere else: anything that is not a finite,
+    non-negative number renders as a dash rather than as a claim.
+    """
+    if not isinstance(v, (int, float)) or v != v or v in (float("inf"), float("-inf")) or v < 0:
+        return "—"
+    if v >= 10_000:
+        return f"{v/1000:.0f}k chars"
+    if v >= 1_000:
+        return f"{v/1000:.1f}k chars"
+    return f"{v:.0f} chars"
+
+
 def _pct(t: tuple[float, float, float]) -> str:
     p, lo, hi = t
     if not all(isinstance(v, (int, float)) and math.isfinite(v) for v in t):
@@ -211,15 +226,15 @@ def leaderboard_md(scores: list[ProviderScore], rungs: list[int] | None = None) 
     rungs = rungs or [300, 900, 3600, 21600, 86400, 259200]
     rows = [
         "| provider | median TTI | p90 | 24h recall | staleness "
-        "| $/1k events | $/1k fresh answers | n |",
-        "|---|---|---|---|---|---|---|---|",
+        "| text/result | $/1k events | $/1k fresh answers | n |",
+        "|---|---|---|---|---|---|---|---|---|",
     ]
     for sc in sorted(scores, key=lambda s: (s.median_ttl is None, s.median_ttl or 0)):
         per_1k = (sc.spend_usd / sc.n_events * 1000) if sc.n_events else 0.0
         rows.append(
             f"| `{sc.provider}/{sc.mode}` | {fmt_pair(sc.median_bracket)} "
             f"| {fmt_pair(sc.p90_bracket)} | {_pct(sc.recall_24h)} "
-            f"| {_pct(sc.staleness)} | ${per_1k:.2f} "
+            f"| {_pct(sc.staleness)} | {fmt_chars(sc.chars_per_result_p50)} | ${per_1k:.2f} "
             f"| {_cpf(sc.cost_per_fresh_24h)} | {sc.n_events} |"
         )
     return "\n".join(rows)
@@ -670,6 +685,7 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
         f"{_pct(sc.staleness)}</td>"
         + (f"<td class='k'>{_pct(sc.phrasing_agreement)}</td>" if any_phrasing else "")
         + f"<td class='k'>{sc.p50_latency_ms:.0f}ms</td>"
+        f"<td class='k'>{fmt_chars(sc.chars_per_result_p50)}</td>"
         f"<td class='k'>${(sc.spend_usd / sc.n_events * 1000) if sc.n_events else 0:.2f}</td>"
         + f"<td class='k'>{_cpf(sc.cost_per_fresh_24h)}</td>"
         + f"<td class='k'>{sc.n_events}</td></tr>")
@@ -834,7 +850,9 @@ Generated {gen}.</p>
     <th>95% CI<br><span style="text-transform:none;letter-spacing:0">on the median</span></th>
     <th>p90</th><th>24h recall</th>
     <th>24h recall<br><span style="text-transform:none;letter-spacing:0">vs origin</span></th>
-    <th>staleness</th>{ph_head}<th>p50 latency</th><th>$/1k events</th>
+    <th>staleness</th>{ph_head}<th>p50 latency</th>
+    <th>text served<br><span style="text-transform:none;letter-spacing:0">per result</span></th>
+    <th>$/1k events</th>
     <th>$/1k fresh<br><span style="text-transform:none;letter-spacing:0">answers</span></th>
     <th>events</th></tr></thead>
     <tbody>{rows}</tbody></table></div>

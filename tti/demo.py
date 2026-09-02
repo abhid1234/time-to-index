@@ -35,6 +35,13 @@ PROFILES = [
     ("provider-c", "base",  64_800.0, 1.6, 0.78, 0.44),
 ]
 
+# Characters of text a synthetic arm serves per result. Real arms differ by
+# an order of magnitude here (an excerpt API honours max_chars_per_result; a
+# snippet API returns ~150 regardless), and the leaderboard has a column for
+# it, so the demo gives each arm a distinct, seeded figure rather than a zero
+# the page would render as "0 chars" and a reader would take literally.
+CHARS_PER_RESULT = {"provider-a": 1_380, "provider-b": 150, "provider-c": 620}
+
 CLASSES = [
     ("package_registry", "npm", True, 40),
     ("code_release", "github_release", True, 22),
@@ -170,7 +177,16 @@ def _r(ev: Event, provider: str, mode: str, rung: int, verdict: str,
             zlib.crc32(f"{provider}:{mode}:{rung}".encode())).randint(300, 2400),
         matched_stale=[ev.predecessor] if verdict == STALE and ev.predecessor else [],
         matched_fresh=[ev.answer] if verdict == FRESH else [],
-        n_results=5, cost_usd=cost, raw_ref="", note=note, render=render)
+        n_results=5, chars=_chars(provider, mode, rung),
+        cost_usd=cost, raw_ref="", note=note, render=render)
+
+
+def _chars(provider: str, mode: str, rung: int) -> int:
+    base = CHARS_PER_RESULT.get(provider)
+    if base is None:            # the origin control reads a page, not results
+        return 0
+    jitter = random.Random(zlib.crc32(f"chars:{provider}:{mode}:{rung}".encode())).randint(-8, 8)
+    return 5 * (base + jitter)
 
 
 BANNER = """

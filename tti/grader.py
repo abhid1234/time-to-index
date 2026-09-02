@@ -65,6 +65,13 @@ class Rules:
     use_aliases: bool = True
     min_token_len: int = 3
     max_depth: int = 12
+    # Characters kept from each text leaf before matching; 0 = all of it. The
+    # arms do not return the same amount of text per result -- an excerpt
+    # API returns up to `max_chars_per_result`, a classic snippet API ~160
+    # characters -- and a version string deep in a long excerpt is a hit
+    # that a short snippet could never have carried. The `snippet-window`
+    # variant grades every arm as though it had returned short snippets.
+    max_chars_per_field: int = 0
 
 
 def flatten_text(payload: Any, _depth: int = 0, rules: Rules | None = None) -> str:
@@ -84,7 +91,7 @@ def flatten_text(payload: Any, _depth: int = 0, rules: Rules | None = None) -> s
             if lk in rules.skip_keys:
                 continue
             if lk in rules.text_keys:
-                out.append(_stringify(v, _depth + 1))
+                out.append(_stringify(v, _depth + 1, rules.max_chars_per_field))
             elif isinstance(v, (dict, list)):
                 out.append(flatten_text(v, _depth + 1, rules))
     elif isinstance(payload, list):
@@ -93,19 +100,23 @@ def flatten_text(payload: Any, _depth: int = 0, rules: Rules | None = None) -> s
     return "\n".join(s for s in out if s)
 
 
-def _stringify(v: Any, _depth: int = 0) -> str:
+def _stringify(v: Any, _depth: int = 0, limit: int = 0) -> str:
     # Depth-bounded like flatten_text. Without this, a known content key
     # holding a deeply nested value recurses without limit, and a provider
     # response is attacker-adjacent input: it is not worth a stack overflow
     # in an unattended job to read one more level.
+    #
+    # `limit` applies per leaf string, not to the joined result: a list of
+    # ten excerpts windowed to 160 characters is ten short snippets, which
+    # is the thing being simulated, not one.
     if _depth > 12:
         return ""
     if isinstance(v, str):
-        return v
+        return v[:limit] if limit else v
     if isinstance(v, list):
-        return "\n".join(_stringify(x, _depth + 1) for x in v)
+        return "\n".join(_stringify(x, _depth + 1, limit) for x in v)
     if isinstance(v, dict):
-        return "\n".join(_stringify(x, _depth + 1) for x in v.values())
+        return "\n".join(_stringify(x, _depth + 1, limit) for x in v.values())
     return ""
 
 
@@ -182,4 +193,5 @@ VARIANTS = [
     Rules(name="urls-count-as-evidence", skip_keys=frozenset({"query", "objective"})),
     Rules(name="titles-only", text_keys=frozenset({"title"})),
     Rules(name="shallow-walk", max_depth=2),
+    Rules(name="snippet-window", max_chars_per_field=160),
 ]

@@ -225,6 +225,13 @@ class ProviderScore:
     n_errors: int = 0
     n_skipped_budget: int = 0
     p50_latency_ms: float = 0.0
+    # Median characters the grader read per returned result, for this arm.
+    # The arms are asked for the same `max_chars_per_result`, but only the
+    # APIs that take such a parameter honour it; the rest return their own
+    # snippet length. A recall gap between an arm serving 1,400 characters a
+    # result and one serving 150 is partly a gap in how much text was
+    # searched, and this column is what lets a reader see that.
+    chars_per_result_p50: float = float("nan")
 
 
 def observations(
@@ -471,6 +478,7 @@ def score(
     # each opportunity to mislead an agent is a separate opportunity.
     stale = eligible = 0
     lat: list[int] = []
+    cpr: list[float] = []
     for r in results:
         if r.provider != provider or r.mode != mode or r.phrasing:
             continue
@@ -488,6 +496,8 @@ def score(
         sc.spend_usd += r.cost_usd
         if r.latency_ms:
             lat.append(r.latency_ms)
+        if r.n_results > 0 and r.chars >= 0:
+            cpr.append(r.chars / r.n_results)
         if ev.measures_staleness and r.verdict in (STALE, ABSENT):
             eligible += 1
             if r.verdict == STALE:
@@ -505,6 +515,9 @@ def score(
     if lat:
         lat.sort()
         sc.p50_latency_ms = lat[len(lat) // 2]
+    if cpr:
+        cpr.sort()
+        sc.chars_per_result_p50 = cpr[len(cpr) // 2]
     return sc
 
 

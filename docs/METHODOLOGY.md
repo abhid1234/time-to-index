@@ -118,6 +118,41 @@ retrieval, not a stale one.
 excluded — a URL can carry a version string that the page body contradicts —
 and so is any echo of the query.
 
+## The arms do not return the same amount of text
+
+Every arm is asked for the same five results and the same 1,500 characters
+per result. Only the APIs that take a characters parameter honour it: an
+excerpt API returns up to that much of each page, a classic web-search API
+returns the snippet length it always returns, somewhere around 150
+characters, and no parameter changes that. The grader reads whatever came
+back. So an arm that serves ten times the text per result has ten times the
+surface on which a version string can appear, and a recall gap between two
+arms is partly a gap in freshness and partly a gap in how much of the page
+each one chose to show.
+
+This is not corrected away, for a reason worth stating: the text an API
+serves is the text an agent gets. An agent asking "what is the latest
+version" and receiving a 150-character snippet that stops before the
+version line has, for its purposes, not been told. That is a property of
+the product, and the leaderboard measures products. But a reader deciding
+whether the *index* was fresh, rather than whether the *answer* was usable,
+needs to be able to separate the two, so two things are reported:
+
+- **Text served per result**, a column on the leaderboard: the median
+  number of characters the grader actually read per returned result, for
+  each arm. Two arms with the same recall and a tenfold difference in this
+  column are not the same result.
+- **The `snippet-window` variant of `tti sensitivity`**: every stored payload
+  re-graded with each text field cut to its first 160 characters, so every
+  arm is judged as though it had returned short snippets. If the ranking
+  holds under that window, the text-volume difference did not decide it. If
+  it reorders, the arms that fall are the ones whose recall was living in
+  the long tail of their excerpts, and that is reported beside the ranking
+  like every other variant.
+
+The 160 figure is a conventional snippet length, not a measurement of any
+particular provider; the column above is the measurement.
+
 ## The phrasing axis
 
 The first version of this listed "no phrasing-sensitivity arm" as a
@@ -487,7 +522,8 @@ finding, not a caveat.
 
 Every grading rule above is a judgement call. Match on token boundaries or
 not. Count a `v` prefix. Trust aliases. Read titles only. Treat a URL as
-evidence. Each is defensible; none is forced.
+evidence. Read the whole excerpt, or only as much as a snippet would have
+carried. Each is defensible; none is forced.
 
 A benchmark published by one person should be able to say how much of its
 ranking survives those calls being made differently, so `tti sensitivity`
