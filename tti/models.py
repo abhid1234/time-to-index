@@ -99,7 +99,7 @@ class Probe:
 
     event_id: str
     provider: str
-    mode: str            # provider-specific tier, e.g. "base" / "pro" / "basic"
+    mode: str            # provider-specific mode, e.g. "advanced" / "auto" / "basic"
     rung: int            # target lag in seconds after publication
     due_at: float        # UNIX seconds, = event.published_at + rung
     phrasing: int = 0    # 0 = the canonical question; see tti/phrasing.py

@@ -902,10 +902,16 @@ def cmd_power(args) -> int:
     arms = sorted({(r.provider, r.mode) for r in results
                    if r.provider != ORIGIN_ARM})
     if len(arms) < 2:
+        cs = _control_summary(led)
         if args.json:
             return _emit({"comparisons": [],
-                          "note": "need at least two provider arms with results"})
-        print("need at least two provider arms with results")
+                          "note": "need at least two provider arms with results",
+                          "control_results": cs["graded"] if cs else 0})
+        print("need at least two provider arms with results"
+              + (f" ({len(arms)} so far)" if arms else ""))
+        if cs:
+            print(f"({cs['graded']} control-arm result(s) exist; power compares provider "
+                  f"arms against each other, and the control is not one.)")
         return 1
 
     rate = _events_per_day(led)
@@ -1260,7 +1266,8 @@ def cmd_watch(args) -> int:
         print("no history yet — run `tti watch` at least twice, days apart")
         return 1
 
-    print(f"\n{cov.urls} URLs · {cov.runs} runs · {cov.span_days:.1f} days of history "
+    print(f"\n{cov.urls} URLs · {cov.runs} run{'s' if cov.runs != 1 else ''} · "
+          f"{cov.span_days:.1f} days of history "
           f"· {cov.judged_rate*100:.0f}% of observations judged")
     if cov.runs < 2:
         print("  One run is not a series. Nothing can be said about change yet.")

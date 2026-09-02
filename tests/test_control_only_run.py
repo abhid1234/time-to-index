@@ -87,3 +87,15 @@ def test_sensitivity_says_provider_arm_not_no_results(wired, tmp_path, monkeypat
     assert "1 control-arm result(s) exist" in out
     assert "no results to re-grade" not in out
 
+
+
+def test_power_names_the_control_results_it_is_not_counting(wired, tmp_path, monkeypatch, capsys):
+    _control_only_ledger(wired, tmp_path, monkeypatch)
+    assert main(["--run-dir", str(tmp_path), "power"]) == 1
+    out = capsys.readouterr().out
+    assert "need at least two provider arms with results" in out
+    assert "1 control-arm result(s) exist" in out
+    capsys.readouterr()
+    assert main(["--run-dir", str(tmp_path), "power", "--json"]) == 1
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["comparisons"] == [] and payload["control_results"] == 1

@@ -404,7 +404,7 @@ def corpus_html(sv, hist=None, changes=(), coverage=None) -> str:
 <h2>What moved</h2>
 <div class="panel">
   <p style="margin-top:0">{coverage.urls} URLs over {coverage.span_days:.1f} days
-  and {coverage.runs} runs. <b>{len(changes)}</b> posture change(s),
+  and {coverage.runs} run{"s" if coverage.runs != 1 else ""}. <b>{len(changes)}</b> posture change(s),
   <b>{len(worse)}</b> of them regressions.</p>
   {"<div class='scroll'><table><thead><tr><th>when</th><th>page</th>"
    "<th>what changed</th></tr></thead><tbody>" + change_rows +
