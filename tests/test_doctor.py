@@ -30,10 +30,13 @@ class _FanOut:
     `errors`, `all_failed`, `max_subjects`, and `collect()`.
     """
 
-    def __init__(self, attempted: int, errors: int, events: int):
+    def __init__(self, attempted: int, errors: int, events: int,
+                 warnings: int = 0):
         self._attempted, self._errors, self._events = attempted, errors, events
+        self._warnings = warnings
         self.attempted = 0
         self.errors: list[str] = []
+        self.warnings: list[str] = []
         self.max_subjects = None
 
     @property
@@ -43,6 +46,8 @@ class _FanOut:
     def collect(self, seen):
         self.attempted = self._attempted
         self.errors = [f"cat-{k}: HTTPError: 503" for k in range(self._errors)]
+        self.warnings = [f"cat-{k}: packument is 25.0 MB, bound is 32 MB"
+                         for k in range(self._warnings)]
         return [_event(i) for i in range(self._events)]
 
 
@@ -73,7 +78,17 @@ def test_a_subject_that_errored_is_not_counted_as_reachable(monkeypatch, capsys)
     assert main(["doctor"]) == 0
     out = capsys.readouterr().out
     assert "  1/2 subjects reachable" in out, out
-    assert "[1 subject errors]" in out
+    # Named, not counted. "[1 subject errors]" told you nothing about which.
+    assert "failed: cat-0" in out
+    assert "first:  cat-0: HTTPError: 503" in out
+
+
+def test_a_warning_is_shown_beside_the_subject_that_raised_it(monkeypatch, capsys):
+    _wire(monkeypatch, _FanOut(attempted=2, errors=0, events=4, warnings=1))
+    assert main(["doctor"]) == 0
+    out = capsys.readouterr().out
+    assert "  2/2 subjects reachable" in out
+    assert "~ cat-0: packument is 25.0 MB" in out
 
 
 def test_every_subject_failing_is_unreachable_not_a_zero(monkeypatch, capsys):

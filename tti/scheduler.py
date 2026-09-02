@@ -106,7 +106,12 @@ def discover(ledger: Ledger, source_names: list[str] | None = None,
             rep.source_errors[name] = src.errors
             if verbose:
                 print(f"  ! {name}: {len(src.errors)}/{src.attempted} subjects failed "
-                      f"-- {src.errors[0][:120]}")
+                      f"-- {sources.subject_names(src.errors)}")
+                print(f"    first error: {src.errors[0][:110]}")
+        if getattr(src, "warnings", None) and verbose:
+            print(f"  ~ {name}: {len(src.warnings)} warning(s) -- "
+                  f"{sources.subject_names(src.warnings)}")
+            print(f"    {src.warnings[0][:110]}")
         if src.all_failed:
             # Every subject failed: the source is unreachable, not quiet. These
             # look identical in the event count, and conflating them is how a

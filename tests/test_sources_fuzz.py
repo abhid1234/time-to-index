@@ -31,9 +31,48 @@ def watchlist(monkeypatch):
     monkeypatch.setitem(config._cache, "watchlist", WATCHLIST)
 
 
-def collect(mod, cls, payload, method="get_json"):
+@pytest.fixture(autouse=True)
+def no_live_network(monkeypatch):
+    """Every fuzz test is offline by contract. Enforce it.
+
+    A refactor moved npm from `get_json` to `get_json_sized`; the fuzz patch
+    still targeted `get_json`, so npm's fetch went unpatched and made a LIVE
+    call to the registry. The "null document" case then returned a genuine
+    Event for the real package `p`, published in 2012 -- a plausible result
+    for entirely the wrong reason, and the assertion caught it only because
+    it demanded an empty list. Patching the transport turns that class of
+    drift into a loud failure at the first call.
+    """
+    from tti import http as _http
+
+    attempts: list[str] = []
+
+    def refuse(method, url, *a, **kw):
+        attempts.append(f"{method} {url}")
+        raise ConnectionError("fuzz: live request refused")
+    monkeypatch.setattr(_http, "_request", refuse)
+    yield
+    # Asserted at teardown, not inside `refuse`. Sources catch every Exception
+    # from a fetch and file it under `errors`, so an assertion raised inside
+    # the transport is swallowed and the test passes with the source merely
+    # "errored" -- indistinguishable, to a never-invents assertion, from the
+    # right answer. Out here nothing can catch it.
+    assert not attempts, (
+        "fuzz test reached the network; the patch is not covering this "
+        "source's fetch:\n  " + "\n  ".join(attempts))
+
+
+def collect(mod, cls, payload, method="get_json_sized"):
+    """Run a source against a canned payload with no network.
+
+    Patches `get_json_sized` by default: `get_json` delegates to it, so one
+    patch covers every JSON source regardless of which of the two it calls.
+    The sized variant returns (document, byte_count); for a fuzz payload the
+    byte count is irrelevant and is zero.
+    """
     src = cls()
-    with patch.object(mod.http, method, return_value=payload):
+    value = (payload, 0) if method == "get_json_sized" else payload
+    with patch.object(mod.http, method, return_value=value):
         events = src.collect({})
     return src, events
 
@@ -162,6 +201,6 @@ def test_a_source_returning_garbage_for_every_subject_reads_as_broken(monkeypatc
     changed its API, and must not read as a quiet day."""
     monkeypatch.setitem(config._cache, "watchlist", {"npm": ["a", "b", "c"]})
     src = npm_mod.Npm()
-    with patch.object(npm_mod.http, "get_json", return_value=None):
+    with patch.object(npm_mod.http, "get_json_sized", return_value=(None, 0)):
         src.collect({})
     assert src.all_failed and len(src.errors) == 3

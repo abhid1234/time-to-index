@@ -36,6 +36,10 @@ class BaseSource:
 
     def __init__(self) -> None:
         self.errors: list[str] = []
+        # Non-fatal, per-subject. The subject was collected and the event is
+        # real; something about it deserves a human's eye before it becomes
+        # an error -- a packument nearing its size bound, for instance.
+        self.warnings: list[str] = []
         self.attempted = 0
         # Cap on subjects polled this call. `tti doctor` sets it low: a
         # reachability check does not need the whole watchlist, and one that
@@ -98,3 +102,21 @@ def available() -> list[str]:
 
 # Import for side effects: each module registers itself.
 from . import arxiv, edgar, federal_register, github_releases, npm, pypi  # noqa: E402,F401
+
+
+def subject_names(messages: list[str], limit: int = 8) -> str:
+    """The subjects behind a list of "<subject>: <detail>" messages.
+
+    Printed instead of the first message alone. The first real run against
+    the live registry reported "12/46 subjects failed -- antd: ..." and the
+    other eleven, one of which was `next`, took a separate script to learn.
+    A count with one example is a number; a list of names is a finding.
+    """
+    names = []
+    for m in messages:
+        n = m.split(":", 1)[0].strip()
+        if n and n not in names:
+            names.append(n)
+    shown = ", ".join(names[:limit])
+    rest = len(names) - limit
+    return shown + (f", +{rest} more" if rest > 0 else "")

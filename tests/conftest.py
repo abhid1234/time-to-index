@@ -128,12 +128,20 @@ class Origin(QuietServer):
         host, port = self.server_address[:2]
         return f"http://127.0.0.1:{port}"
 
-    def publish_npm(self, pkg: str, versions: list[tuple[str, float]]) -> None:
-        """versions: [(version, unix_ts)], newest last."""
+    def publish_npm(self, pkg: str, versions: list[tuple[str, float]],
+                    pad_bytes: int = 0) -> None:
+        """versions: [(version, unix_ts)], newest last.
+
+        `pad_bytes` inflates the document with a `readme` field, which real
+        packuments carry, so a test can serve a packument the size of a big
+        package's without hand-writing thousands of versions.
+        """
         self.npm[pkg] = {
             "dist-tags": {"latest": versions[-1][0]},
             "time": {v: _iso(t) for v, t in versions},
         }
+        if pad_bytes:
+            self.npm[pkg]["readme"] = "x" * pad_bytes
 
     def publish_pypi(self, pkg: str, versions: list[tuple[str, float]]) -> None:
         self.pypi[pkg] = {

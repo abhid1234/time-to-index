@@ -122,3 +122,33 @@ the sandbox's egress proxy, not by those services. Their collectors are
 written and unit-tested but have not been exercised against live endpoints.
 Anyone running this outside such a sandbox should expect them to work and
 should treat `tti doctor` as the first thing to run, not the last.
+
+## Live-run notes
+
+Dated observations from running collectors against real endpoints. Each one
+changed code; none was visible from the fixture server.
+
+**2026-09-02, npm registry, from a cloud container.** Twelve of forty-six
+watched packages failed with `ResponseTooLarge` on the first live `discover`:
+astro, @types/node, antd, langchain, firebase, next, playwright, prisma,
+tailwindcss, vite, wrangler, storybook. The full packument is the only document
+carrying the `time` map, and for big packages it runs 8–16 MB (measured: antd
+8.4, @types/node 11.1, aws-sdk 10.6, typescript 15.6, react-native 15.8). The
+abbreviated packument is smaller but has no `time` map. The packument fetch now
+has its own 32 MB bound with a warning at 24 MB; every other fetch keeps the
+8 MB module default. `discover` and `doctor` now name the failing subjects
+rather than showing the first error and a count — the count-and-one-example
+form is how `next` being broken took a separate script to learn.
+
+**2026-09-02, npmjs.com, from a cloud container.** `www.npmjs.com/package/…`
+returns 403 to this client; `pypi.org/project/…` returns 200. The control arm
+already handles this by falling back to the registry document and recording
+that it did. Consequence for anyone running `tti crawlability` against
+npmjs.com: do it from a residential connection, not a cloud host.
+
+**2026-09-02, cold start.** The first `discover` against the live registries
+collected 82 events and dropped all 82 as detected-late. This is the documented
+cold-start behaviour, not a fault: every watched package looks new on the first
+poll and shipped days ago. A populated ledger needs the collector to be running
+when a release lands, which is what the timers are for.
+

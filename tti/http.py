@@ -73,13 +73,20 @@ def _read_capped(resp: requests.Response, max_bytes: int) -> tuple[bytes, bool]:
     return bytes(buf), False
 
 
-def get_json(url: str, *, headers: dict | None = None, params: dict | None = None,
-             timeout: float = 20.0, retries: int = 2,
-             max_bytes: int = MAX_RESPONSE_BYTES) -> Any:
-    """Parsed JSON, refused rather than truncated if oversized.
+def get_json_sized(url: str, *, headers: dict | None = None,
+                   params: dict | None = None, timeout: float = 20.0,
+                   retries: int = 2,
+                   max_bytes: int = MAX_RESPONSE_BYTES) -> tuple[Any, int]:
+    """Parsed JSON and the body size in bytes, refused if oversized.
+
+    The size exists so a caller with a per-source bound can notice a document
+    creeping toward it. Registry packuments only ever grow -- every release
+    appends -- and the failure mode without this is a subject that works for
+    a year and then starts erroring on the day it crosses the line, with
+    nothing in any earlier output having said it was close.
 
     Truncating JSON produces a parse error at best and, worse, could produce
-    a *shorter valid document* — a registry response missing its newest
+    a *shorter valid document* -- a registry response missing its newest
     entries, which would read as a quiet day rather than as a failure.
     """
     resp = _request("GET", url, headers=headers, params=params, timeout=timeout,
@@ -88,13 +95,21 @@ def get_json(url: str, *, headers: dict | None = None, params: dict | None = Non
     if truncated:
         raise ResponseTooLarge(f"body exceeded the {max_bytes:,}-byte cap")
     try:
-        return json.loads(raw.decode("utf-8", "replace"))
+        return json.loads(raw.decode("utf-8", "replace")), len(raw)
     except json.JSONDecodeError as exc:
         # Wrapped so every failure from this module is one exception type.
         # Collectors catch broadly, but a caller that catches HttpError and
         # not JSONDecodeError would otherwise crash on a malformed body while
         # handling every other failure cleanly.
         raise HttpError(f"response was not valid JSON: {exc}") from exc
+
+
+def get_json(url: str, *, headers: dict | None = None, params: dict | None = None,
+             timeout: float = 20.0, retries: int = 2,
+             max_bytes: int = MAX_RESPONSE_BYTES) -> Any:
+    """Parsed JSON, refused rather than truncated if oversized."""
+    return get_json_sized(url, headers=headers, params=params, timeout=timeout,
+                          retries=retries, max_bytes=max_bytes)[0]
 
 
 def get_text(url: str, *, headers: dict | None = None, params: dict | None = None,

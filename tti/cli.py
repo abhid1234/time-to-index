@@ -348,9 +348,13 @@ def cmd_doctor(args) -> int:
                 # because a fresh poll yields at most one event per subject.
                 # The event count is still useful, so it is shown, separately.
                 answered = src.attempted - len(src.errors)
-                note = f" [{len(src.errors)} subject errors]" if src.errors else ""
                 print(f"  ✓ {name:18s} {answered:3d}/{src.attempted} subjects "
-                      f"reachable · {len(got):3d} events  {ms:6.0f}ms{note}")
+                      f"reachable · {len(got):3d} events  {ms:6.0f}ms")
+                if src.errors:
+                    print(f"      failed: {sources.subject_names(src.errors)}")
+                    print(f"      first:  {src.errors[0][:100]}")
+                for w in getattr(src, "warnings", [])[:8]:
+                    print(f"      ~ {w[:110]}")
         except Exception as exc:  # noqa: BLE001
             print(f"  ✗ {name:18s} {type(exc).__name__}: {exc}"[:110])
             bad += 1
