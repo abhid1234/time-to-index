@@ -1000,7 +1000,8 @@ def cmd_sensitivity(args) -> int:
         print(f"{label:26s} {churn:>8s} {tau:>6s} {meds:>8s} {lost:>5s}  {moved}")
 
     print()
-    print(sensitivity.verdict(rows))
+    for line in _wrap(sensitivity.verdict(rows), 78):
+        print(line)
     print()
     print("churn = share of probe verdicts that change. tau = Kendall rank")
     print("correlation against the reported ordering. medians = arms whose median")
