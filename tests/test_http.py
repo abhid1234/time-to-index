@@ -11,11 +11,12 @@ unattended job has nobody to notice it fell over.
 import pathlib
 import sys
 import threading
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 import pytest
+from conftest import QuietServer
 
 from tti import http as H
 
@@ -75,8 +76,7 @@ class Hostile(BaseHTTPRequestHandler):
 
 @pytest.fixture
 def hostile():
-    srv = ThreadingHTTPServer(("127.0.0.1", 0), Hostile)
-    srv.daemon_threads = True
+    srv = QuietServer(("127.0.0.1", 0), Hostile)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     try:
         yield f"http://127.0.0.1:{srv.server_address[1]}"

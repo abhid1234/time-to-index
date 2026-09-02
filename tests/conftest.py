@@ -80,9 +80,36 @@ ROBOTS_BLOCK_AI = ("User-agent: *\nAllow: /\n\n"
                    "User-agent: ClaudeBot\nDisallow: /\n")
 
 
-class Origin(ThreadingHTTPServer):
+class QuietServer(ThreadingHTTPServer):
+    """A fixture server that does not narrate clients hanging up on it.
+
+    Several tests deliberately stop reading an oversized body partway through
+    -- that is the response-size cap working. On macOS the server side sees
+    that as BrokenPipe / ConnectionReset / ConnectionAborted, and socketserver's
+    default `handle_error` prints "Exception occurred during processing of
+    request from ..." plus a traceback to stderr. Every test still passes, so
+    the suite is green with four alarming stack traces in it -- which is worse
+    than red, because a reader who has just been told the guards are careful
+    sees output that looks like nobody looked. Linux swallows the same
+    condition silently, which is why it was never seen in CI.
+
+    Only the three disconnect errors are suppressed. Anything else still
+    prints, so a genuine handler bug is not hidden behind this.
+    """
     daemon_threads = True
     allow_reuse_address = True
+
+    _CLIENT_WENT_AWAY = (BrokenPipeError, ConnectionResetError,
+                         ConnectionAbortedError)
+
+    def handle_error(self, request, client_address):
+        exc = sys.exc_info()[1]
+        if isinstance(exc, self._CLIENT_WENT_AWAY):
+            return
+        super().handle_error(request, client_address)
+
+
+class Origin(QuietServer):
 
     def __init__(self, *a, **kw):
         super().__init__(*a, **kw)

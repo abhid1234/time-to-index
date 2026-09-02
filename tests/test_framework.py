@@ -133,3 +133,46 @@ def test_robots_matrix_respects_specific_agent_blocks_over_wildcard():
     assert m["ClaudeBot"] is True
     m2 = robots_matrix(txt, "https://example.com/private/x")
     assert m2["CCBot"] is False
+
+
+# ---------------------------------------------------------------------------
+# The fixture server stays quiet when a client hangs up
+# ---------------------------------------------------------------------------
+
+def _invoke_handle_error(server, exc):
+    """Call handle_error the way socketserver does: from inside an except."""
+    try:
+        raise exc
+    except type(exc):
+        server.handle_error(request=None, client_address=("127.0.0.1", 1))
+
+
+@pytest.mark.parametrize("exc", [BrokenPipeError(), ConnectionResetError(),
+                                 ConnectionAbortedError()])
+def test_a_client_hanging_up_is_not_narrated_to_stderr(exc, capsys):
+    """Four of these appeared in a green run on macOS, from the tests that
+    stop reading an oversized body on purpose. Linux swallows the same
+    condition, so CI never showed it. Asserted directly against handle_error
+    rather than by reproducing the disconnect, because the reproduction is
+    OS-dependent and the contract is not."""
+    from conftest import QuietServer
+    srv = QuietServer(("127.0.0.1", 0), None)
+    try:
+        _invoke_handle_error(srv, exc)
+    finally:
+        srv.server_close()
+    assert capsys.readouterr().err == ""
+
+
+def test_a_real_handler_bug_still_prints(capsys):
+    """The suppression is three disconnect errors, not a blindfold. A handler
+    that raises anything else must still be loud about it."""
+    from conftest import QuietServer
+    srv = QuietServer(("127.0.0.1", 0), None)
+    try:
+        _invoke_handle_error(srv, RuntimeError("handler bug"))
+    finally:
+        srv.server_close()
+    err = capsys.readouterr().err
+    assert "Exception occurred during processing of request" in err
+    assert "handler bug" in err
