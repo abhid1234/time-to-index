@@ -341,9 +341,16 @@ def cmd_doctor(args) -> int:
                       f"— {src.errors[0][:70]}")
                 bad += 1
             else:
+                # Subjects that answered, over subjects asked. Not events over
+                # subjects: one arXiv category returns many papers, and the
+                # first real run of this command printed "10/2 subjects
+                # reachable" -- ten of two. npm and PyPI only looked right
+                # because a fresh poll yields at most one event per subject.
+                # The event count is still useful, so it is shown, separately.
+                answered = src.attempted - len(src.errors)
                 note = f" [{len(src.errors)} subject errors]" if src.errors else ""
-                print(f"  ✓ {name:18s} {len(got):3d}/{src.attempted} subjects "
-                      f"reachable  {ms:6.0f}ms{note}")
+                print(f"  ✓ {name:18s} {answered:3d}/{src.attempted} subjects "
+                      f"reachable · {len(got):3d} events  {ms:6.0f}ms{note}")
         except Exception as exc:  # noqa: BLE001
             print(f"  ✗ {name:18s} {type(exc).__name__}: {exc}"[:110])
             bad += 1
