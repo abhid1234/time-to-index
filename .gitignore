@@ -5,3 +5,6 @@ __pycache__/
 .pytest_cache/
 *.pyc
 docs/*.fragment.html
+.venv/
+venv/
+.DS_Store
