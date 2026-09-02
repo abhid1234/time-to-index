@@ -89,3 +89,19 @@ def test_proportion_sample_size_is_sane():
     # A tiny difference needs a lot more.
     assert proportions_n(0.30, 0.32) > 5000
     assert proportions_n(0.3, 0.3) is None
+
+
+def test_power_table_prints_the_days_column_its_footer_describes(tmp_path, capsys):
+    """The footer explained a `days` column the table did not have."""
+    import pathlib as _p
+
+    from tti import config, demo
+    from tti.cli import main
+    demo.generate(_p.Path(tmp_path), config.ladder())
+    assert main(["--run-dir", str(tmp_path), "power"]) == 0
+    out = capsys.readouterr().out
+    header = next(line for line in out.splitlines() if line.startswith("comparison"))
+    assert header.split()[-3:] == ["need", "days", "verdict"]
+    rows = [line for line in out.splitlines() if " vs " in line and "distinguishable" in line]
+    assert rows and all(line.split()[-2] == "0" for line in rows)   # already has the events
+    assert "`days` is how" in out and "0: already there" in out

@@ -930,19 +930,23 @@ def cmd_power(args) -> int:
             print(line)
         print()
     hdr = (f"{'comparison':38s} {'HR':>6s} {'events':>7s} {'p':>7s} "
-           f"{'p adj':>7s} {'power':>6s} {'need':>7s}  verdict")
+           f"{'p adj':>7s} {'power':>6s} {'need':>7s} {'days':>6s}  verdict")
     print(hdr)
     print("-" * len(hdr))
     for r in rows:
         hr = "—" if r.hazard_ratio != r.hazard_ratio else f"{r.hazard_ratio:.2f}"
         pw = "—" if r.power_now != r.power_now else f"{r.power_now*100:.0f}%"
         need = "—" if r.events_for_80 is None else f"{r.events_for_80:.0f}"
+        # 0 days when the run already has the events; a dash when the rate
+        # is unknown, because "0 more days" and "cannot say" are different.
+        days = ("0" if r.events_needed is not None and r.events_needed == 0 else
+                "—" if r.days_needed is None else f"{r.days_needed:.0f}")
         pv, pa = fmt_p(r.p_value), fmt_p(r.p_adjusted)
         print(f"{r.a + ' vs ' + r.b:38s} {hr:>6s} {r.events_observed:>7d} "
-              f"{pv:>7s} {pa:>7s} {pw:>6s} {need:>7s}  {r.verdict}")
+              f"{pv:>7s} {pa:>7s} {pw:>6s} {need:>7s} {days:>6s}  {r.verdict}")
     print("\nHR > 1 means the first arm indexes faster. `need` is the Schoenfeld")
     print("event count for 80% power at the observed hazard ratio; `days` is how")
-    print("much more collection that is at the current rate.")
+    print("much more collection reaching it takes at the current rate (0: already there).")
     return 0
 
 
