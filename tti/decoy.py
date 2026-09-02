@@ -192,20 +192,23 @@ def npm_absent(event: Event, token: str) -> bool | None:
     returns None and is counted as unverified rather than assumed absent.
     """
     from . import http
+    from .sources.npm import fetch_packument
 
-    if event.source == "npm":
-        url = f"https://registry.npmjs.org/{event.subject}"
-        key = "versions"
-    elif event.source == "pypi":
-        url = f"https://pypi.org/pypi/{event.subject}/json"
-        key = "releases"
-    else:
-        return None
     try:
-        doc = http.get_json(url)
+        if event.source == "npm":
+            # Through the shared bounded fetch. With the module default this
+            # raised on the twelve largest packages and the check quietly
+            # returned "unverified" for exactly the subjects that matter.
+            doc, _ = fetch_packument(event.subject)
+            key = "versions"
+        elif event.source == "pypi":
+            doc = http.get_json(f"https://pypi.org/pypi/{event.subject}/json")
+            key = "releases"
+        else:
+            return None
     except Exception:
         return None
-    versions = doc.get(key)
+    versions = doc.get(key) if isinstance(doc, dict) else None
     if not isinstance(versions, dict):
         return None
     return token not in versions

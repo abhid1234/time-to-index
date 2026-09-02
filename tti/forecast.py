@@ -100,10 +100,10 @@ class Forecast:
 
 
 def _npm(pkg: str) -> SourceCadence:
-    from .sources.npm import _is_prerelease, _iso
+    from .sources.npm import _is_prerelease, _iso, fetch_packument
     row = SourceCadence("npm", pkg)
     cutoff = dt.datetime.now(dt.timezone.utc).timestamp() - WINDOW_DAYS * 86400
-    doc = http.get_json(f"https://registry.npmjs.org/{pkg}", timeout=25)
+    doc, _ = fetch_packument(pkg, timeout=60.0)
     row.releases = sum(
         1 for v, t in (doc.get("time") or {}).items()
         if v not in ("created", "modified") and not _is_prerelease(v) and _iso(t) >= cutoff)

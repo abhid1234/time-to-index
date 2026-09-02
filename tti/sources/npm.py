@@ -57,6 +57,21 @@ def _is_prerelease(v: str) -> bool:
     return any(t in v for t in ("-", "canary", "rc", "alpha", "beta", "next", "nightly"))
 
 
+def fetch_packument(pkg: str, timeout: float = 60.0) -> tuple[dict, int]:
+    """The full packument, under the per-source bound, for every caller.
+
+    Three modules read packuments: this collector, `forecast` (release
+    cadence over the last sixty days) and `decoy` (does a counterfactual
+    version exist). The bound was raised here and not in the other two, and
+    the first live forecast then excluded the twelve largest packages from
+    the event-rate estimate the stopping rule depends on, while the decoy
+    check silently downgraded those same packages to "unverified". One
+    function, one bound, and a test that every caller goes through it.
+    """
+    return http.get_json_sized(API.format(pkg=pkg), timeout=timeout,
+                               max_bytes=PACKUMENT_CAP)
+
+
 class Npm(BaseSource):
     name = "npm"
     source_class = "package_registry"
@@ -87,8 +102,7 @@ class Npm(BaseSource):
             if seen.get((self.name, pkg)) == latest:
                 return out
 
-            doc, size = http.get_json_sized(API.format(pkg=pkg), timeout=60.0,
-                                            max_bytes=PACKUMENT_CAP)
+            doc, size = fetch_packument(pkg)
             if size >= PACKUMENT_WARN:
                 self.warnings.append(
                     f"{pkg}: packument is {size / 1e6:.1f} MB, bound is "
