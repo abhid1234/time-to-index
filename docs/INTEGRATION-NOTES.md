@@ -140,6 +140,30 @@ has its own 32 MB bound with a warning at 24 MB; every other fetch keeps the
 rather than showing the first error and a count — the count-and-one-example
 form is how `next` being broken took a separate script to learn.
 
+**2026-09-02, later the same night — a correction to the entry above.** The
+32 MB bound was wrong, and wrong for a reason worth recording. It was sized
+from five packuments measured with `curl`, which reports compressed wire
+bytes; the collector reads decompressed bytes, several times larger. And the
+five did not include `next`, `prisma` or `vite`. Measured through the
+collector's own path: prisma 43.8 MB, vite 38.9, next 31.2, firebase 30.2,
+wrangler 29.6, storybook 24.1. The bound refused two packages and sat within a
+megabyte of a third on its first live run. It is now 96 MB, from the
+collector's own measurement of every package that had failed. The code
+comment says which kind of megabyte.
+
+Two structural changes came out of the same measurement, and matter more than
+the number. First, the collector now asks npm's `/-/package/<pkg>/dist-tags`
+endpoint (~300 bytes) before anything else, and fetches the full packument
+only when `latest` differs from its high-water mark — so the 30 MB document is
+a per-release cost, not a per-poll one. The abbreviated packument was
+considered and rejected: no `time` map, and 25.5 MB for `next` regardless.
+Second, a pre-existing bug the sizes made visible: events dropped as
+detected-late were never written anywhere, so the collector had no memory of
+them and re-fetched every packument on every poll. Against the live registry
+that was roughly a gigabyte per five-minute cycle on a stale watchlist. Late
+drops are now recorded in `runs/seen.jsonl`; a test asserts the second poll
+fetches zero packuments.
+
 **2026-09-02, npmjs.com, from a cloud container.** `www.npmjs.com/package/…`
 returns 403 to this client; `pypi.org/project/…` returns 200. The control arm
 already handles this by falling back to the registry document and recording

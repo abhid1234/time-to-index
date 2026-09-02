@@ -60,6 +60,10 @@ class Ledger:
     def results_path(self) -> pathlib.Path:
         return self.root / "results.jsonl"
 
+    @property
+    def seen_path(self) -> pathlib.Path:
+        return self.root / "seen.jsonl"
+
     # -- generic append/read ----------------------------------------------
     @staticmethod
     def _append(path: pathlib.Path, rows: list[dict]) -> None:
@@ -192,12 +196,52 @@ class Ledger:
 
         Collectors use this as their high-water mark so a restart does not
         re-emit the whole watchlist as if everything had just been published.
+
+        Read from two files. Events that entered the ladder are in
+        events.jsonl. Events that were collected and dropped as detected-late
+        are in seen.jsonl -- they never became events, but the collector
+        still needs to know it has seen that answer, or it fetches the same
+        document on every poll forever. Against the live npm registry that
+        was roughly a gigabyte per five-minute cycle on a stale watchlist.
+
+        Per key, the record with the later timestamp wins, because the two
+        files are appended independently and file order says nothing about
+        wall-clock order between them.
         """
-        out: dict[tuple[str, str], str] = {}
-        for d in self._read(self.events_path):
-            if "source" in d and "subject" in d and "answer" in d:
-                out[(d["source"], d["subject"])] = d["answer"]
-        return out
+        best: dict[tuple[str, str], tuple[float, str]] = {}
+        for path, tkey in ((self.events_path, "discovered_at"),
+                           (self.seen_path, "marked_at")):
+            for d in self._read(path):
+                if "source" in d and "subject" in d and "answer" in d:
+                    key = (d["source"], d["subject"])
+                    t = d.get(tkey)
+                    t = float(t) if isinstance(t, (int, float)) else 0.0
+                    if key not in best or t >= best[key][0]:
+                        best[key] = (t, d["answer"])
+        return {k: v for k, (_, v) in best.items()}
+
+    def mark_seen(self, events: list[Event], reason: str) -> int:
+        """Record answers for events that were collected but will not be
+        probed, so the collector's high-water mark advances past them.
+
+        Only answers that would change the mark are written; on a five-minute
+        cadence the same stale answer arrives 288 times a day per subject,
+        and appending each one would be a log of nothing happening. Returns
+        the number written.
+        """
+        import time as _t
+        current = self.seen_subjects()
+        rows = []
+        now = _t.time()
+        for e in events:
+            if current.get((e.source, e.subject)) != e.answer:
+                rows.append({"source": e.source, "subject": e.subject,
+                             "answer": e.answer, "reason": reason,
+                             "marked_at": now})
+                current[(e.source, e.subject)] = e.answer
+        if rows:
+            self._append(self.seen_path, rows)
+        return len(rows)
 
     # -- probes ------------------------------------------------------------
     def probes(self) -> dict[str, Probe]:

@@ -122,6 +122,7 @@ def discover(ledger: Ledger, source_names: list[str] | None = None,
     rep.collected = len(candidates)
 
     fresh_enough = []
+    late: list[Event] = []
     for e in candidates:
         if e.published_at <= 0:
             rep.dropped_late += 1
@@ -140,8 +141,19 @@ def discover(ledger: Ledger, source_names: list[str] | None = None,
             # anything older than that was published before we started
             # watching this subject, and its ladder cannot be honoured.
             rep.dropped_late += 1
+            late.append(e)
             continue
         fresh_enough.append(e)
+
+    # Advance the high-water mark past the late drops. They are not events,
+    # but a collector that has not been told it saw them asks for the same
+    # document on every poll, and for npm's larger packuments that is tens
+    # of megabytes per subject per five minutes, indefinitely. Future-clock
+    # drops are deliberately NOT marked: they are treated as errors, and
+    # marking one would silently lose the event when its timestamp becomes
+    # valid.
+    if late and not dry_run:
+        ledger.mark_seen(late, reason="detected_late")
 
     if dry_run:
         # Same predicate `add_events` applies, without the append. Computed

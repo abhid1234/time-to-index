@@ -348,8 +348,9 @@ def cmd_doctor(args) -> int:
                 # because a fresh poll yields at most one event per subject.
                 # The event count is still useful, so it is shown, separately.
                 answered = src.attempted - len(src.errors)
+                ev_word = "event " if len(got) == 1 else "events"
                 print(f"  ✓ {name:18s} {answered:3d}/{src.attempted} subjects "
-                      f"reachable · {len(got):3d} events  {ms:6.0f}ms")
+                      f"reachable · {len(got):3d} {ev_word}  {ms:6.0f}ms")
                 if src.errors:
                     print(f"      failed: {sources.subject_names(src.errors)}")
                     print(f"      first:  {src.errors[0][:100]}")
@@ -918,24 +919,57 @@ def cmd_crawlability(args) -> int:
 
     _http.set_retry_ceiling(1)
     out_rows = []
+    repeat = max(1, int(getattr(args, "repeat", 1) or 1))
     for url in args.urls:
         row = {"url": url}
-        try:
-            resp = _http.raw_get(url, timeout=25, headers={
-                "Accept": "text/html,application/xhtml+xml"})
-            html = resp.text
-            if resp.status_code != 200:
-                raise _http.HttpError(
-                    f"HTTP {resp.status_code} — a non-200 is not a verdict about "
-                    f"the site's rendering")
-        except Exception as exc:  # noqa: BLE001
-            row["error"] = str(exc)[:200]
+        # Repeat-fetch agreement, the same rule `survey` applies. A verdict
+        # about somebody's site should not rest on one request: a challenge
+        # page, a rate limit or an edge node having a bad minute all classify
+        # perfectly and mean nothing. The richest body is kept for the
+        # verdict, because a truncated response reads as a worse posture than
+        # the site deserves.
+        samples: list[tuple[str, object]] = []      # (html, PageProfile)
+        postures: list[str] = []
+        err = ""
+        for i in range(repeat):
+            if i:
+                time.sleep(1.5)
+            try:
+                resp = _http.raw_get(url, timeout=25, headers={
+                    "Accept": "text/html,application/xhtml+xml"})
+                if resp.status_code != 200:
+                    postures.append(f"HTTP{resp.status_code}")
+                    err = (f"HTTP {resp.status_code} — a non-200 is not a "
+                           f"verdict about the site's rendering")
+                    continue
+                pr = fw.profile(resp.text)
+                samples.append((resp.text, pr))
+                postures.append(pr.posture)
+            except Exception as exc:  # noqa: BLE001
+                err = str(exc)[:200]
+                postures.append("error")
+        if not samples:
+            row["error"] = err
             out_rows.append(row)
             if not args.json:
-                print(f"\n{url}\n  could not fetch: {row['error'][:100]}")
+                print(f"\n{url}\n  could not fetch: {err[:100]}")
             continue
+        row["attempts"] = repeat
+        row["postures_seen"] = postures
+        if len(set(postures)) > 1:
+            row["verdict"] = "unstable"
+            out_rows.append(row)
+            if not args.json:
+                print(f"\n{url}")
+                print(f"  UNSTABLE — {repeat} fetches disagreed: "
+                      f"{' / '.join(postures)}")
+                print("  No verdict. A page that classifies differently on "
+                      "consecutive requests is")
+                print("  telling you about the network between you and it, "
+                      "not about itself.")
+            continue
+        html, prof = max(samples, key=lambda bp: bp[1].bytes_total)
 
-        prof = fw.profile(html)
         verdict, why = fw.VERDICTS[prof.posture]
         row.update({"framework": prof.framework, "posture": prof.posture,
                     "verdict": verdict, "bytes": prof.bytes_total,
@@ -1464,6 +1498,8 @@ def main(argv: list[str] | None = None) -> int:
     cw.add_argument("urls", nargs="+", help="one or more page URLs")
     cw.add_argument("--find", help="check whether this exact string is agent-visible")
     cw.add_argument("--json", action="store_true", help="machine-readable output")
+    cw.add_argument("--repeat", type=int, default=2,
+                    help="fetch this many times and require agreement (default 2)")
     cw.set_defaults(fn=cmd_crawlability)
 
     rt = sub.add_parser("routes",

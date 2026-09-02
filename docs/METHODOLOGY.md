@@ -175,6 +175,8 @@ actually made here, in this repository, in the form described.
 | twice the spend and every rate doubled | two cron runs overlapping | an advisory lock; a second run exits zero saying it was early |
 | "Eight commands take `--json`" | a sentence written once and never re-read | the README's list and its count are checked against the argument parser |
 | "distinguishable, p = 0.03" | one of fifteen pairwise tests, each judged against a raw 0.05 — a 54% chance of at least one spurious call | Holm–Bonferroni across the whole family; the verdict uses the adjusted value |
+| a 32 MB bound, "twice the largest seen" | five packuments measured in compressed bytes, none of them the largest | the bound is sized from the collector's own decompressed measurement of every package that failed, and the comment says which megabyte |
+| a quiet five-minute poll | the same 30 MB packument fetched 288 times a day per subject, because late drops were never remembered | late drops advance the high-water mark; the second poll must fetch zero packuments |
 | 78% recall | possibly 78% minus an unmeasured false-positive rate | every payload is re-graded against a counterfactual answer that was never published |
 | an analysis plan declaring `exa/base` | the runner dispatches `exa/auto`; every real arm would have read "exploratory" and every declared arm "produced nothing" | the plan's arms and ladder are asserted equal to `data/settings.yaml` |
 
@@ -193,6 +195,32 @@ locking is available on this platform. CI proves the repository was correct at
 a commit; this proves the installation is correct now. The distinction is not
 pedantic — the spend-cap bug and the overlapping-cron bug were both properties
 of a deployment, not of a diff.
+
+## Which mode of each provider, and why that is a decision
+
+Every provider here sells more than one tier, and the arms in
+`data/settings.yaml` pick one or two of them. That choice is not neutral and
+this section exists so it is not silent.
+
+As registered, the plan probes two Parallel modes, `base` and `pro`, and one
+mode each of Exa (`auto`), Tavily (`basic`), Brave (`web`) and Serper
+(`search`). Parallel also sells `turbo` and `fast` at a fifth of the price of
+the two selected; they are priced in `data/providers.yaml` and not probed.
+
+That is a comparison of one vendor's two premium tiers against four other
+vendors' defaults. It can be defended — the question the project asks is
+"how fresh can this API be", and a premium tier is the fairest answer to that
+— but it is a choice, it affects the cost column directly, and it gives one
+provider two rows in a table where the others have one. A reader from any of
+these companies will notice it before they notice anything else.
+
+It is recorded here rather than resolved here because it is a decision about
+whose money buys which measurement, and it must be made **before the first
+probe** — after that it is a plan change, and the lock will say so. The
+alternatives, each with a cost: one arm per provider at each vendor's
+cheapest tier (comparable, and unflattering to everyone); one arm per
+provider at each vendor's best tier (comparable, and the most expensive run);
+or two tiers for every vendor (symmetric, and doubles the bill).
 
 ## The number of comparisons a leaderboard invites
 

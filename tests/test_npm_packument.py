@@ -117,3 +117,161 @@ def test_discover_names_the_failing_subjects(wired, monkeypatch, capsys):
     out = capsys.readouterr().out
     assert "2/3 subjects failed" in out
     assert "next" in out and "vite" in out
+
+
+# ---------------------------------------------------------------------------
+# Change detection: the 300-byte question before the 30 MB document
+# ---------------------------------------------------------------------------
+
+def _spy(monkeypatch):
+    """Record what the npm source fetches, classified by URL.
+
+    Only `get_json_sized` is wrapped: `get_json` delegates to it, so wrapping
+    both counts one dist-tags request twice. "tags" is the 300-byte question;
+    "packument" is the document that runs to tens of megabytes.
+    """
+    calls: list[str] = []
+    real = npm_mod.http.get_json_sized
+
+    def sized(url, **kw):
+        calls.append("tags" if url.endswith("/dist-tags") else "packument")
+        return real(url, **kw)
+    monkeypatch.setattr(npm_mod.http, "get_json_sized", sized)
+    return calls
+
+
+def test_an_unchanged_subject_never_fetches_the_packument(wired, monkeypatch):
+    """The hot path. On a five-minute cadence almost every poll sees no
+    change, and the full document -- 31 MB for `next` -- must not be asked
+    for. Only dist-tags is."""
+    now = time.time()
+    wired.publish_npm("big", _fresh(now), pad_bytes=200_000)
+    _watch(monkeypatch, "big")
+    calls = _spy(monkeypatch)
+    src = sources.get("npm")
+    assert src.collect({("npm", "big"): "1.0.1"}) == []
+    assert calls == ["tags"], calls
+
+
+def test_a_prerelease_latest_is_skipped_before_the_packument_is_fetched(wired, monkeypatch):
+    """prisma's dist-tags said latest=8.0.0-rc.12 on the live registry. The
+    collector already skipped prereleases; it should do so without first
+    downloading 44 MB to find out."""
+    now = time.time()
+    wired.publish_npm("rc", [("1.0.0", now - 90_000), ("2.0.0-rc.1", now - 20)])
+    _watch(monkeypatch, "rc")
+    calls = _spy(monkeypatch)
+    assert sources.get("npm").collect({}) == []
+    assert calls == ["tags"]
+
+
+def test_a_changed_subject_fetches_the_packument_and_yields_the_event(wired, monkeypatch):
+    now = time.time()
+    wired.publish_npm("moved", _fresh(now))
+    _watch(monkeypatch, "moved")
+    calls = _spy(monkeypatch)
+    got = sources.get("npm").collect({("npm", "moved"): "1.0.0"})
+    assert [(e.answer, e.predecessor) for e in got] == [("1.0.1", "1.0.0")]
+    assert calls == ["tags", "packument"]
+
+
+# ---------------------------------------------------------------------------
+# The high-water mark advances past late drops
+# ---------------------------------------------------------------------------
+
+def _stale_watch(wired, monkeypatch, now):
+    wired.publish_npm("old", [("2.0.0", now - 400_000), ("2.0.1", now - 200_000)])
+    _watch(monkeypatch, "old")
+    monkeypatch.setitem(config._cache, "settings", {
+        "sources": ["npm"], "max_detection_lag_seconds": 600,
+        "ladder": [300], "origin_control": False, "arms": []})
+
+
+def test_a_late_drop_is_not_refetched_on_the_next_poll(wired, monkeypatch, tmp_path):
+    """The bandwidth bug. Dropped-late events were never written anywhere, so
+    the collector had no memory of them and asked for the same document on
+    every poll. Against the live registry that was roughly a gigabyte per
+    five-minute cycle on a stale watchlist."""
+    from tti import scheduler
+    from tti.ledger import Ledger
+    now = time.time()
+    _stale_watch(wired, monkeypatch, now)
+    led = Ledger(tmp_path)
+
+    first = scheduler.discover(led, verbose=False)
+    assert (first.collected, first.dropped_late, first.new_events) == (1, 1, 0)
+    assert led.seen_path.exists()
+    assert led.seen_subjects() == {("npm", "old"): "2.0.1"}
+
+    calls = _spy(monkeypatch)
+    second = scheduler.discover(led, verbose=False)
+    assert (second.collected, second.dropped_late) == (0, 0)
+    # dist-tags asked, packument never touched
+    assert calls == ["tags"]
+
+
+def test_a_dry_run_does_not_advance_the_mark(wired, monkeypatch, tmp_path):
+    from tti import scheduler
+    from tti.ledger import Ledger
+    now = time.time()
+    _stale_watch(wired, monkeypatch, now)
+    led = Ledger(tmp_path)
+    rep = scheduler.discover(led, verbose=False, dry_run=True)
+    assert rep.dropped_late == 1
+    assert not led.seen_path.exists()
+    assert led.seen_subjects() == {}
+
+
+def test_marking_the_same_answer_twice_writes_once(tmp_path):
+    from tti.ledger import Ledger
+    from tti.models import Event
+    led = Ledger(tmp_path)
+    e = Event(source="npm", source_class="package_registry", subject="p",
+              published_at=1.0, discovered_at=2.0, question="q", answer="1.0.0")
+    assert led.mark_seen([e], "detected_late") == 1
+    assert led.mark_seen([e], "detected_late") == 0
+    with open(led.seen_path, encoding="utf-8") as fh:
+        assert sum(1 for _ in fh) == 1
+
+
+def test_a_future_clock_drop_is_not_marked(wired, monkeypatch, tmp_path):
+    """Marking it would silently lose the event when its timestamp becomes
+    valid. It is an error, and errors are not high-water marks."""
+    from tti import scheduler
+    from tti.ledger import Ledger
+    now = time.time()
+    wired.publish_npm("ahead", [("1.0.0", now - 90_000), ("1.0.1", now + 3600)])
+    _watch(monkeypatch, "ahead")
+    monkeypatch.setitem(config._cache, "settings", {
+        "sources": ["npm"], "max_detection_lag_seconds": 600,
+        "max_clock_skew_seconds": 120,
+        "ladder": [300], "origin_control": False, "arms": []})
+    rep = scheduler.discover(Ledger(tmp_path), verbose=False)
+    assert rep.dropped_future == 1
+    assert not (tmp_path / "seen.jsonl").exists()
+
+
+def test_the_later_record_wins_across_the_two_files(tmp_path):
+    """events.jsonl and seen.jsonl are appended independently; file order
+    says nothing about wall-clock order between them."""
+    from tti.ledger import Ledger
+    from tti.models import Event
+    led = Ledger(tmp_path)
+    older = Event(source="npm", source_class="package_registry", subject="p",
+                  published_at=1.0, discovered_at=100.0, question="q", answer="1.0.0")
+    led.add_events([older])
+    newer = Event(source="npm", source_class="package_registry", subject="p",
+                  published_at=2.0, discovered_at=200.0, question="q", answer="1.0.1")
+    led.mark_seen([newer], "detected_late")
+    assert led.seen_subjects()[("npm", "p")] == "1.0.1"
+    # and the reverse: a newer real event outranks an older mark
+    led2 = Ledger(tmp_path / "b")
+    led2.mark_seen([older], "detected_late")
+    import json as _j
+    # force the mark's timestamp to be older than the event's discovered_at
+    with open(led2.seen_path, encoding="utf-8") as fh:
+        rows = [_j.loads(line) for line in fh]
+    rows[0]["marked_at"] = 50.0
+    led2.seen_path.write_text("\n".join(_j.dumps(r) for r in rows) + "\n")
+    led2.add_events([newer])
+    assert led2.seen_subjects()[("npm", "p")] == "1.0.1"

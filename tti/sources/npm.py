@@ -18,21 +18,35 @@ from ..models import Event
 from . import BaseSource, register
 
 API = "https://registry.npmjs.org/{pkg}"
+# ~300 bytes: the current dist-tags and nothing else. Asked first, on every
+# poll. The full packument is fetched only when `latest` differs from the
+# high-water mark, which on a five-minute cadence is almost never.
+DIST_TAGS = "https://registry.npmjs.org/-/package/{pkg}/dist-tags"
 
 # The full packument is the only document that carries the `time` map, and
-# for a package with thousands of releases it is large. Measured on
-# 2026-09-02, live: antd 8.4 MB, @types/node 11.1 MB, aws-sdk 10.6 MB,
-# typescript 15.6 MB, react-native 15.8 MB. The abbreviated packument
-# (Accept: application/vnd.npm.install-v1+json) is smaller but has no `time`
-# map, so it cannot be used here. The module-wide 8 MB cap refused twelve of
-# the forty-six watched packages on the first live run, `next` among them.
+# for a package with thousands of releases it is large. Measured 2026-09-02
+# through this module's own fetch path, i.e. decompressed bytes as the
+# collector sees them: prisma 43.8 MB, vite 38.9, next 31.2, firebase 30.2,
+# wrangler 29.6, storybook 24.1, typescript 15.6, antd 8.4.
 #
-# 32 MB is roughly twice the largest seen. Packuments only grow, so the
-# warning threshold exists to make the next crossing visible in `doctor` and
-# `discover` output well before it becomes a failure. Peak memory is bounded
-# by the fan-out pool (8 workers), not by the watchlist length.
-PACKUMENT_CAP = 32_000_000
-PACKUMENT_WARN = 24_000_000
+# A correction. The first version of this bound was 32 MB, described as
+# "roughly twice the largest seen". It was sized from five packages measured
+# with curl -- which reports compressed wire bytes, several times smaller than
+# what this code reads -- and the five did not include next, prisma or vite.
+# The bound refused two packages and sat within 1 MB of a third on its first
+# live run. The number below comes from the collector's own measurement of
+# every package that failed, and is written down that way so the next person
+# knows which kind of megabyte it is.
+#
+# The abbreviated packument (Accept: application/vnd.npm.install-v1+json) is
+# not a way out: it has no `time` map, and for `next` it is 25.5 MB anyway.
+#
+# 96 MB is ~2.2x the largest seen. With dist-tags change-detection the full
+# fetch is a per-release event, not a per-poll one, so this bound is the
+# cold-start path. Peak memory is workers x bound; workers is 4 for that
+# reason.
+PACKUMENT_CAP = 96_000_000
+PACKUMENT_WARN = 72_000_000
 
 
 def _iso(s: str) -> float:
@@ -46,6 +60,8 @@ def _is_prerelease(v: str) -> bool:
 class Npm(BaseSource):
     name = "npm"
     source_class = "package_registry"
+    # Bounds peak memory at workers x PACKUMENT_CAP on a cold start.
+    workers = 4
 
     def collect(self, seen):
         return self.fan_out(lambda pkg: self._one(pkg, seen),
@@ -53,7 +69,25 @@ class Npm(BaseSource):
 
     def _one(self, pkg: str, seen) -> list[Event]:
             out: list[Event] = []
-            doc, size = http.get_json_sized(API.format(pkg=pkg), timeout=15.0,
+            # Cheap question first. If the answer has not changed since the
+            # last poll, or is a prerelease we would skip anyway, the 30 MB
+            # document is never requested.
+            tags = http.get_json(DIST_TAGS.format(pkg=pkg), timeout=15.0)
+            if not isinstance(tags, dict):
+                # Raised, not swallowed. A dist-tags endpoint answering with
+                # something other than an object for every subject is the
+                # registry having changed its API, and that must read as a
+                # broken source -- not as forty-six quiet packages.
+                raise ValueError(
+                    f"dist-tags response was not an object "
+                    f"({type(tags).__name__})")
+            latest = tags.get("latest")
+            if not latest or _is_prerelease(latest):
+                return out
+            if seen.get((self.name, pkg)) == latest:
+                return out
+
+            doc, size = http.get_json_sized(API.format(pkg=pkg), timeout=60.0,
                                             max_bytes=PACKUMENT_CAP)
             if size >= PACKUMENT_WARN:
                 self.warnings.append(

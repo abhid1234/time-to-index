@@ -171,6 +171,11 @@ class Handler(BaseHTTPRequestHandler):
 
         if path == "/robots.txt":
             return self._send(200, srv.robots, "text/plain")
+        if path.startswith("/npm/-/package/") and path.endswith("/dist-tags"):
+            pkg = path[len("/npm/-/package/"):-len("/dist-tags")]
+            doc = srv.npm.get(pkg)
+            return self._send(200, json.dumps(doc["dist-tags"]), "application/json") \
+                if doc else self._send(404, "{}", "application/json")
         if path.startswith("/npm/"):
             pkg = path[len("/npm/"):]
             doc = srv.npm.get(pkg)
@@ -246,6 +251,8 @@ def wired(origin, monkeypatch, tmp_path):
     from tti.sources import pypi as pypi_mod
 
     monkeypatch.setattr(npm_mod, "API", origin.base + "/npm/{pkg}")
+    monkeypatch.setattr(npm_mod, "DIST_TAGS",
+                        origin.base + "/npm/-/package/{pkg}/dist-tags")
     monkeypatch.setattr(pypi_mod, "API", origin.base + "/pypi/{pkg}/json")
     monkeypatch.setattr(config, "RUNS", tmp_path)
     monkeypatch.setitem(config._cache, "watchlist", {"npm": [], "pypi": []})
