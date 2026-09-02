@@ -254,7 +254,7 @@ stale hit. The stored payload is the 1,601-character excerpt window by
 design; the grader read that, not a full body. First real control-arm
 result the project has produced.
 
-*The crawlability figures the pitch memo cites*, each fetched three times
+*The crawlability figures the README cites*, each fetched three times
 with agreement required:
 
 | page | posture | visible / served |
@@ -269,7 +269,7 @@ with agreement required:
 | rubygems.org/gems/rails | static_html | 2,377 / 63,794 |
 
 All eight allow all twelve AI crawler user-agents in robots.txt. The three
-numbers the memo leads with — 32, 9, 93,012 — reproduce to the character.
+numbers the README leads with — 32, 9, 93,012 — reproduce to the character.
 
 One behaviour worth knowing about crates.io: with no `User-Agent` header at
 all it returns 403; with a UA but no `Accept: text/html` it returned 404 on
@@ -341,7 +341,7 @@ was treated, not how the site renders for a crawler in good standing.
 **2026-09-02, `tti survey` on the eight reachable pages, three fetches each.**
 Five of eight readable, crates.io and Bitbucket named as allowing every AI
 crawler and shipping nothing, GitLab metadata-only with breadcrumb JSON-LD, no
-false interception across eight distinct hosts. The memo's narrative
+false interception across eight distinct hosts. The README's narrative
 reproduces end to end through the tool that produced it.
 
 **2026-09-02, not a bug.** `tti prereg` appeared to exit 1 on the first real
