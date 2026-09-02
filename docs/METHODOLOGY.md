@@ -178,6 +178,7 @@ actually made here, in this repository, in the form described.
 | a 32 MB bound, "twice the largest seen" | five packuments measured in compressed bytes, none of them the largest | the bound is sized from the collector's own decompressed measurement of every package that failed, and the comment says which megabyte |
 | a quiet five-minute poll | the same 30 MB packument fetched 288 times a day per subject, because late drops were never remembered | late drops advance the high-water mark; the second poll must fetch zero packuments |
 | two Parallel arms, `base` and `pro` | Task API processor names in a Search API adapter, against a retired endpoint; every probe would 403 | the adapter is checked against the published OpenAPI document, and a test asserts every configured arm is a mode its adapter declares |
+| Brave's freshness column | a `freshness=pd` filter no other arm carried, removing stale competitors at short rungs and the correct document at 72 h | every arm receives the same request shape; a per-adapter request test pins it |
 | 78% recall | possibly 78% minus an unmeasured false-positive rate | every payload is re-graded against a counterfactual answer that was never published |
 | an analysis plan declaring `exa/base` | the runner dispatches `exa/auto`; every real arm would have read "exploratory" and every declared arm "produced nothing" | the plan's arms and ladder are asserted equal to `data/settings.yaml` |
 
@@ -409,6 +410,16 @@ that hides the denominator is advertising.
 
 Prices come from `data/providers.yaml`, where each one carries the vendor
 page it was read from and the date it was last checked by hand.
+
+Where a vendor states its own charge in the response — Exa does, as
+`costDollars.total` — that number is recorded on the result instead, marked
+`cost_source: reported`, and the day's spend is settled to it. The cap still
+gates dispatch on the list estimate; settlement records what was actually
+billed, with no cap check, because a call that has already happened has
+already cost what it cost. When the two disagree by more than half, the
+result says so in its note. A price table that has drifted from what vendors
+charge is a cost column that is wrong, and this is how it becomes visible
+before an invoice does.
 
 ## Spend cap
 

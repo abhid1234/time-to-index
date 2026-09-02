@@ -1,9 +1,17 @@
 """Serper (Google SERP relay). POST https://google.serper.dev/search.
 
-Included as the control arm. Serper is a thin pass-through to Google's own
-index, so it answers a question the other arms cannot: how much of a
-provider's indexing lag is its own crawler, and how much is the open web
-simply not having the document yet.
+A reference arm, not the control. The control is the origin fetch, which
+asks whether the document was reachable at all. Serper is a thin
+pass-through to Google's index, so it offers a second reference point: how a
+general-purpose index that is not selling itself as an agent tool fares on
+the same questions at the same rungs. It is not ground truth for what is
+indexable, and nothing here treats it as such.
+
+Verified 2026-09-02: `X-API-KEY` header, `q`, `num`; results under
+`organic[]` with `snippet`. One credit buys up to ten results, two credits
+for eleven to a hundred; `num` here is five. Priced at the entry pack,
+$1.00 per 1,000 queries; volume packs go to $0.30 and a benchmark is not
+going to buy twelve million queries, so the entry rate is the honest one.
 """
 
 from __future__ import annotations

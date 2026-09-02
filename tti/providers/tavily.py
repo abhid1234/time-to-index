@@ -1,4 +1,12 @@
-"""Tavily. POST https://api.tavily.com/search, bearer auth."""
+"""Tavily. POST https://api.tavily.com/search, bearer auth.
+
+Verified against Tavily's published OpenAPI document and pricing page on
+2026-09-02: `search_depth` is one of `basic`, `advanced`, `fast`,
+`ultra-fast` (default `basic`); `max_results` default 5, max 20; `basic`,
+`fast` and `ultra-fast` cost one credit, `advanced` two; pay-as-you-go is
+$0.008 per credit. `include_answer` is off because this benchmark grades
+retrieval, not summarisation. No `time_range` or date filter is sent.
+"""
 
 from __future__ import annotations
 
@@ -12,7 +20,7 @@ class Tavily:
     name = "tavily"
 
     def modes(self) -> list[str]:
-        return ["basic", "advanced"]
+        return ["basic", "advanced", "fast", "ultra-fast"]
 
     def available(self) -> bool:
         return config.api_key("TAVILY_API_KEY") is not None

@@ -191,3 +191,20 @@ message, rather than letting the API 403 and having that graded as an outage.
 against Parallel's 3–6-keyword guidance, deliberately — see the adapter
 docstring.
 
+**2026-09-02, the other four adapters, from the published specs.** Same
+exercise as Parallel, same night. Brave sent `freshness=pd` — a last-24-hours
+filter no other arm carried and nothing in the repository justified; it is
+gone, and the adapter docstring says why it was wrong in both directions. Exa
+declared `keyword` and `neural`, neither a documented type any more, and was
+priced at $5 with 25 results included when it is $7 with ten — a 29%
+understatement of the configured arm's cost. Exa also reports the actual
+charge in every response, and the ledger now records it. Tavily was correct in
+every field. Serper's pricing was correct at the entry pack, and its docstring
+called it "the control arm", which it is not — the origin fetch is; it is a
+reference point, and treating a general index as ground truth for what is
+indexable was never the claim.
+
+A generic test now asserts that every mode any adapter *declares* is priced,
+not only the configured ones. An unpriced mode is $0.00 in the cost column,
+which is the cheapest way to win a benchmark.
+

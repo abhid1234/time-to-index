@@ -30,6 +30,8 @@ class Budget:
         self.day = day
         self.refused = 0
         self.refunded = 0.0
+        self.reconciled_delta = 0.0
+        self.settled = 0
 
     def remaining(self) -> float:
         return max(0.0, self.cap - self.spent)
@@ -65,6 +67,21 @@ class Budget:
         if day != self.day:
             self.day = day
             self.spent = spent_today
+
+    def settle(self, estimate: float, actual: float) -> None:
+        """Replace a reserved list-price estimate with the vendor's own charge.
+
+        No cap check. The call has already happened and the vendor has
+        already billed it; refusing to record a settlement that crosses the
+        cap would understate what was spent, which is the one thing a spend
+        cap must never do. The cap gates dispatch on the estimate; settlement
+        records reality. The running delta is kept so a table of list prices
+        that has drifted from what vendors actually charge shows up as a
+        number rather than as a surprise on an invoice.
+        """
+        self.spent = max(0.0, self.spent - estimate + actual)
+        self.reconciled_delta += actual - estimate
+        self.settled += 1
 
     def charge(self, cost: float) -> None:
         if not self.can_afford(cost):

@@ -22,31 +22,47 @@ providers:
       advanced: {usd_per_1k_requests: 5.0, usd_per_1k_extra_results: 1.0, results_included: 10}
 
   exa:
-    docs: https://docs.exa.ai/reference/pricing
-    pricing_checked: "2026-08-26"
+    docs: https://exa.ai/pricing
+    # $7 per 1k for auto/fast/instant, ten results and text included, $1 per
+    # 1k results above ten. The previous entry said $5 with 25 included and
+    # priced `keyword`, which is no longer a documented search type. Exa also
+    # states the actual charge in every response (costDollars.total); the
+    # ledger records that when present.
+    pricing_checked: "2026-09-02"
     env: EXA_API_KEY
     modes:
-      auto:     {usd_per_1k_requests: 5.0, results_included: 25}
-      keyword:  {usd_per_1k_requests: 2.5, results_included: 25}
+      auto:           {usd_per_1k_requests: 7.0,  usd_per_1k_extra_results: 1.0, results_included: 10}
+      fast:           {usd_per_1k_requests: 7.0,  usd_per_1k_extra_results: 1.0, results_included: 10}
+      instant:        {usd_per_1k_requests: 7.0,  usd_per_1k_extra_results: 1.0, results_included: 10}
+      deep-lite:      {usd_per_1k_requests: 12.0, usd_per_1k_extra_results: 1.0, results_included: 10}
+      deep:           {usd_per_1k_requests: 12.0, usd_per_1k_extra_results: 1.0, results_included: 10}
+      deep-reasoning: {usd_per_1k_requests: 15.0, usd_per_1k_extra_results: 1.0, results_included: 10}
 
   tavily:
-    docs: https://tavily.com/pricing
-    pricing_checked: "2026-08-26"
+    docs: https://www.tavily.com/pricing
+    # One credit for basic/fast/ultra-fast, two for advanced, at $0.008 per
+    # credit pay-as-you-go. max_results default 5, max 20; no per-result fee.
+    pricing_checked: "2026-09-02"
     env: TAVILY_API_KEY
     modes:
-      basic:    {usd_per_1k_requests: 8.0, results_included: 10}
-      advanced: {usd_per_1k_requests: 16.0, results_included: 10}
+      basic:      {usd_per_1k_requests: 8.0,  results_included: 20}
+      fast:       {usd_per_1k_requests: 8.0,  results_included: 20}
+      ultra-fast: {usd_per_1k_requests: 8.0,  results_included: 20}
+      advanced:   {usd_per_1k_requests: 16.0, results_included: 20}
 
   brave:
     docs: https://brave.com/search/api/
-    pricing_checked: "2026-08-26"
+    # $5 per 1k requests, count up to 20, no per-result fee.
+    pricing_checked: "2026-09-02"
     env: BRAVE_API_KEY
     modes:
       web:      {usd_per_1k_requests: 5.0, results_included: 20}
 
   serper:
-    docs: https://serper.dev/pricing
-    pricing_checked: "2026-08-26"
+    docs: https://serper.dev/
+    # Entry pack: $50 for 50k credits, $1.00 per 1k. One credit covers up to
+    # ten results; eleven to a hundred costs two. Volume packs reach $0.30.
+    pricing_checked: "2026-09-02"
     env: SERPER_API_KEY
     modes:
       search:   {usd_per_1k_requests: 1.0, results_included: 10}

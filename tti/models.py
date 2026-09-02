@@ -141,6 +141,9 @@ class ProbeResult:
     n_results: int = 0
     chars: int = 0
     cost_usd: float = 0.0
+    # "list": priced from data/providers.yaml. "reported": the vendor stated
+    # the charge in its response and that number was recorded instead.
+    cost_source: str = "list"
     raw_ref: str = ""          # relative path to the stored raw payload
     note: str = ""             # error text, or skip reason
 

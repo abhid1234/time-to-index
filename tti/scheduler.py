@@ -312,6 +312,7 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
             rep.dispatched += 1
             continue
 
+        prov = None if is_control else providers.get(probe.provider)
         t0 = time.perf_counter()
         try:
             if is_control:
@@ -322,7 +323,7 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
                 if question is None:
                     raise RuntimeError(
                         f"phrasing {probe.phrasing} unavailable for {event.source}")
-                payload = providers.get(probe.provider).search(
+                payload = prov.search(
                     question, probe.mode,
                     max_results=max_results, max_chars=max_chars)
         except Exception as exc:  # noqa: BLE001
@@ -357,6 +358,21 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
                     + (f" render={render}" if render else ""))
         raw_ref = ledger.store_raw(probe.provider, probe.probe_id, payload)
 
+        # Where the vendor states its own charge in the response, record that
+        # instead of this repository's reading of a price list. The cap was
+        # reserved on the list estimate; settle the difference now, and say
+        # so on the result when the two disagree by more than half, because
+        # a price table that has drifted is a cost column that is wrong.
+        cost_source = "list"
+        hook = getattr(prov, "reported_cost", None) if prov is not None else None
+        actual = hook(payload) if hook else None
+        if actual is not None:
+            budget.settle(cost, actual)
+            if cost > 0 and abs(actual - cost) > 0.5 * cost:
+                note = (note + " " if note else "") + \
+                    f"cost: reported ${actual:.4f} vs list ${cost:.4f}"
+            cost, cost_source = actual, "reported"
+
         out.append(ProbeResult(
             probe_id=probe.probe_id, event_id=event.event_id,
             provider=probe.provider, mode=probe.mode, rung=probe.rung,
@@ -364,7 +380,7 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
             requested_at=now, lag=lag, verdict=verdict, latency_ms=latency,
             matched_fresh=fresh_hits, matched_stale=stale_hits,
             n_results=_count_results(payload), chars=chars,
-            cost_usd=cost, raw_ref=raw_ref, note=note))
+            cost_usd=cost, cost_source=cost_source, raw_ref=raw_ref, note=note))
 
         rep.dispatched += 1
         rep.spend_usd += cost
