@@ -1,7 +1,7 @@
 """`tti crawlability --repeat`: one request is not a verdict.
 
 `survey` already required agreement across repeat fetches. `crawlability`
-did not, and the Mason handoff told people to run it with `--repeat 3` -- a
+did not, and the setup notes told people to run it with `--repeat 3` -- a
 flag it did not have. Now it does, with the same rule.
 """
 from __future__ import annotations
