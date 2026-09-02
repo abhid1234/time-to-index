@@ -86,6 +86,7 @@ def test_fmt_chars_refuses_to_render_a_non_measurement():
     assert fmt_chars(150) == "150 chars"
     assert fmt_chars(1450) == "1.4k chars"
     assert fmt_chars(12_000) == "12k chars"
+    assert fmt_chars(1450, unit=False) == "1.4k"
 
 
 def test_the_column_reaches_markdown_html_and_json(tmp_path, capsys):
@@ -102,7 +103,7 @@ def test_the_column_reaches_markdown_html_and_json(tmp_path, capsys):
     assert main(["--run-dir", str(tmp_path), "report", "--out", str(out)]) == 0
     html = (out / "index.html").read_text()
     md = (out / "RESULTS.md").read_text()
-    assert "text served" in html and "per result" in html
+    assert "text served" in html and "chars / result" in html
     assert "| text/result |" in md
 
 

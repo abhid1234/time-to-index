@@ -196,19 +196,23 @@ def _cpf(v: float) -> str:
     return f"${v*1000:.2f}"
 
 
-def fmt_chars(v: float) -> str:
+def fmt_chars(v: float, unit: bool = True) -> str:
     """Characters the grader read per result, as a short number.
 
     Formatter contract as everywhere else: anything that is not a finite,
-    non-negative number renders as a dash rather than as a claim.
+    non-negative number renders as a dash rather than as a claim. `unit`
+    off is for the HTML table, whose header carries the unit and whose
+    width is already spoken for.
     """
     if not isinstance(v, (int, float)) or v != v or v in (float("inf"), float("-inf")) or v < 0:
         return "—"
     if v >= 10_000:
-        return f"{v/1000:.0f}k chars"
-    if v >= 1_000:
-        return f"{v/1000:.1f}k chars"
-    return f"{v:.0f} chars"
+        n = f"{v/1000:.0f}k"
+    elif v >= 1_000:
+        n = f"{v/1000:.1f}k"
+    else:
+        n = f"{v:.0f}"
+    return f"{n} chars" if unit else n
 
 
 def _pct(t: tuple[float, float, float]) -> str:
@@ -288,7 +292,7 @@ _CSS = """
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
      font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
-.wrap{max-width:980px;margin:0 auto;padding:48px 24px 80px}
+.wrap{max-width:1100px;margin:0 auto;padding:48px 24px 80px}
 h1{font-size:30px;letter-spacing:-.02em;margin:0 0 6px;text-wrap:balance}
 h2{font-size:15px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);
    margin:44px 0 14px;font-weight:600}
@@ -298,9 +302,9 @@ h2{font-size:15px;text-transform:uppercase;letter-spacing:.09em;color:var(--mute
 table{width:100%;border-collapse:collapse;font-size:13.5px;
       font-variant-numeric:tabular-nums}
 th{text-align:left;font-weight:600;color:var(--muted);font-size:11px;
-   text-transform:uppercase;letter-spacing:.07em;padding:0 12px 9px 0;
+   text-transform:uppercase;letter-spacing:.06em;padding:0 10px 9px 0;
    border-bottom:1px solid var(--line);white-space:nowrap}
-td{padding:9px 12px 9px 0;border-bottom:1px solid var(--grid)}
+td{padding:9px 10px 9px 0;border-bottom:1px solid var(--grid)}
 tr:last-child td{border-bottom:none}
 td.k{font-family:var(--mono);font-size:12.5px}
 .scroll{overflow-x:auto}
@@ -685,7 +689,7 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
         f"{_pct(sc.staleness)}</td>"
         + (f"<td class='k'>{_pct(sc.phrasing_agreement)}</td>" if any_phrasing else "")
         + f"<td class='k'>{sc.p50_latency_ms:.0f}ms</td>"
-        f"<td class='k'>{fmt_chars(sc.chars_per_result_p50)}</td>"
+        f"<td class='k'>{fmt_chars(sc.chars_per_result_p50, unit=False)}</td>"
         f"<td class='k'>${(sc.spend_usd / sc.n_events * 1000) if sc.n_events else 0:.2f}</td>"
         + f"<td class='k'>{_cpf(sc.cost_per_fresh_24h)}</td>"
         + f"<td class='k'>{sc.n_events}</td></tr>")
@@ -851,7 +855,7 @@ Generated {gen}.</p>
     <th>p90</th><th>24h recall</th>
     <th>24h recall<br><span style="text-transform:none;letter-spacing:0">vs origin</span></th>
     <th>staleness</th>{ph_head}<th>p50 latency</th>
-    <th>text served<br><span style="text-transform:none;letter-spacing:0">per result</span></th>
+    <th>text served<br><span style="text-transform:none;letter-spacing:0">chars / result</span></th>
     <th>$/1k events</th>
     <th>$/1k fresh<br><span style="text-transform:none;letter-spacing:0">answers</span></th>
     <th>events</th></tr></thead>
@@ -872,6 +876,14 @@ Generated {gen}.</p>
   A freshness win bought at 5&#215; the price is a different product decision than a
   freshness win at parity, and a leaderboard that hides the denominator is
   advertising.</p>
+  <p class="note">Text served is the median number of characters the grader read per
+  returned result. Every arm is asked for the same 1,500; only the APIs that take a
+  characters parameter honour it, and a snippet API returns ~150 regardless. The
+  grader reads whatever came back, because that is what an agent gets &#8212; but a
+  tenfold difference in this column is a tenfold difference in the surface a version
+  string can appear on, and part of any recall gap lives there. The
+  <code>snippet-window</code> sensitivity variant below re-grades every arm as though it
+  had returned short snippets.</p>
   <p class="note">Median is a Turnbull nonparametric MLE for interval-censored data,
   reported as the interval the estimate actually pins down. An arm seen absent at 15m
   and fresh at 1h indexed somewhere in (15m, 1h] &#8212; it did not index <i>at</i> 1h, and
