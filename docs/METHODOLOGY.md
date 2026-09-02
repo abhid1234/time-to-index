@@ -501,7 +501,7 @@ Stated up front, because a benchmark that only lists its strengths is a
 marketing page.
 
 - **Watchlist composition.** 46 npm packages, 48 PyPI projects, 30 GitHub
-  repositories and a handful of filers and feeds is not the web. A provider
+  repositories, 27 SEC filers and 6 arXiv categories is not the web. A provider
   tuned for developer content will look better here than it would on a
   general corpus. The watchlist is a YAML file; fork it and find out.
 - **Ladder resolution.** Anything faster than 5 minutes reads as "≤5m".
