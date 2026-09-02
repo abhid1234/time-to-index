@@ -1309,6 +1309,8 @@ def cmd_watch(args) -> int:
               f"contribute nothing:")
         for u in cov.never_judged[:8]:
             print(f"  {u}")
+        if len(cov.never_judged) > 8:
+            print(f"  … and {len(cov.never_judged) - 8} more (all of them in the JSON form)")
 
     if getattr(args, "out_dir", None):
         if sv is None:

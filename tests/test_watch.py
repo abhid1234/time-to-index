@@ -178,3 +178,19 @@ def test_cli_watch_report_only_needs_history(tmp_path, capsys):
     from tti.cli import main
     assert main(["--run-dir", str(tmp_path), "watch", "--report"]) == 1
     assert "no history yet" in capsys.readouterr().out
+
+
+def test_the_never_judged_list_says_how_many_it_did_not_print(tmp_path, capsys):
+    """Live run: 33 never-judged URLs, eight printed, no sign there were more."""
+    from tti.cli import main
+    rows = [("https://ok", 0.0, True, "static_html", 900),
+            ("https://ok", DAY, True, "static_html", 900)]
+    for i in range(10):
+        rows += [(f"https://never{i}", 0.0, False, "no_body", 0),
+                 (f"https://never{i}", DAY, False, "no_body", 0)]
+    write(tmp_path, rows)
+    assert main(["--run-dir", str(tmp_path), "watch", "--report"]) == 0
+    out = capsys.readouterr().out
+    assert "10 URL(s) were never judged" in out
+    assert out.count("https://never") == 8
+    assert "… and 2 more" in out
