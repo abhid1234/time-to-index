@@ -217,3 +217,22 @@ def test_decoy_makes_no_provider_calls(wired, tmp_path, monkeypatch):
 
     decoy.run(led, verify_absent=None, verbose=False)
     assert sum(r.cost_usd for r in Ledger(tmp_path).results()) == spent_before
+
+
+def test_a_synthetic_ledger_never_asks_a_registry(tmp_path, monkeypatch, capsys):
+    """The demo's subjects exist nowhere. Verifying a counterfactual against
+    npm for them is a network call to confirm something known by
+    construction, and the demo now carries payloads so `tti decoy` on it is
+    a thing people will do."""
+    from tti import demo
+
+    def boom(*a, **k):
+        raise AssertionError("registry was asked on a synthetic ledger")
+    monkeypatch.setattr(decoy, "npm_absent", boom)
+    demo.generate(tmp_path, config.ladder())
+    assert main(["--run-dir", str(tmp_path), "decoy"]) == 0
+    out = capsys.readouterr().out
+    assert "synthetic run" in out and "payloads re-graded" in out
+    assert main(["--run-dir", str(tmp_path), "decoy", "--json"]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["events_decoyed"] == 106 and payload["unverified_counterfactuals"] == 0

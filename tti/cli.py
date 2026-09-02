@@ -742,7 +742,14 @@ def cmd_decoy(args) -> int:
         print("no results yet — nothing to re-grade")
         return 1
 
-    verify = None if args.no_verify else decoy_mod.npm_absent
+    synthetic = _plan_status(led, []) == "synthetic"
+    # A synthetic ledger's subjects do not exist on any registry. Asking npm
+    # whether "npm-subject-3@4.17.9" was ever published would be a network
+    # call to confirm something known by construction.
+    verify = None if (args.no_verify or synthetic) else decoy_mod.npm_absent
+    if synthetic and not args.json:
+        print("synthetic run: the counterfactuals are unpublished by construction, "
+              "so no registry was asked")
     rep = decoy_mod.run(led, verify_absent=verify, verbose=not args.json)
 
     if args.json:
