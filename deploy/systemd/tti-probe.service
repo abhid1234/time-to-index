@@ -7,4 +7,4 @@ Wants=network-online.target
 Type=oneshot
 WorkingDirectory=/opt/time-to-index
 EnvironmentFile=/opt/time-to-index/.env
-ExecStart=/opt/time-to-index/.venv/bin/tti probe
+ExecStart=/opt/time-to-index/.venv/bin/python -m tti probe

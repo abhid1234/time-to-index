@@ -7,6 +7,6 @@ Wants=network-online.target
 Type=oneshot
 WorkingDirectory=/opt/time-to-index
 EnvironmentFile=/opt/time-to-index/.env
-ExecStart=/opt/time-to-index/.venv/bin/tti discover
+ExecStart=/opt/time-to-index/.venv/bin/python -m tti discover
 # A source being unreachable exits 2. That is a partial run, not a failed one.
 SuccessExitStatus=0 2
