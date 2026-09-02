@@ -5,11 +5,13 @@ project matters until it has.
 
 ## Where it can run
 
-**Not from a Claude cloud session.** All five provider APIs are unreachable
-from that sandbox's egress proxy — `api.parallel.ai`, `api.exa.ai`,
-`api.tavily.com`, `api.search.brave.com`, `google.serper.dev` all fail at
-the tunnel, before any auth. So do `data.sec.gov`, `export.arxiv.org`,
-`www.federalregister.gov` and `api.github.com`.
+**Not from a sandboxed cloud container.** The environment this was built in
+proxies all egress, and every provider API is unreachable from it —
+`api.parallel.ai`, `api.exa.ai`, `api.tavily.com`, `api.search.brave.com`,
+`google.serper.dev` all fail at the tunnel, before any auth. So do
+`data.sec.gov`, `export.arxiv.org`, `www.federalregister.gov` and
+`api.github.com`. If your host proxies egress, run `tti doctor` first and
+believe it.
 
 Three real options:
 
