@@ -396,3 +396,27 @@ none of the string tests could:
 
 The screenshot is now part of the routine for any change to report.py. It
 takes four seconds and it is the only test that sees what a reader sees.
+
+**2026-09-02, three things the dispatch loop did that nothing declared.**
+Read while auditing the scheduler for anything a provider could fairly
+object to. Probes due at the same time went out in insertion order, which
+was the arms' order in `settings.yaml` — one arm always asked first and one
+always last, by the seconds a sweep takes, for every event, all run. Every
+row in a sweep carried the run's start time, so the last arm's row claimed
+the first arm's clock. And a 429 was retried after the generic backoff,
+ignoring the vendor's Retry-After. Fixed together: a per-(event, rung) arm
+order that is a function of the ledger; a per-row dispatch clock; and
+Retry-After honoured to a ten-second cap, past which the row is an ERROR
+rather than a stalled run. None of these would have moved a median by a
+rung. All three are the kind of thing a vendor reading the code would find
+before the author did.
+
+**2026-09-02, environment: a box with no time zone database.** `edgar.py`
+built `ZoneInfo("America/New_York")` at import time; `tti.sources` imports
+every collector at import; `tti.cli` imports `tti.sources`. On a slim
+container image with no IANA database — where a cron job tends to live —
+every command, `tti --version` included, would have died before printing
+a line, and no CI runner would ever show it because they all ship tzdata.
+The zone is built on first use now, a missing database is a per-subject
+error naming the fix, `tzdata` is a declared dependency, and a test runs
+the CLI in a subprocess with zoneinfo's search path emptied.
