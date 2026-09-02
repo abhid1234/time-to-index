@@ -269,7 +269,7 @@ with agreement required:
 | rubygems.org/gems/rails | static_html | 2,377 / 63,794 |
 
 All eight allow all twelve AI crawler user-agents in robots.txt. The three
-numbers the README leads with — 32, 9, 93,012 — reproduce to the character.
+numbers the README leads with — crates.io at 32 and pkg.go.dev at 93,012 — and Bitbucket's 9 reproduce to the character.
 
 One behaviour worth knowing about crates.io: with no `User-Agent` header at
 all it returns 403; with a UA but no `Accept: text/html` it returned 404 on
