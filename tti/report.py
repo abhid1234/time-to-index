@@ -837,8 +837,10 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
         from .sensitivity import verdict as _sv
         sens_verdict = e(_sv(list(sensitivity_rows)))
     else:
-        sens_rows = ("<tr><td colspan='5'>not evaluated &#8212; needs stored raw "
-                     "payloads from a real run</td></tr>")
+        sens_rows = ("<tr><td colspan='5'>" + (
+            NO_ARMS if not ordered else
+            "not evaluated &#8212; needs stored raw payloads from a real run")
+            + "</td></tr>")
         sens_verdict = ("This panel fills in once probes have run against live "
                         "providers and their responses are on disk.")
 

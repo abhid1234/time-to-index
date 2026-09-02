@@ -117,5 +117,6 @@ def test_provider_only_panels_say_why_they_are_empty(tmp_path):
     assert "No staleness opportunities yet" in page
     assert 'class="big bad">—<' not in page and "of 0 opportunities" not in page
     assert "Per-class tables appear once" in page
+    assert "needs stored raw payloads from a real run" not in page   # it has payloads; it lacks arms
     # The control panel is untouched by any of this.
     assert "<b>2</b> were confirmed retrievable" in page
