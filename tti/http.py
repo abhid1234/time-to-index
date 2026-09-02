@@ -167,6 +167,27 @@ def raw_get(url: str, *, headers: dict | None = None, timeout: float = 25.0,
     return resp
 
 
+# The longest a Retry-After header is obeyed for. A provider that says "come
+# back in an hour" gets an ERROR row now, not a probe run stalled for an hour
+# with every other arm's rung slipping behind it.
+RETRY_AFTER_CAP = 10.0
+
+
+def _retry_delay(attempt: int, retry_after: str | None) -> float:
+    """Seconds to wait before the next attempt.
+
+    Exponential backoff by default. On a 429 that carries Retry-After in
+    seconds, that number instead, capped, because the vendor knows its own
+    window and guessing past it just spends the retry.
+    """
+    if retry_after:
+        try:
+            return max(0.0, min(float(retry_after), RETRY_AFTER_CAP))
+        except ValueError:
+            pass                       # an HTTP-date form; fall back to backoff
+    return 1.5 * (2 ** attempt)
+
+
 def _request(method: str, url: str, *, retries: int = 2,
              allow_error_status: bool = False, **kw) -> requests.Response:
     if _max_retries is not None:
@@ -175,10 +196,13 @@ def _request(method: str, url: str, *, retries: int = 2,
     h.update(kw.pop("headers", None) or {})
     last: Exception | None = None
     for attempt in range(retries + 1):
+        retry_after = None
         try:
             r = _session.request(method, url, headers=h, **kw)
             if not allow_error_status and (r.status_code == 429
                                            or 500 <= r.status_code < 600):
+                if r.status_code == 429:
+                    retry_after = r.headers.get("Retry-After")
                 raise HttpError(f"{r.status_code} {r.text[:200]}")
             if r.status_code >= 400 and not allow_error_status:
                 raise HttpError(f"{r.status_code} {r.text[:400]}")
@@ -186,5 +210,5 @@ def _request(method: str, url: str, *, retries: int = 2,
         except Exception as exc:  # noqa: BLE001
             last = exc
             if attempt < retries:
-                time.sleep(1.5 * (2 ** attempt))
+                time.sleep(_retry_delay(attempt, retry_after))
     raise HttpError(str(last))

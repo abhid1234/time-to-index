@@ -95,6 +95,15 @@ and the drop is written to the ledger.
 rungs are skipped. Indexing is not observed to reverse, and the survival
 estimator only needs the first FRESH.
 
+Within a rung, the order the arms are asked in is not the order they are
+listed in. The control fetch goes first — it is free and it is the yardstick —
+and the provider arms follow in an order fixed for each (event, rung) pair and
+different between pairs. A sweep of seven arms takes seconds, and before this
+the arm listed first in settings was always asked first and the one listed last
+always last, for every event, for the whole run: a systematic per-arm offset
+of a few seconds that nothing declared. Each row also carries the moment its
+own call went out, not the moment the sweep started.
+
 ## Grading
 
 Three verdicts, from the flattened text of the provider's response:

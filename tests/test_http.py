@@ -11,6 +11,7 @@ unattended job has nobody to notice it fell over.
 import pathlib
 import sys
 import threading
+import time
 from http.server import BaseHTTPRequestHandler
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
@@ -21,6 +22,9 @@ from conftest import QuietServer
 from tti import http as H
 
 CHUNK = b"x" * 65_536
+
+
+HITS: list[float] = []
 
 
 class Hostile(BaseHTTPRequestHandler):
@@ -70,6 +74,18 @@ class Hostile(BaseHTTPRequestHandler):
                         "text/html; charset=utf-8")
         elif self.path == "/small":
             self._plain(b"<html><body>fine</body></html>")
+        elif self.path == "/rate-limited":
+            # 429 with Retry-After on the first call, 200 after.
+            HITS.append(time.time())
+            if len(HITS) == 1:
+                self.send_response(429)
+                self.send_header("Retry-After", "2")
+                self.send_header("Content-Length", "0")
+                self.send_header("Connection", "close")
+                self.end_headers()
+                self.close_connection = True
+            else:
+                self._plain(b'{"ok": true}', "application/json")
         else:
             self._plain(b"", "text/plain")
 
@@ -149,3 +165,18 @@ def test_raw_get_still_exposes_status_and_text(hostile):
     assert r.tti_truncated is True
     small = H.raw_get(hostile + "/small", timeout=10, retries=0)
     assert small.tti_truncated is False and "fine" in small.text
+
+
+def test_a_429_with_retry_after_is_retried_after_that_long(hostile):
+    HITS.clear()
+    assert H.get_json(hostile + "/rate-limited", retries=1) == {"ok": True}
+    assert len(HITS) == 2
+    assert 1.9 <= HITS[1] - HITS[0] < 2.7          # the header's 2s, not the 1.5s backoff
+
+
+def test_retry_after_is_bounded_and_falls_back_on_dates():
+    assert H._retry_delay(0, None) == 1.5
+    assert H._retry_delay(1, None) == 3.0
+    assert H._retry_delay(0, "4") == 4.0
+    assert H._retry_delay(0, "3600") == H.RETRY_AFTER_CAP
+    assert H._retry_delay(0, "Wed, 21 Oct 2026 07:28:00 GMT") == 1.5

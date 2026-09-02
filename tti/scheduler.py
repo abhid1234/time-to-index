@@ -242,7 +242,7 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
 
     due = [p for p in ledger.probes().values()
            if p.probe_id not in done and p.due_at <= now and p.event_id in events]
-    due.sort(key=lambda p: p.due_at)
+    due = dispatch_order(due)
     if limit:
         due = due[:limit]
 
@@ -259,9 +259,15 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
                 print(f"  ! could not lock the analysis plan: {exc}")
 
     out: list[ProbeResult] = []
+    wall0 = time.time()
     for probe in due:
         event = events[probe.event_id]
-        lag = now - event.published_at
+        # The clock each row carries is the moment its call went out, not the
+        # moment the run started. A sweep of seven arms takes seconds; the
+        # last arm asked is asked later, and its row should say so. `now` may
+        # be injected (tests, replays), so elapsed wall time is added to it.
+        t = now + (time.time() - wall0)
+        lag = t - event.published_at
 
         # A long run can cross midnight. Without this the second half keeps
         # charging against a cap that has already reset, and refuses probes
@@ -275,13 +281,13 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
         # and not another has not "already resolved" the others, and skipping
         # them would erase the only evidence of that.
         if not probe.phrasing and (probe.event_id, probe.provider, probe.mode) in resolved:
-            out.append(_skip(probe, event, now, lag, "carry-forward: already FRESH"))
+            out.append(_skip(probe, event, t, lag, "carry-forward: already FRESH"))
             rep.skipped_carry += 1
             continue
 
-        if now - probe.due_at > slip:
-            out.append(_skip(probe, event, now, lag,
-                             f"rung slip {now - probe.due_at:.0f}s exceeds {slip:.0f}s"))
+        if t - probe.due_at > slip:
+            out.append(_skip(probe, event, t, lag,
+                             f"rung slip {t - probe.due_at:.0f}s exceeds {slip:.0f}s"))
             rep.dropped_slip += 1
             continue
 
@@ -296,13 +302,13 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
         except config.ConfigError as exc:
             # An arm the price table no longer knows. Skipping is right;
             # spending against a cap that cannot see the charge is not.
-            out.append(_skip(probe, event, now, lag, f"unpriced: {exc}"))
+            out.append(_skip(probe, event, t, lag, f"unpriced: {exc}"))
             rep.skipped_budget += 1
             continue
         try:
             budget.charge(cost)
         except BudgetExceeded as exc:
-            out.append(_skip(probe, event, now, lag, f"budget: {exc}"))
+            out.append(_skip(probe, event, t, lag, f"budget: {exc}"))
             rep.skipped_budget += 1
             continue
 
@@ -335,7 +341,7 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
                 probe_id=probe.probe_id, event_id=event.event_id,
                 provider=probe.provider, mode=probe.mode, rung=probe.rung,
                 phrasing=probe.phrasing,
-                requested_at=now, lag=lag, verdict=ERROR, cost_usd=0.0,
+                requested_at=t, lag=lag, verdict=ERROR, cost_usd=0.0,
                 latency_ms=int((time.perf_counter() - t0) * 1000),
                 note=str(exc)[:400]))
             rep.errors += 1
@@ -377,7 +383,7 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
             probe_id=probe.probe_id, event_id=event.event_id,
             provider=probe.provider, mode=probe.mode, rung=probe.rung,
             phrasing=probe.phrasing, render=render,
-            requested_at=now, lag=lag, verdict=verdict, latency_ms=latency,
+            requested_at=t, lag=lag, verdict=verdict, latency_ms=latency,
             matched_fresh=fresh_hits, matched_stale=stale_hits,
             n_results=_count_results(payload), chars=chars,
             cost_usd=cost, cost_source=cost_source, raw_ref=raw_ref, note=note))
@@ -400,6 +406,28 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
     if not dry_run:
         ledger.add_results(out)
     return rep
+
+
+def dispatch_order(due: list) -> list:
+    """The order probes go out in.
+
+    By due time first. Within one due time, the origin control first -- it is
+    free and it is the yardstick, so it should be as close to the rung as any
+    paid call -- and then the provider arms in an order that is fixed for the
+    (event, rung) pair and differs between pairs. Before this the order was
+    insertion order, which was the arms' order in settings.yaml, which meant
+    one provider was always asked first and another always last, by a few
+    seconds, on every event, for the whole run. Small, but systematic, and a
+    freshness benchmark should not carry a systematic per-arm offset it did
+    not declare.
+    """
+    import zlib
+
+    def key(p):
+        return (p.due_at,
+                0 if p.provider == "origin" else 1,
+                zlib.crc32(f"{p.event_id}:{p.rung}:{p.provider}/{p.mode}:{p.phrasing}".encode()))
+    return sorted(due, key=key)
 
 
 def _skip(probe: Probe, event: Event, now: float, lag: float, note: str) -> ProbeResult:

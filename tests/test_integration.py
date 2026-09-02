@@ -200,7 +200,10 @@ def test_full_ladder_with_origin_control(wired, tmp_path, monkeypatch):
 
     sc = score(led.events(), led.results(), "stub", "base")
     assert sc.n_events == 1 and sc.n_indexed == 1
-    assert sc.median_bracket == (900.0, 3600.0)
+    # Each row now carries the moment its own call went out, so the bracket
+    # edges are the observed lags (a few ms past the rung here), not the rungs.
+    lo, hi = sc.median_bracket
+    assert abs(lo - 900.0) < 1.0 and abs(hi - 3600.0) < 1.0
     assert sc.n_stale == 2
 
 
