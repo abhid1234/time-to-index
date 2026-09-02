@@ -24,7 +24,7 @@ import zlib
 
 from . import report
 from .ledger import Ledger
-from .metrics import fmt_duration, fmt_pair, logrank, observations, score, staleness_by_rung
+from .metrics import fmt_duration, fmt_pair, score, staleness_by_rung
 from .models import ABSENT, FRESH, STALE, Event, ProbeResult
 
 # (arm, median latency in seconds, sigma, ceiling on ever indexing,
@@ -210,24 +210,12 @@ def render(run_dir: pathlib.Path, out: pathlib.Path, ladder: list[int]) -> str:
     classes = sorted({e.source_class for e in events.values()})
     by_class = {c: [score(events, results, p, m, c) for p, m in arms] for c in classes}
 
-    pairs = []
-    for i in range(len(arms)):
-        for j in range(i + 1, len(arms)):
-            _, pv = logrank(observations(events, results, *arms[i]),
-                            observations(events, results, *arms[j]))
-            if pv == pv:
-                pairs.append((f"{arms[i][0]}/{arms[i][1]}",
-                              f"{arms[j][0]}/{arms[j][1]}", pv))
-
-    from .power import analyse
-    powers = []
-    for i in range(len(arms)):
-        for j in range(i + 1, len(arms)):
-            oa = observations(events, results, *arms[i])
-            ob = observations(events, results, *arms[j])
-            _, pv = logrank(oa, ob)
-            powers.append(analyse(f"{arms[i][0]}/{arms[i][1]}", oa,
-                                  f"{arms[j][0]}/{arms[j][1]}", ob, pv, 15.0))
+    # Same family function as `tti report` and `tti power`: the demo's own
+    # copy of this loop skipped the Holm step, and the page printed a column
+    # of dashes under "p adjusted" beside verdicts it said were adjusted.
+    from .power import pairwise_family, raw_pairs
+    powers = pairwise_family(events, results, arms, 15.0)
+    pairs = raw_pairs(powers)
     stale_series = [(f"{sc.provider}/{sc.mode}",
                      staleness_by_rung(events, results, sc.provider, sc.mode))
                     for sc in sorted(scores, key=lambda s: (s.median_ttl is None,

@@ -195,3 +195,33 @@ def test_the_dashboard_shows_the_adjusted_column_and_says_why(tmp_path):
     assert "p adjusted" in page
     assert "the adjusted column is the one to read" in page
     assert "The <b>read</b> column uses the adjusted value." in page
+
+
+def test_every_caller_of_the_pairwise_loop_gets_the_adjusted_value(tmp_path):
+    """The demo page printed a Holm column of dashes beside verdicts the note
+    said were adjusted: its private copy of the pairwise loop never called
+    holm. One function now, and the demo's rows carry adjusted values."""
+    import math
+
+    from tti import demo
+    from tti.power import pairwise_family
+
+    led, _ = demo.generate(tmp_path, [300, 900, 3600])
+    events, results = led.events(), led.results()
+    arms = sorted({(r.provider, r.mode) for r in results if r.provider != "origin"})
+    rows = pairwise_family(events, results, arms, 15.0)
+    assert len(rows) == 3
+    for r in rows:
+        if math.isfinite(r.p_value):
+            assert math.isfinite(r.p_adjusted) and r.p_adjusted >= r.p_value
+
+    page = (tmp_path / "demo.html")
+    demo.render(tmp_path / "run", page, [300, 900, 3600])
+    html = page.read_text()
+    i = html.find("Are the differences real")
+    body = html[i:i + 4000]
+    # No dash in the adjusted column where the raw p was printed.
+    import re
+    for cells in re.findall(r"<tr>(.*?)</tr>", body, flags=re.S)[1:4]:
+        tds = re.findall(r"<td[^>]*>(.*?)</td>", cells, flags=re.S)
+        assert tds[3] != "—" and tds[4] != "—", tds

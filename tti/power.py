@@ -175,3 +175,33 @@ def analyse(a_name: str, a: list[Observation],
                      p_value=p_value, p_adjusted=p_adjusted, power_now=power_now,
                      events_for_80=need, events_needed=extra, days_needed=days,
                      verdict=verdict)
+
+
+def pairwise_family(events, results, arms, rate: float) -> list[PairPower]:
+    """Every pairwise comparison among `arms`, Holm-adjusted as one family.
+
+    The only place this loop exists. There were three copies -- `tti power`,
+    `tti report`, and the demo -- and the demo's had no adjustment step, so
+    its page printed a Holm column of dashes over verdicts the note beneath
+    said were adjusted. A correction that lives in one function cannot be
+    applied to some of the callers.
+    """
+    from .metrics import logrank, observations
+    from .multiplicity import holm
+
+    raw = []
+    for i in range(len(arms)):
+        for j in range(i + 1, len(arms)):
+            a, b = arms[i], arms[j]
+            oa = observations(events, results, *a)
+            ob = observations(events, results, *b)
+            _, pv = logrank(oa, ob)
+            raw.append((f"{a[0]}/{a[1]}", oa, f"{b[0]}/{b[1]}", ob, pv))
+    adj = holm([(f"{na} vs {nb}", pv) for na, _, nb, _, pv in raw])
+    return [analyse(na, oa, nb, ob, pv, rate, p_adjusted=ad.adjusted)
+            for (na, oa, nb, ob, pv), ad in zip(raw, adj, strict=True)]
+
+
+def raw_pairs(powers: list[PairPower]) -> list[tuple[str, str, float]]:
+    """(a, b, uncorrected p) for the comparisons that could be computed."""
+    return [(r.a, r.b, r.p_value) for r in powers if r.p_value == r.p_value]

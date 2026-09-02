@@ -37,8 +37,6 @@ from .metrics import ORIGIN as metrics_origin
 from .metrics import (
     ProviderScore,
     fmt_duration,
-    logrank,
-    observations,
     recall_by_render,
     score,
     staleness_by_rung,
@@ -875,20 +873,8 @@ def _pairwise_family(events, results, arms, rate):
     them would have produced two different verdicts for the same data
     depending on which flag the reader passed.
     """
-    from .multiplicity import holm
-    from .power import analyse
-
-    raw = []
-    for i in range(len(arms)):
-        for j in range(i + 1, len(arms)):
-            a, b = arms[i], arms[j]
-            oa = observations(events, results, *a)
-            ob = observations(events, results, *b)
-            _, pv = logrank(oa, ob)
-            raw.append((f"{a[0]}/{a[1]}", oa, f"{b[0]}/{b[1]}", ob, pv))
-    adj = holm([(f"{na} vs {nb}", pv) for na, _, nb, _, pv in raw])
-    return [analyse(na, oa, nb, ob, pv, rate, p_adjusted=ad.adjusted)
-            for (na, oa, nb, ob, pv), ad in zip(raw, adj, strict=True)]
+    from .power import pairwise_family
+    return pairwise_family(events, results, arms, rate)
 
 
 def cmd_power(args) -> int:
@@ -1513,31 +1499,15 @@ def cmd_report(args) -> int:
     classes = sorted({e.source_class for e in events.values()})
     by_class = {c: _all_scores(led, c) for c in classes}
 
-    from .power import analyse
+    from .power import pairwise_family, raw_pairs
     rate = _events_per_day(led)
-    pairs, powers = [], []
     arms = [(s.provider, s.mode) for s in
             sorted(scores, key=lambda s: (s.median_ttl is None, s.median_ttl or 0))
             if s.provider != ORIGIN_ARM]
     # Every pair is computed first, then the whole family is Holm-adjusted
-    # together. Adjusting as we go would make each comparison's verdict depend
-    # on the order the loop happened to visit them in.
-    from .multiplicity import holm
-
-    raw: list[tuple[str, str, float, list, list]] = []
-    for i in range(len(arms)):
-        for j in range(i + 1, len(arms)):
-            a = observations(events, results, *arms[i])
-            b = observations(events, results, *arms[j])
-            _, p = logrank(a, b)
-            na = f"{arms[i][0]}/{arms[i][1]}"
-            nb = f"{arms[j][0]}/{arms[j][1]}"
-            raw.append((na, nb, p, a, b))
-    adj = holm([(f"{na} vs {nb}", p) for na, nb, p, _, _ in raw])
-    for (na, nb, p, a, b), ad in zip(raw, adj, strict=True):
-        if p == p:
-            pairs.append((na, nb, p))
-        powers.append(analyse(na, a, nb, b, p, rate, p_adjusted=ad.adjusted))
+    # together, in the one function `tti power` and the demo also use.
+    powers = pairwise_family(events, results, arms, rate)
+    pairs = raw_pairs(powers)
 
     out_dir = _out_dir(args)
     stale_series = [(f"{sc.provider}/{sc.mode}",
