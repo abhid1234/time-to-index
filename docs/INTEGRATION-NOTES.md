@@ -441,3 +441,11 @@ persist step copies the lock and archives only the files this run wrote
 never overlap. Simulated end to end in a scratch directory before commit:
 day two restores day one's payloads, writes one more, and archives only
 that one.
+
+**2026-09-02, the late-drop memory, live.** On a scratch ledger with no
+`seen.jsonl`, `tti discover --sources npm pypi` collected 87 subjects, all
+dropped as detected-late (cold start), and wrote 87 lines to `seen.jsonl`.
+The same command again, dry-run, collected 0 in 3.1 seconds wall-clock:
+every npm subject answered from its ~300-byte dist-tags document, no
+packument was fetched, and PyPI likewise. That is the guard the offline
+test asserts, observed against the registries it was written for.
