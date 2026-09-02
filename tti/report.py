@@ -601,14 +601,30 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
     # page is not lying. It is, however, a rendered dashboard, and a rendered
     # dashboard reads as results. Say so at the top instead.
     scoreable = [s for s in scores if s.n_events]
-    empty_note = ("" if scoreable else
-                  "<div class='panel'><p style='margin-top:0'><b>No arm produced a "
-                  "scoreable observation.</b> Every probe in this run errored, was "
-                  "refused by the spend cap, or was skipped. The table below is a "
-                  "list of arms, not a set of results.</p>"
-                  "<p class='note'>Rendered rather than withheld, because "
-                  "\"every probe failed\" is itself the finding and refusing to "
-                  "draw the page would hide it.</p></div>")
+    control_graded = sum(1 for r in results
+                         if r.provider == "origin" and r.verdict not in ("ERROR", "SKIPPED"))
+    if scoreable:
+        empty_note = ""
+    elif not scores and control_graded:
+        # Not "every probe failed". Nothing failed; there is simply no
+        # provider arm, which is the state before the first key arrives.
+        empty_note = (
+            "<div class='panel'><p style='margin-top:0'><b>Only the origin control "
+            f"has results</b> — {control_graded} graded probe(s), no provider arm. "
+            "The leaderboard compares provider arms and there are none: every "
+            "provider key is unset, or every provider probe is still pending.</p>"
+            "<p class='note'>The control panel below is the whole finding for "
+            "this run. It is the yardstick, not a result about any provider.</p>"
+            "</div>")
+    else:
+        empty_note = (
+            "<div class='panel'><p style='margin-top:0'><b>No arm produced a "
+            "scoreable observation.</b> Every probe in this run errored, was "
+            "refused by the spend cap, or was skipped. The table below is a "
+            "list of arms, not a set of results.</p>"
+            "<p class='note'>Rendered rather than withheld, because "
+            "\"every probe failed\" is itself the finding and refusing to "
+            "draw the page would hide it.</p></div>")
 
     from .multiplicity import family_error_rate
     m_comparisons = sum(1 for r in powers if r.p_value == r.p_value)

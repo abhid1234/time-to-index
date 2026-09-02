@@ -289,3 +289,22 @@ one module and not another. 13.1 per day is the rate the watchlist was
 sized to when it was built; the bug had quietly returned the corpus to
 roughly its pre-expansion rate.
 
+**2026-09-02, the first real ledger.** A pipeline exercise, not the protocol:
+detection-lag and rung-slip windows relaxed so eight already-published PyPI
+releases entered the ladder and every past rung fired at once, origin arm
+only, scratch directory. Eight probes at the 5-minute rung, all `found` at
+rank 0, all `server_html`, all FRESH; carry-forward skipped the 28 later
+rungs; twelve remained pending with due times in the future. The
+pre-registration lock wrote itself on the first dispatched probe -- the first
+time that mechanism has fired -- and `tti verify` read it back unchanged.
+`tti decoy` on the eight control excerpts: 0 false positives, Wilson upper
+bound 32%, reported as the bound and not as zero.
+
+And a defect: `tti score` and `tti report` both said "no results yet" on a
+ledger holding 36 results. The leaderboard excludes the control arm by
+design, so a control-only run -- the state anyone is in before the first
+provider key -- was told nothing had happened. Both now recognise that state,
+summarise what the control found, and exit 0; the dashboard renders with its
+control panel and a banner that says why the table is empty, rather than the
+"every probe errored" wording, which would have been false.
+

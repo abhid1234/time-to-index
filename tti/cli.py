@@ -500,10 +500,70 @@ def _all_scores(led: Ledger, source_class: str | None = None) -> list[ProviderSc
             for p, m in arms]
 
 
+def _control_summary(led) -> dict | None:
+    """What the origin control found, when it is the only arm with results.
+
+    A run with no provider key -- the state anyone is in before the first key
+    arrives -- produces a ledger full of control results and an empty
+    leaderboard, because the leaderboard compares provider arms by design.
+    "No results yet" is false for that ledger. This is what is true of it.
+    Returns None when there are no graded control rows.
+    """
+    rows = [r for r in led.results()
+            if r.provider == ORIGIN_ARM and r.verdict not in (ERROR, SKIPPED)]
+    if not rows:
+        return None
+    states: dict[str, int] = {}
+    renders: dict[str, int] = {}
+    rank0 = 0
+    for r in rows:
+        st = (r.note or "origin:unknown").split()[0].replace("origin:", "")
+        states[st] = states.get(st, 0) + 1
+        if r.render:
+            renders[r.render] = renders.get(r.render, 0) + 1
+        if "rank=0" in (r.note or ""):
+            rank0 += 1
+    events = {r.event_id for r in rows}
+    return {"events": len(events), "graded": len(rows), "states": states,
+            "render": renders, "rank0": rank0,
+            "fresh": sum(1 for r in rows if r.verdict == "FRESH")}
+
+
+def _print_control_only(cs: dict) -> None:
+    print(f"Only the origin control has results: {cs['graded']} graded probe(s) "
+          f"across {cs['events']} event(s), no provider arm.")
+    print("The leaderboard compares provider arms, and there are none -- every")
+    print("provider key is unset or every provider probe is still pending.")
+    print()
+    print("| origin state | probes |")
+    print("|---|---|")
+    for k, v in sorted(cs["states"].items(), key=lambda kv: -kv[1]):
+        print(f"| {k} | {v} |")
+    if cs["render"]:
+        print()
+        print("| render class | probes |")
+        print("|---|---|")
+        for k, v in sorted(cs["render"].items(), key=lambda kv: -kv[1]):
+            print(f"| {k} | {v} |")
+    print()
+    print(f"{cs['fresh']}/{cs['graded']} found the answer in the served bytes; "
+          f"{cs['rank0']}/{cs['graded']} on the canonical page rather than a fallback.")
+    print("This is the yardstick, not a result about any provider.")
+
+
 def cmd_score(args) -> int:
     led = _ledger(args)
     scores = _all_scores(led)
     if not scores:
+        cs = _control_summary(led)
+        if cs:
+            if args.json:
+                return _emit({"arms": [], "control": cs,
+                              "note": "only the origin control has results; the "
+                                      "leaderboard compares provider arms and "
+                                      "there are none"})
+            _print_control_only(cs)
+            return 0
         if args.json:
             return _emit({"arms": [], "note": "no results yet"})
         print("no results yet — run `tti discover` then `tti probe`")
@@ -1403,9 +1463,11 @@ def cmd_report(args) -> int:
     led = _ledger(args)
     events, results = led.events(), led.results()
     scores = _all_scores(led)
-    if not scores:
+    if not scores and not _control_summary(led):
         print("no results yet")
         return 1
+    # With control results and no provider arm the page still renders: the
+    # control panel is the whole finding, and the banner says so.
 
     classes = sorted({e.source_class for e in events.values()})
     by_class = {c: _all_scores(led, c) for c in classes}

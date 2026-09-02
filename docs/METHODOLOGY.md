@@ -180,6 +180,7 @@ actually made here, in this repository, in the form described.
 | two Parallel arms, `base` and `pro` | Task API processor names in a Search API adapter, against a retired endpoint; every probe would 403 | the adapter is checked against the published OpenAPI document, and a test asserts every configured arm is a mode its adapter declares |
 | Brave's freshness column | a `freshness=pd` filter no other arm carried, removing stale competitors at short rungs and the correct document at 72 h | every arm receives the same request shape; a per-adapter request test pins it |
 | `workers = 2  # arXiv asks for one request every 3s` | a comment quoting a rule the code beside it did not follow | the base class enforces the spacing; a test times the requests |
+| "no results yet" | a ledger of 36 control-arm results and no provider key | score and report distinguish an empty ledger from a control-only one, and say which |
 | 78% recall | possibly 78% minus an unmeasured false-positive rate | every payload is re-graded against a counterfactual answer that was never published |
 | an analysis plan declaring `exa/base` | the runner dispatches `exa/auto`; every real arm would have read "exploratory" and every declared arm "produced nothing" | the plan's arms and ladder are asserted equal to `data/settings.yaml` |
 
