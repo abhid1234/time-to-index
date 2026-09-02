@@ -59,6 +59,11 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # exclusion cannot drift out of step with the thing it excludes.
 ORIGIN_ARM = metrics_origin
 
+# Fewer usable routes than this and `tti routes` declines to say anything
+# site-wide. Three is the smallest number at which "uniform" and "mixed" are
+# distinguishable claims rather than descriptions of one or two pages.
+ROUTES_MIN_USABLE = 3
+
 
 def _n(v):
     """JSON has no NaN or Infinity that a strict parser will accept.
@@ -964,7 +969,11 @@ def cmd_sensitivity(args) -> int:
                 "arms_lost": r.arms_lost, "arms": r.n_arms,
                 "ordering": r.order} for r in rows]})
     if not rows:
-        print("no results to re-grade — run `tti probe` first")
+        print("no provider-arm results to re-grade — run `tti probe` with a provider key first")
+        cs = _control_summary(led)
+        if cs:
+            print(f"({cs['graded']} control-arm result(s) exist; sensitivity re-grades "
+                  f"provider arms, which the leaderboard ranks, and the control is not one.)")
         return 1
 
     hdr = (f"{'rule variant':26s} {'churn':>8s} {'tau':>6s} {'medians':>8s} "
@@ -1158,14 +1167,29 @@ def cmd_routes(args) -> int:
         sv = sv_mod.run([(u, "route") for u in rs.sampled],
                         workers=args.workers, repeat=args.repeat)
         if sv.intercepted:
-            print(f"  ! {len(sv.intercepted)} of {len(rs.sampled)} sampled routes "
-                  f"returned a body identical to another route's.")
+            print(f"  ! {len(sv.intercepted)} of {len(rs.sampled)} sampled routes: "
+                  f"{sv.intercepted_summary()}.")
             print("    One page served for many is a challenge, block or proxy —")
-            print("    not a rendering posture. Those routes are excluded.")
+            print("    not a rendering posture. Those routes are excluded, and the")
+            print("    exclusion says how this client was treated, not how the site")
+            print("    renders for a crawler in good standing.")
         hit, n = sv.readable_rate()
         if not n:
             print("  no route could be judged — fetches failed, disagreed, or all")
             print("  returned the same intercepted body")
+            continue
+        if n < ROUTES_MIN_USABLE and n < len(rs.sampled):
+            # The first live run: seven of eight routes intercepted, one
+            # survivor, and the line below it read "Uniformly readable across
+            # the sample". A site-level sentence from one page is not a
+            # sample; it is an anecdote with a percentage sign.
+            for r in sorted(sv.usable, key=lambda r: r.prof.text_ratio):
+                path = urllib.parse.urlsplit(r.url).path or "/"
+                print(f"     {r.prof.text_ratio*100:5.2f}%  {r.prof.visible_chars:>7,}c  "
+                      f"{r.prof.posture:15s} {path[:52]}")
+            print(f"  Only {n} of {len(rs.sampled)} sampled routes usable after "
+                  f"exclusions — too few to characterise the site.")
+            print("  Re-run later, from a different network, or with a larger sample.")
             continue
         for r in sorted(sv.usable, key=lambda r: r.prof.text_ratio):
             mark = " " if r.readable else "!"

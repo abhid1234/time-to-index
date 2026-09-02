@@ -77,3 +77,13 @@ def test_a_truly_empty_ledger_keeps_the_old_contract(tmp_path, capsys):
     assert main(["--run-dir", str(tmp_path), "score", "--json"]) == 0
     assert json.loads(capsys.readouterr().out) == {"arms": [], "note": "no results yet"}
     assert main(["--run-dir", str(tmp_path), "report", "--out-dir", str(tmp_path)]) == 1
+
+
+def test_sensitivity_says_provider_arm_not_no_results(wired, tmp_path, monkeypatch, capsys):
+    _control_only_ledger(wired, tmp_path, monkeypatch)
+    assert main(["--run-dir", str(tmp_path), "sensitivity"]) == 1
+    out = capsys.readouterr().out
+    assert "no provider-arm results to re-grade" in out
+    assert "1 control-arm result(s) exist" in out
+    assert "no results to re-grade" not in out
+

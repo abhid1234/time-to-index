@@ -181,6 +181,7 @@ actually made here, in this repository, in the form described.
 | Brave's freshness column | a `freshness=pd` filter no other arm carried, removing stale competitors at short rungs and the correct document at 72 h | every arm receives the same request shape; a per-adapter request test pins it |
 | `workers = 2  # arXiv asks for one request every 3s` | a comment quoting a rule the code beside it did not follow | the base class enforces the spacing; a test times the requests |
 | "no results yet" | a ledger of 36 control-arm results and no provider key | score and report distinguish an empty ledger from a control-only one, and say which |
+| "Uniformly readable across the sample" | one route, after seven were excluded as a challenge interstitial | no site-level sentence below three usable routes; the exclusion names the body's size and title |
 | 78% recall | possibly 78% minus an unmeasured false-positive rate | every payload is re-graded against a counterfactual answer that was never published |
 | an analysis plan declaring `exa/base` | the runner dispatches `exa/auto`; every real arm would have read "exploratory" and every declared arm "produced nothing" | the plan's arms and ladder are asserted equal to `data/settings.yaml` |
 

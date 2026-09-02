@@ -23,6 +23,7 @@ what predicts retrievability and the framework only correlates with it.
 from __future__ import annotations
 
 import concurrent.futures as cf
+import re
 import statistics
 import time
 from collections import Counter
@@ -66,6 +67,11 @@ class SiteResult:
     postures_seen: list[str] = field(default_factory=list)
     stable: bool = True
     body_sha: str = ""
+    # <title> of the body that was kept. Bodies never reach the ledger, but
+    # when seven routes return the same bytes, "titled 'Client Challenge'"
+    # tells the reader what happened and "identical" only tells them that it
+    # did.
+    title: str = ""
     # Set when another distinct URL in the same batch returned a
     # byte-identical body. See Survey.mark_identical_bodies.
     duplicate_of: str = ""
@@ -129,6 +135,26 @@ class Survey:
     @property
     def intercepted(self) -> list[SiteResult]:
         return [r for r in self.results if r.duplicate_of]
+
+    def intercepted_summary(self) -> str:
+        """One line describing the intercepted group(s), for the human output.
+
+        "7 routes returned an identical 3,036-byte body titled 'Client
+        Challenge'" is a finding about how this client was treated. Without
+        the title it reads as a mystery; with it, a reader knows the site
+        challenged the harness and that the sample says nothing about how
+        the site renders for a crawler in good standing.
+        """
+        groups: dict[str, list[SiteResult]] = {}
+        for r in self.intercepted:
+            groups.setdefault(r.body_sha, []).append(r)
+        parts = []
+        for g in sorted(groups.values(), key=len, reverse=True):
+            size = g[0].prof.bytes_total if g[0].prof else 0
+            titles = {x.title for x in g if x.title}
+            t = f" titled {sorted(titles)[0]!r}" if len(titles) == 1 else ""
+            parts.append(f"{len(g)} returned an identical {size:,}-byte body{t}")
+        return "; ".join(parts)
 
     def mark_identical_bodies(self) -> int:
         """Flag distinct URLs that returned byte-identical responses.
@@ -226,10 +252,19 @@ class Survey:
                 if r.prof is not None and r.prof.posture != METADATA]
 
 
+_TITLE = re.compile(r"<title[^>]*>(.*?)</title>", re.I | re.S)
+
+
+def _title(html: str) -> str:
+    m = _TITLE.search(html or "")
+    return " ".join(m.group(1).split())[:80] if m else ""
+
+
 def _fetch(url: str, category: str, timeout: float, repeat: int = 2,
            gap: float = 1.5) -> SiteResult:
     res = SiteResult(url=url, category=category, attempts=repeat)
     profs: list[PageProfile] = []
+    titles: list[str] = []
     last_status: int | None = None
     last_error = ""
 
@@ -242,6 +277,7 @@ def _fetch(url: str, category: str, timeout: float, repeat: int = 2,
             last_status = resp.status_code
             pr = profile(resp.text)
             profs.append(pr)
+            titles.append(_title(resp.text))
             res.postures_seen.append(pr.posture if resp.status_code == 200
                                      else f"HTTP{resp.status_code}")
         except Exception as exc:  # noqa: BLE001
@@ -259,6 +295,7 @@ def _fetch(url: str, category: str, timeout: float, repeat: int = 2,
     best = max(profs, key=lambda p: p.bytes_total)
     res.prof = best
     res.body_sha = best.body_sha
+    res.title = titles[profs.index(best)] if titles else ""
     res.stable = len(set(res.postures_seen)) == 1
     if not res.stable:
         return res

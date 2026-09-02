@@ -308,3 +308,33 @@ summarise what the control found, and exit 0; the dashboard renders with its
 control panel and a banner that says why the table is empty, rather than the
 "every probe errored" wording, which would have been false.
 
+**2026-09-02, `tti routes` against pypi.org.** Seven of eight sitemap-sampled
+project and user routes returned the same 3,036-byte body with HTTP 200,
+titled "Client Challenge". The interception guard excluded them, as designed
+— and its docstring, written from an earlier observation, gives "the same
+3,036 bytes with HTTP 200" as its example. The live web reproduced the
+guard's own number to the byte. Two things followed. `routes` then said
+"Uniformly readable across the sample" from the one survivor; it now refuses
+a site-level sentence below three usable routes and says how many were
+excluded and why. And the exclusion line now carries the intercepted body's
+size and title, because "7 routes returned an identical 3,036-byte body
+titled 'Client Challenge'" tells a reader the harness was challenged, while
+"identical" only tells them something was.
+
+PyPI challenges selectively: `/project/requests/` served a full page to a
+single fetch minutes earlier; eight distinct routes in quick succession from
+the same client drew the interstitial. A benchmark sampling a site looks
+like a scraper. The output now says the exclusion describes how this client
+was treated, not how the site renders for a crawler in good standing.
+
+**2026-09-02, `tti survey` on the eight reachable pages, three fetches each.**
+Five of eight readable, crates.io and Bitbucket named as allowing every AI
+crawler and shipping nothing, GitLab metadata-only with breadcrumb JSON-LD, no
+false interception across eight distinct hosts. The memo's narrative
+reproduces end to end through the tool that produced it.
+
+**2026-09-02, not a bug.** `tti prereg` appeared to exit 1 on the first real
+ledger. It was `head` closing the pipe and Python dying on BrokenPipeError;
+unpiped it exits 0 with the lock unchanged. Recorded so the next person who
+sees it does not spend the twenty minutes.
+
