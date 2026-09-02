@@ -315,7 +315,7 @@ up on an invoice.
 
 The analysis plan is in [docs/PREREGISTRATION.md](docs/PREREGISTRATION.md),
 written before the first probe was ever dispatched. It names the primary
-endpoint, the arms, three hypotheses with the condition that would falsify
+endpoint, the arms, four hypotheses with the condition that would falsify
 each, six exclusion rules, and a stopping rule.
 
 The point is not the document. Benchmarks have had methodology sections for
@@ -336,15 +336,16 @@ that the plan is **locked to the data**:
 Editing the plan is not forbidden. Plans are sometimes wrong. It is made
 **visible**, which is the property that was actually needed.
 
-Three labels follow onto every leaderboard:
+Four labels follow onto every leaderboard:
 
 | label | meaning |
 |---|---|
 | pre-registered | declared before collection began |
 | exploratory | in the data and not in the plan — shown, not hidden |
-| declared, produced nothing | the plan named it and it never scored |
+| declared, enabled, produced nothing | the plan named it, a key was set, and it never scored |
+| declared, not enabled | the plan named it and no key was set — a configuration state, not a result |
 
-The last one matters as much as the others. A leaderboard is built from what
+The third one matters as much as the others. A leaderboard is built from what
 is in the ledger, so an arm that failed everywhere is simply not a row — which
 is how a benchmark loses its worst result without anybody deciding to.
 
@@ -371,7 +372,7 @@ which is ours, and it answers offline:
 The test suite proves the repository is correct at the commit CI ran. It says
 nothing about the copy on the box that will actually produce the numbers —
 its edited config, its collected ledger, its Python, its floating point. Each
-of the five checks exists because the failure it catches once produced a
+of the six checks exists because the failure it catches once produced a
 plausible answer rather than a crash: a config that silently defaulted a
 spend cap, a version prefix matching inside a longer version, two cron runs
 overlapping and double-counting every rate.
@@ -399,8 +400,9 @@ working correctly, and `tti discover` says so.
 
 ### Cost
 
-~500 probes/day across five providers is roughly **$3–12/day** at list
-prices. `data/settings.yaml` sets a hard daily cap; a probe that would cross
+With the shipped watchlist and six arms, the worst case is about **$2/day**
+at list prices and roughly half that once carry-forward stops resolved
+ladders (SETUP.md has the arithmetic). `data/settings.yaml` sets a hard daily cap; a probe that would cross
 it is refused and written to the ledger as `SKIPPED`, and the dashboard
 reports the count. A cap that silently stopped probing would look exactly
 like a provider that silently stopped indexing.
@@ -434,7 +436,8 @@ silently discarded.
 
 `tti sensitivity` is the one to run first. It re-scores everything under
 deliberately worse rules — plain substring matching, no `v` prefix, no
-aliases, titles only — and reports verdict churn, Kendall rank correlation
+aliases, titles only, every text field cut to a 160-character snippet — and
+reports verdict churn, Kendall rank correlation
 against the reported ordering, and how many arms stopped being measurable.
 
 ```
@@ -454,7 +457,8 @@ for a table that has stopped meaning anything.
 
 ## Pre-commitment
 
-Results get published on the schedule below regardless of which provider
+Results get published when the pre-registered stopping rule says so — thirty
+days, or 191 events, whichever comes first — regardless of which provider
 wins, including if the provider I find most interesting comes last, and
 including if the answer is that all of them are fine and the metric is
 boring. The raw payloads ship with the results either way.
