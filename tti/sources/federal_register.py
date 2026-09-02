@@ -8,12 +8,21 @@ publishes, with no vendor in between.
 
 No supersession, so like arXiv this contributes to time-to-index and recall
 only.
+
+A caveat that bounds what this source can say. `published_at` is anchored to
+the printed issue's morning; the document was on the public-inspection desk
+before that, sometimes the previous business day. A provider that indexed the
+public-inspection copy would look faster than the issue time implies. The
+direction of that error is known -- it flatters providers, never penalises
+them -- and it is stated here rather than corrected, because the correction
+would need the public-inspection endpoint and a second timestamp per event.
 """
 
 from __future__ import annotations
 
 import datetime as dt
 import time
+from zoneinfo import ZoneInfo
 
 from .. import http
 from ..models import Event
@@ -48,8 +57,10 @@ class FederalRegister(BaseSource):
             ags = r.get("agencies") or []
             if ags and isinstance(ags[0], dict):
                 agency = ags[0].get("name") or ""
+            # 8 a.m. Eastern on the issue date, in Eastern time -- not a fixed
+            # UTC hour, which was wrong by one for five months of the year.
             published = dt.datetime.strptime(date, "%Y-%m-%d").replace(
-                hour=13, tzinfo=dt.timezone.utc).timestamp()   # 8am ET issue time
+                hour=8, tzinfo=ZoneInfo("America/New_York")).timestamp()
             out.append(Event(
                 source=self.name,
                 source_class=self.source_class,

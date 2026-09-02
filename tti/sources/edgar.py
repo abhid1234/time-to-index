@@ -18,13 +18,17 @@ from __future__ import annotations
 
 import datetime as dt
 import time
+from zoneinfo import ZoneInfo
 
 from .. import config, http
 from ..models import Event
 from . import BaseSource, register
 
 API = "https://data.sec.gov/submissions/CIK{cik:0>10}.json"
-EASTERN = dt.timezone(dt.timedelta(hours=-4))   # EDGAR stamps US/Eastern
+# EDGAR stamps US/Eastern. This was a fixed -04:00, which is EDT only; for
+# five months of the year that is an hour wrong, in a benchmark whose first
+# rung is five minutes.
+EASTERN = ZoneInfo("America/New_York")
 
 # Forms worth asking about: periodic reports and material-event disclosures.
 FORMS = {"10-K", "10-Q", "8-K", "6-K", "20-F", "S-1", "424B4", "DEF 14A"}

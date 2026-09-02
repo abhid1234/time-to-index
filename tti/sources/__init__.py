@@ -14,6 +14,7 @@ upstream in the scheduler rather than charged to a provider.
 from __future__ import annotations
 
 import concurrent.futures as cf
+import time
 from collections.abc import Callable, Iterable
 from typing import Any, Protocol
 
@@ -45,6 +46,12 @@ class BaseSource:
         # reachability check does not need the whole watchlist, and one that
         # takes two minutes will not be run before the run that needed it.
         self.max_subjects: int | None = None
+        # Minimum seconds between consecutive requests when workers == 1.
+        # For publishers whose terms say "one request every N seconds and a
+        # single connection at a time" -- arXiv's exact words -- a thread pool
+        # of any size is a violation, and a comment saying otherwise is not a
+        # rate limiter.
+        self.min_interval: float = 0.0
 
     def fan_out(self, fn: Callable[[Any], list[Event]], items: Iterable[Any]) -> list[Event]:
         items = list(items)
@@ -53,6 +60,17 @@ class BaseSource:
         self.attempted += len(items)
         out: list[Event] = []
         if not items:
+            return out
+        if self.workers == 1 and self.min_interval > 0:
+            # Sequential and spaced. Same error accounting as the pool path,
+            # so a broken subject reads the same whichever way it was fetched.
+            for i, it in enumerate(items):
+                if i:
+                    time.sleep(self.min_interval)
+                try:
+                    out.extend(fn(it) or [])
+                except Exception as exc:  # noqa: BLE001
+                    self.errors.append(f"{it}: {type(exc).__name__}: {exc}"[:200])
             return out
         with cf.ThreadPoolExecutor(max_workers=min(self.workers, len(items))) as pool:
             futures = {pool.submit(fn, it): it for it in items}

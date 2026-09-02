@@ -29,7 +29,15 @@ ID_RE = re.compile(r"(\d{4}\.\d{4,5})(v\d+)?")
 class ArXiv(BaseSource):
     name = "arxiv"
     source_class = "preprint"
-    workers = 2          # arXiv asks for no more than one request every 3s
+    # arXiv's terms of use, verbatim: "make no more than one request every
+    # three seconds, and limit requests to a single connection at a time."
+    # This was workers = 2 with no spacing, under a comment that quoted the
+    # rule. Six categories fired in about a second every five minutes.
+    workers = 1
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.min_interval = 3.0
 
     def collect(self, seen):
         return self.fan_out(lambda cat: self._one(cat, seen),

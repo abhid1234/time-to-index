@@ -15,7 +15,12 @@ from .. import config, http
 from ..models import Event
 from . import BaseSource, register
 
-API = "https://api.github.com/repos/{repo}/releases?per_page=5"
+# Thirty, not five. A repository that ships canaries between stable releases
+# -- next.js publishes several a day -- can put more than five prereleases
+# ahead of the newest stable, and with per_page=5 the stable fell off the
+# page and the repo silently produced no event. Same single request.
+API = "https://api.github.com/repos/{repo}/releases?per_page=30"
+API_VERSION = "2022-11-28"
 
 
 def _iso(s: str) -> float:
@@ -28,7 +33,8 @@ class GithubReleases(BaseSource):
     workers = 4          # unauthenticated GitHub allows 60 requests/hour
 
     def collect(self, seen):
-        headers = {"Accept": "application/vnd.github+json"}
+        headers = {"Accept": "application/vnd.github+json",
+                   "X-GitHub-Api-Version": API_VERSION}
         tok = config.api_key("GITHUB_TOKEN")
         if tok:
             headers["Authorization"] = f"Bearer {tok}"

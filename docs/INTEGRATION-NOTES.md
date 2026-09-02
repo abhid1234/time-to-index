@@ -217,3 +217,18 @@ removing. First real call: store the raw response (the ledger does this
 anyway under `runs/raw/`), read `usage`, and if it states a charge, add the
 hook and the test alongside Exa's.
 
+**2026-09-02, the four collectors that cannot be reached from a cloud
+container, from their published terms.** arXiv's terms of use say one
+request every three seconds and a single connection at a time; the collector
+ran two concurrent workers with no spacing, under a comment that quoted the
+rule. It is now one worker with a three-second gap, and the base class
+enforces the gap rather than a comment describing it. EDGAR and the Federal
+Register both anchored Eastern-time stamps to a fixed UTC offset, an hour
+wrong for five months of the year; both use `zoneinfo` now. GitHub's
+collector asked for five releases per repository, so a canary-heavy repo
+could push the newest stable off the page and produce nothing; it asks for
+thirty, same request, and sends an explicit `X-GitHub-Api-Version`. The
+Federal Register source now states the public-inspection caveat: documents
+are on the web before the issue time this source anchors to, so any error
+flatters providers rather than penalising them.
+
