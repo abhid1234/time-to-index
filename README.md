@@ -146,9 +146,14 @@ aggregation says so.
 ## Look at it without paying for it
 
 ```bash
+python3 -m venv .venv && source .venv/bin/activate
 pip install -e .
-tti demo          # renders docs/demo.html and checks the estimator
+python -m tti demo    # renders docs/demo.html and checks the estimator
 ```
+
+(`tti` and `python -m tti` are the same program; the second also works when
+the checkout path contains a space, which the console script's `sh` wrapper
+does not. SETUP.md has the rest.)
 
 `tti demo` runs a synthetic corpus with made-up providers (`provider-a/b/c`)
 whose indexing latencies are drawn from a seeded generator, then reports
@@ -450,7 +455,7 @@ pip install -e ".[dev]"
 pytest -q && ruff check tti tests
 ```
 
-252 tests, on Python 3.10 through 3.13, no network calls. The ones that
+Over 500 tests, on Python 3.10 through 3.13, no network calls. The ones that
 matter:
 
 - **Turnbull reduces to Kaplan–Meier** on right-censored data — a theorem, so

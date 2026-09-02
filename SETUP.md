@@ -57,10 +57,15 @@ protects you.
 Computed from `data/providers.yaml` list prices, not estimated:
 
 ```
-per full rung sweep across 6 arms      $0.029
-worst case, 13.1 events/day, 6 rungs   $2.28/day
-with carry-forward stopping ladders    ~$1.25/day
+per full rung sweep across 6 arms      $0.027
+worst case, 13.1 events/day, 6 rungs   $2.12/day
+with carry-forward stopping ladders    ~$1.15/day
 ```
+
+(List prices as of 2026-09-02, five results per request. The two Parallel
+arms are `advanced` at $5/1k and `fast` at $1/1k; if you change the arms in
+`data/settings.yaml`, the plan in `docs/PREREGISTRATION.md` must change with
+them, and a test will tell you if it has not.)
 
 Carry-forward is why the real number is roughly half the worst case: once an
 arm answers FRESH for an event, its remaining rungs are skipped. The cap in
@@ -71,16 +76,29 @@ and written to the ledger as `SKIPPED` rather than dropped quietly.
 
 ```bash
 git clone <your-repo> && cd time-to-index
+python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
+python -m tti verify         # install is sound: config, estimator, grader, ledger, locking
 cp .env.example .env         # add your keys
 set -a && source .env && set +a
 
-tti doctor                   # every source and provider reachable? ~6s
-tti forecast                 # how long until this can support a claim?
-tti discover && tti probe    # then put both on a timer
+python -m tti doctor         # every source and provider reachable? ~6s
+python -m tti forecast       # how long until this can support a claim?
+python -m tti discover && python -m tti probe    # then put both on a timer
 ```
 
 Then `deploy/systemd/` or `.github/workflows/probe.yml`, and leave it.
+
+`python -m tti` and `tti` are the same program. Prefer the first: the `tti`
+console script is a `#!/bin/sh` wrapper that breaks when the checkout path
+contains a space (macOS `~/Documents/Personal projects/…` did exactly this,
+with a misleading `ModuleNotFoundError`). Recent macOS ships no `pip`
+outside a venv, which is the other reason the venv line is there.
+
+Before the first `probe` with a key, read "Which mode of each provider" in
+`docs/METHODOLOGY.md` and decide whether the two Parallel arms are the ones
+you want. The first dispatched probe locks the plan; changing arms after
+that is a new plan, not an edit.
 
 ## How long to leave it
 
@@ -116,8 +134,10 @@ was built, so the 13.1 figure is a floor.
 2. **`tti forecast`.** With releases and filings reachable the rate should
    climb well above 13/day, which shortens everything above.
 3. **Run for a week.** Check `tti power` rather than the leaderboard.
-4. **Fill in `docs/INTEGRATION-NOTES.md`.** The provider section is entirely
-   "Open" right now because no provider API has ever been called. Filling it
-   in honestly is worth more than any number in the results table — it is the
-   part a vendor cannot get anywhere else.
+4. **Fill in `docs/INTEGRATION-NOTES.md`.** Every adapter was checked
+   against its provider's published API document on 2026-09-02, but no
+   provider API has ever been called from this code: the "Open" items are
+   the behaviours a spec cannot tell you. Filling them in honestly is worth
+   more than any number in the results table — it is the part a vendor
+   cannot get anywhere else.
 5. **Then publish**, and only then.
