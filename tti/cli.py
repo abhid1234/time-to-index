@@ -37,6 +37,7 @@ from .metrics import ORIGIN as metrics_origin
 from .metrics import (
     ProviderScore,
     fmt_duration,
+    fmt_p,
     recall_by_render,
     score,
     staleness_by_rung,
@@ -936,8 +937,7 @@ def cmd_power(args) -> int:
         hr = "—" if r.hazard_ratio != r.hazard_ratio else f"{r.hazard_ratio:.2f}"
         pw = "—" if r.power_now != r.power_now else f"{r.power_now*100:.0f}%"
         need = "—" if r.events_for_80 is None else f"{r.events_for_80:.0f}"
-        pv = "—" if r.p_value != r.p_value else f"{r.p_value:.4f}"
-        pa = "—" if r.p_adjusted != r.p_adjusted else f"{r.p_adjusted:.4f}"
+        pv, pa = fmt_p(r.p_value), fmt_p(r.p_adjusted)
         print(f"{r.a + ' vs ' + r.b:38s} {hr:>6s} {r.events_observed:>7d} "
               f"{pv:>7s} {pa:>7s} {pw:>6s} {need:>7s}  {r.verdict}")
     print("\nHR > 1 means the first arm indexes faster. `need` is the Schoenfeld")

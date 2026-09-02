@@ -24,6 +24,7 @@ from .metrics import (
     SurvivalCurve,
     fmt_bracket,
     fmt_duration,
+    fmt_p,
     fmt_pair,
 )
 from .models import Event, ProbeResult
@@ -728,8 +729,8 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
             f"<td class='k'>{e(r.a)} vs {e(r.b)}</td>",
             f"<td class='k'>{'—' if r.hazard_ratio != r.hazard_ratio else f'{r.hazard_ratio:.2f}'}</td>",
             f"<td class='k'>{r.events_observed}</td>",
-            f"<td class='k'>{'—' if r.p_value != r.p_value else f'{r.p_value:.4f}'}</td>",
-            f"<td class='k'>{'—' if r.p_adjusted != r.p_adjusted else f'{r.p_adjusted:.4f}'}</td>",
+            f"<td class='k'>{fmt_p(r.p_value)}</td>",
+            f"<td class='k'>{fmt_p(r.p_adjusted)}</td>",
             f"<td class='k'>{'—' if r.power_now != r.power_now else f'{r.power_now*100:.0f}%'}</td>",
         ]
         if r.verdict == "distinguishable":
@@ -743,7 +744,7 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
 
     pair_rows = "".join(_pw(r) for r in powers) or (
         "".join(
-            f"<tr><td class='k'>{e(a)} vs {e(b)}</td><td colspan='5' class='k'>p = {p:.4f} (uncorrected)</td>"
+            f"<tr><td class='k'>{e(a)} vs {e(b)}</td><td colspan='5' class='k'>p = {fmt_p(p)} (uncorrected)</td>"
             f"<td>{'distinguishable' if p < 0.05 else 'not distinguishable at this n'}</td></tr>"
             for a, b, p in pairs)   # fallback only; `powers` carries the adjusted verdict
         or "<tr><td colspan='7'>not enough events yet</td></tr>")

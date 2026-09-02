@@ -602,6 +602,17 @@ def _finite(v: object) -> bool:
         and math.isfinite(v) and v >= 0
 
 
+def fmt_p(p: float) -> str:
+    """A p-value for a table. "0.0000" is a claim that the probability is
+    exactly zero, which no test with a finite sample can make; below the
+    printed precision it reads "<0.0001". Not a number: a dash, as everywhere."""
+    if not isinstance(p, (int, float)) or p != p or p < 0 or p > 1:
+        return "—"
+    if p < 0.0001:
+        return "<0.0001"
+    return f"{p:.4f}"
+
+
 def fmt_pair(b: tuple[float | None, float | None]) -> str:
     """Render a Turnbull quantile bracket.
 

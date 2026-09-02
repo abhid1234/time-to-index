@@ -370,3 +370,29 @@ The first thing a real run did was violate the assumption. This is the same
 lesson as the control-only branch in score and report the night before, one
 layer up: it is not enough to detect the state, every sentence on the page
 has to have been written knowing the state exists.
+
+**2026-09-02, the pages rendered in a browser.** Every dashboard check until
+tonight had been string assertions against the HTML. A headless Chromium
+screenshot of each page, at 1280 pixels, in both themes, found four things
+none of the string tests could:
+
+- The twelfth leaderboard column pushed "$/1k fresh answers" and "events"
+  off the right edge into a scroll container. Measured: a 983-pixel table
+  in an 886-pixel box. Fixed by moving the unit into the header, widening
+  the frame to 1100 and tightening header padding; now 1006 in 1006.
+- On the control-only page, five provider-only panels rendered the layout
+  of a finding with the finding missing: a header-only leaderboard, axes
+  with no curve, a header-only estimator table, "it returned the superseded
+  answer — of the time (0 of 0 opportunities)", and a heading over nothing.
+  Each now says, in one shared sentence, that no provider arm has results.
+  A test asserts no table on the page is header-only.
+- The corpus page printed "0/0" in the robots column for two pages whose
+  robots.txt could not be fetched, beside "0/12" for pages whose robots.txt
+  was fetched and blocks nobody. Now "not checked".
+- The demo's "Are the differences real" table showed "—" under
+  Holm–Bonferroni on every row, beside raw p-values and verdicts the note
+  said were adjusted. The demo had its own copy of the pairwise loop with
+  no adjustment step. There were three copies; there is one.
+
+The screenshot is now part of the routine for any change to report.py. It
+takes four seconds and it is the only test that sees what a reader sees.

@@ -119,3 +119,13 @@ def test_score_raises_on_an_impossible_interval():
     ]
     # Normal: first FRESH at 300 with nothing earlier -> (0, 300]. Fine.
     assert score(events, results, "px", "base").median_bracket == (0.0, 300.0)
+
+
+def test_a_p_value_below_the_printed_precision_is_not_printed_as_zero():
+    from tti.metrics import fmt_p
+    assert fmt_p(0.0) == "<0.0001"
+    assert fmt_p(3e-7) == "<0.0001"
+    assert fmt_p(0.0001) == "0.0001"
+    assert fmt_p(0.0312) == "0.0312"
+    assert fmt_p(float("nan")) == "—"
+    assert fmt_p(1.5) == "—" and fmt_p(-0.1) == "—"
