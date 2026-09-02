@@ -71,7 +71,7 @@ nothing here is a finding about any product. Real runs are published at
 
 <p class="sub">How long a newly published fact takes to become retrievable through each
 web-search API, and how often the API confidently returns the answer it replaced.
-Generated 2026-09-02 07:11 UTC.</p>
+Generated 2026-09-02 07:18 UTC.</p>
 
 
 <div class='panel'><p style='margin-top:0'><b>Synthetic run.</b> These arms are a generator whose latencies are already known. The pre-registered plan does not apply, because nothing here is a measurement of anybody's product.</p></div>
@@ -156,8 +156,7 @@ Generated 2026-09-02 07:11 UTC.</p>
 <polygon points="372.0,256.5 510.2,229.2 617.2,166.8 702.0,116.1 702.0,73.2 617.2,120.7 510.2,192.4 372.0,236.2" fill="#2f7d5c" opacity="0.10"/>
 <polyline points="56.0,260.0 372.0,260.0 372.0,250.8 510.2,250.8 510.2,214.0 617.2,214.0 617.2,144.9 702.0,144.9 702.0,94.3 702.0,94.3" fill="none" stroke="#2f7d5c" stroke-width="2" stroke-linejoin="round"/>
 <text x="56" y="294" font-size="10" fill="var(--muted)">lag since publication (log scale) &#183; shaded band = 95% CI</text>
-</svg>
-  <div class="legend"><span><i style="background:#3b6ea5"></i>provider-a/fast</span><span><i style="background:#c2571a"></i>provider-b/base</span><span><i style="background:#2f7d5c"></i>provider-c/base</span></div>
+</svg><div class="legend"><span><i style="background:#3b6ea5"></i>provider-a/fast</span><span><i style="background:#c2571a"></i>provider-b/base</span><span><i style="background:#2f7d5c"></i>provider-c/base</span></div>
 </div>
 
 <h2>The control arm</h2>
@@ -210,10 +209,7 @@ Generated 2026-09-02 07:11 UTC.</p>
 
 <h2>Staleness</h2>
 <div class="panel">
-  <p style="margin-top:0">Across every probe where the provider had not yet indexed the
-  new answer and the question had a superseded one, it returned the superseded answer
-  <span class="big bad">56%</span> of the time
-  (376 of 667 opportunities).</p>
+  <p style="margin-top:0">Across every probe where the provider had not yet indexed the new answer and the question had a superseded one, it returned the superseded answer <span class="big bad">56%</span> of the time (376 of 667 opportunities).</p>
   <p class="note">Existing search benchmarks score a miss and a confidently-wrong
   stale answer identically. In production they are not the same event. An agent that
   gets nothing back retries, widens, or says it does not know. An agent that gets last

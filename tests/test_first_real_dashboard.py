@@ -101,3 +101,21 @@ def test_classify_splits_silent_by_whether_the_arm_was_enabled():
     legacy = prereg.classify(plan, present=[])
     assert legacy.declared_but_silent == sorted(declared)
     assert legacy.declared_not_enabled == []
+
+
+def test_provider_only_panels_say_why_they_are_empty(tmp_path):
+    """Screenshotting the first real page showed an empty twelve-column table,
+    an empty chart, an empty estimator table, a staleness line reading
+    "— of the time (0 of 0 opportunities)" and a bare heading. None of those
+    is a sentence. Each panel now says the same thing, once."""
+    from tti.report import NO_ARMS
+    _control_only(tmp_path, n_events=2)
+    page, md = _page(tmp_path)
+    assert "<tbody></tbody>" not in page                 # no header-only tables
+    assert page.count(NO_ARMS) >= 3                      # leaderboard, chart, estimator
+    assert "No curve yet" in page
+    assert "No staleness opportunities yet" in page
+    assert 'class="big bad">—<' not in page and "of 0 opportunities" not in page
+    assert "Per-class tables appear once" in page
+    # The control panel is untouched by any of this.
+    assert "<b>2</b> were confirmed retrievable" in page

@@ -87,6 +87,13 @@ TICKS = [(60, "1m"), (300, "5m"), (900, "15m"), (3600, "1h"),
          (21_600, "6h"), (86_400, "24h"), (259_200, "72h")]
 
 
+# The sentence every provider-only panel falls back to when there is no
+# provider arm to draw from. One string, so the page says the same thing in
+# each place rather than five slightly different things.
+NO_ARMS = ("No provider arm has results yet: every provider key is unset, or every "
+           "provider probe is still pending. This fills in with the first graded probe.")
+
+
 def survival_svg(scores: list[ProviderScore], title: str = "") -> str:
     tmin, tmax = 60.0, 259_200.0
     parts = [
@@ -833,6 +840,19 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
     stale_total = sum(s.n_stale for s in scores)
     stale_elig = sum(s.n_stale_eligible for s in scores)
     stale_pct = f"{stale_total / stale_elig * 100:.0f}%" if stale_elig else "—"
+    if stale_elig:
+        stale_sentence = (
+            '<p style="margin-top:0">Across every probe where the provider had not yet indexed '
+            'the new answer and the question had a superseded one, it returned the superseded '
+            f'answer <span class="big bad">{stale_pct}</span> of the time '
+            f'({stale_total} of {stale_elig} opportunities).</p>')
+    else:
+        # A rate with no denominator is not a rate. Say what would create one.
+        stale_sentence = (
+            '<p style="margin-top:0"><b>No staleness opportunities yet.</b> An opportunity is '
+            'a provider probe graded ABSENT or STALE on a question whose answer has a '
+            'superseded value; none has been recorded'
+            + (' because no provider arm has results.' if not ordered else '.') + '</p>')
 
     return f"""<title>Time to Index</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -859,7 +879,7 @@ Generated {gen}.</p>
     <th>$/1k events</th>
     <th>$/1k fresh<br><span style="text-transform:none;letter-spacing:0">answers</span></th>
     <th>events</th></tr></thead>
-    <tbody>{rows}</tbody></table></div>
+    <tbody>{rows or f"<tr><td colspan='{12 + (1 if any_phrasing else 0)}'>{NO_ARMS}</td></tr>"}</tbody></table></div>
   {converge_note}
   {drop_note}
   {ph_note}
@@ -896,8 +916,9 @@ Generated {gen}.</p>
 
 <h2>Time to index</h2>
 <div class="panel">
-  {survival_svg(ordered, "time to index, all sources")}
-  <div class="legend">{legend}</div>
+  {(survival_svg(ordered, "time to index, all sources") + f'<div class="legend">{legend}</div>')
+   if ordered else
+   f"<p class='note' style='margin-top:0'>No curve yet. {NO_ARMS} The control arm's outcomes are in the next panel.</p>"}
 </div>
 
 <h2>The control arm</h2>
@@ -923,7 +944,7 @@ Generated {gen}.</p>
   <div class="scroll"><table>
     <thead><tr><th>arm</th><th>Turnbull (reported)</th><th>Kaplan&#8211;Meier on the rung</th>
     <th>overstatement</th></tr></thead>
-    <tbody>{km_rows}</tbody></table></div>
+    <tbody>{km_rows or f"<tr><td colspan='4'>{NO_ARMS}</td></tr>"}</tbody></table></div>
   <p class="note">Kaplan&#8211;Meier needs a point event time, so feeding it the rung records
   an arm as indexing <i>at</i> the probe that first saw it. That overstates every latency
   by up to a bracket width, and it cannot represent a widened interval at all when a
@@ -934,10 +955,7 @@ Generated {gen}.</p>
 
 <h2>Staleness</h2>
 <div class="panel">
-  <p style="margin-top:0">Across every probe where the provider had not yet indexed the
-  new answer and the question had a superseded one, it returned the superseded answer
-  <span class="big bad">{stale_pct}</span> of the time
-  ({stale_total} of {stale_elig} opportunities).</p>
+  {stale_sentence}
   <p class="note">Existing search benchmarks score a miss and a confidently-wrong
   stale answer identically. In production they are not the same event. An agent that
   gets nothing back retries, widens, or says it does not know. An agent that gets last
@@ -954,7 +972,7 @@ Generated {gen}.</p>
 </div>
 
 <h2>By source class</h2>
-{class_blocks}
+{class_blocks or "<div class='panel'><p class='note' style='margin-top:0'>Per-class tables appear once a provider arm has events in a source class.</p></div>"}
 
 <h2>Does the ranking survive the rules that produced it</h2>
 <div class="panel">
