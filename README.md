@@ -33,7 +33,11 @@ it is wrong.
    data blob, or only an API fallback. An arm strong on the first and weak on
    the second is not slow — it does not execute JavaScript.
 4. **Grade FRESH / STALE / ABSENT** against the new answer token and the one
-   it replaced.
+   it replaced, in whatever text the API served. Arms differ by an order of
+   magnitude in how much text that is — an excerpt API honours the 1,500
+   characters asked for, a snippet API returns ~150 regardless — so the
+   leaderboard shows text served per result beside recall, and `tti
+   sensitivity` re-grades every arm as though it had returned short snippets.
 5. **Estimate with Turnbull's NPMLE for interval-censored data.** An arm seen
    absent at 15m and fresh at 1h indexed somewhere in (15m, 1h]; it did not
    index *at* 1h. Kaplan–Meier needs a point event time and would overstate

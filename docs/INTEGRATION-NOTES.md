@@ -44,6 +44,12 @@ anything already written here.
 - **Latency distribution, not mean.** p50 and p99 are both recorded per
   probe. A provider with a good p50 and a 30-second p99 is a different
   integration problem than its average suggests.
+- **How much text each arm actually serves per result** at the configured
+  five results and 1,500 characters. The leaderboard's "text served per
+  result" column measures it; record the first observed values here, per
+  arm, because the METHODOLOGY section on unequal text is written from the
+  documentation and the first real payloads will either confirm the order
+  of magnitude or correct it.
 - **How the SDK or docs read to a coding agent.** Several vendors now state
   that agents are a primary audience for their documentation. That is a
   testable claim: point an agent at the docs cold and see whether it produces
