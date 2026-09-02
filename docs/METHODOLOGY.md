@@ -151,7 +151,11 @@ needs to be able to separate the two, so two things are reported:
   like every other variant.
 
 The 160 figure is a conventional snippet length, not a measurement of any
-particular provider; the column above is the measurement.
+particular provider; the column above is the measurement. The synthetic demo
+shows the effect at full strength: its excerpt arm keeps the fact anywhere in
+1,400 characters, its snippet arm keeps it inside 150, and under the window
+the two swap places with a rank correlation of 0.33. Real arms will sit
+somewhere short of that, and the variant row says where.
 
 ## The phrasing axis
 

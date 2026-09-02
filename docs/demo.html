@@ -71,7 +71,7 @@ nothing here is a finding about any product. Real runs are published at
 
 <p class="sub">How long a newly published fact takes to become retrievable through each
 web-search API, and how often the API confidently returns the answer it replaced.
-Generated 2026-09-02 07:28 UTC.</p>
+Generated 2026-09-02 07:39 UTC.</p>
 
 
 <div class='panel'><p style='margin-top:0'><b>Synthetic run.</b> These arms are a generator whose latencies are already known. The pre-registered plan does not apply, because nothing here is a measurement of anybody's product.</p></div>
@@ -87,7 +87,7 @@ Generated 2026-09-02 07:28 UTC.</p>
     <th>$/1k events</th>
     <th>$/1k fresh<br><span style="text-transform:none;letter-spacing:0">answers</span></th>
     <th>events</th></tr></thead>
-    <tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>15m</td><td class='k'>15m–1.0h</td><td class='k'>99% (95–100)</td><td class='k'>99% (93–100)</td><td class='k bad'>57% (46–67)</td><td class='k'>1057ms</td><td class='k'>1.4k</td><td class='k'>$10.38</td><td class='k'>$10.48</td><td class='k'>106</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>1.0h–6.0h</td><td class='k'>6.0h</td><td class='k'>6.0h–24.0h</td><td class='k'>91% (83–95)</td><td class='k'>90% (82–95)</td><td class='k bad'>70% (63–75)</td><td class='k'>820ms</td><td class='k'>149</td><td class='k'>$19.06</td><td class='k'>$21.04</td><td class='k'>106</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>24.0h–3.0d</td><td class='k'>24.0h–3.0d</td><td class='k'>>3.0d</td><td class='k'>47% (38–57)</td><td class='k'>44% (34–55)</td><td class='k bad'>48% (43–53)</td><td class='k'>1492ms</td><td class='k'>621</td><td class='k'>$26.51</td><td class='k'>$56.20</td><td class='k'>106</td></tr></tbody></table></div>
+    <tbody><tr><td class='k'>provider-a/fast</td><td class='k'>5m–15m</td><td class='k'>15m</td><td class='k'>15m–1.0h</td><td class='k'>99% (95–100)</td><td class='k'>99% (93–100)</td><td class='k bad'>57% (46–67)</td><td class='k'>1057ms</td><td class='k'>1.4k</td><td class='k'>$10.38</td><td class='k'>$10.48</td><td class='k'>106</td></tr><tr><td class='k'>provider-b/base</td><td class='k'>1.0h–6.0h</td><td class='k'>6.0h</td><td class='k'>6.0h–24.0h</td><td class='k'>91% (83–95)</td><td class='k'>90% (82–95)</td><td class='k bad'>70% (63–75)</td><td class='k'>820ms</td><td class='k'>181</td><td class='k'>$19.06</td><td class='k'>$21.04</td><td class='k'>106</td></tr><tr><td class='k'>provider-c/base</td><td class='k'>24.0h–3.0d</td><td class='k'>24.0h–3.0d</td><td class='k'>>3.0d</td><td class='k'>47% (38–57)</td><td class='k'>44% (34–55)</td><td class='k bad'>48% (43–53)</td><td class='k'>1492ms</td><td class='k'>646</td><td class='k'>$26.51</td><td class='k'>$56.20</td><td class='k'>106</td></tr></tbody></table></div>
   
   
   
@@ -278,8 +278,8 @@ Generated 2026-09-02 07:28 UTC.</p>
   <div class="scroll"><table>
     <thead><tr><th>rule variant</th><th>verdict churn</th><th>rank correlation</th>
     <th>medians moved</th><th>arms lost</th></tr></thead>
-    <tbody><tr><td colspan='5'>not evaluated &#8212; needs stored raw payloads from a real run</td></tr></tbody></table></div>
-  <p class="note">This panel fills in once probes have run against live providers and their responses are on disk.</p>
+    <tbody><tr><td class='k'>strict<span style='color:var(--muted)'> (reported)</span></td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/3</td><td class='k'>0</td></tr><tr><td class='k'>naive-substring</td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/3</td><td class='k'>0</td></tr><tr><td class='k'>no-v-prefix</td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/3</td><td class='k'>0</td></tr><tr><td class='k'>canonical-token-only</td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/3</td><td class='k'>0</td></tr><tr><td class='k'>urls-count-as-evidence</td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/3</td><td class='k'>0</td></tr><tr><td class='k'>titles-only</td><td class='k'>55.1%</td><td class='k'>1.00</td><td class='k'>3/3</td><td class='k bad'>3</td></tr><tr><td class='k'>shallow-walk</td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/3</td><td class='k'>0</td></tr><tr><td class='k'>snippet-window</td><td class='k'>27.3%</td><td class='k'>0.33</td><td class='k'>2/3</td><td class='k bad'>2</td></tr></tbody></table></div>
+  <p class="note">&#x27;titles-only&#x27; makes 3 of 3 arms unmeasurable rather than reordering them — the ranking looks stable under it only because there is nothing left to rank</p>
   <p class="note" style="border-color:var(--muted)">Every grading rule here is a
   judgement call: match on token boundaries or not, count a <code>v</code> prefix,
   trust aliases, treat a URL as evidence. Each variant re-grades the stored payloads

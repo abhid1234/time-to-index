@@ -35,12 +35,20 @@ PROFILES = [
     ("provider-c", "base",  64_800.0, 1.6, 0.78, 0.44),
 ]
 
-# Characters of text a synthetic arm serves per result. Real arms differ by
-# an order of magnitude here (an excerpt API honours max_chars_per_result; a
-# snippet API returns ~150 regardless), and the leaderboard has a column for
-# it, so the demo gives each arm a distinct, seeded figure rather than a zero
-# the page would render as "0 chars" and a reader would take literally.
-CHARS_PER_RESULT = {"provider-a": 1_380, "provider-b": 150, "provider-c": 620}
+# The shape of text each synthetic arm serves: which response key it uses and
+# roughly how many characters per result. Real arms differ by an order of
+# magnitude here (an excerpt API honours max_chars_per_result; a snippet API
+# returns ~150 regardless). The demo writes a real payload for every provider
+# probe, in that shape, and grades it with the real grader -- so the text
+# column, the sensitivity panel and the snippet-window variant on the demo
+# page are produced by the same code path a live run uses, not by fiat.
+TEXT_SHAPE = {"provider-a": ("excerpts", 1_380),
+              "provider-b": ("snippet", 150),
+              "provider-c": ("text", 620)}
+
+# Digit-free filler, so nothing version-shaped appears in a payload by
+# accident and the verdict the generator drew is the verdict the grader finds.
+_WORDS = ["release", "notes", "changelog", "package", "install", "upgrade", "fixed", "added", "removed", "documentation", "client", "server", "build", "tests", "pinned", "dependency", "migration", "breaking", "deprecated", "stable", "preview", "maintainers", "thanks", "contributors"]
 
 CLASSES = [
     ("package_registry", "npm", True, 40),
@@ -56,7 +64,8 @@ CLASSES = [
 DEMO_MARKER = "SYNTHETIC"
 
 
-def generate(run_dir: pathlib.Path, ladder: list[int], seed: int = 7
+def generate(run_dir: pathlib.Path, ladder: list[int], seed: int = 7,
+             payloads: bool = True
              ) -> tuple[Ledger, dict[str, list[float]]]:
     rng = random.Random(seed)
     led = Ledger(run_dir)
@@ -146,6 +155,8 @@ def generate(run_dir: pathlib.Path, ladder: list[int], seed: int = 7
                 results.append(_r(ev, provider, mode, rung,
                                   STALE if stale else ABSENT, 0.005, now))
         truth[f"{provider}/{mode}"] = drawn
+    if payloads:
+        _attach_payloads(led, events, results)
     led.add_results(results)
     return led, truth
 
@@ -177,16 +188,56 @@ def _r(ev: Event, provider: str, mode: str, rung: int, verdict: str,
             zlib.crc32(f"{provider}:{mode}:{rung}".encode())).randint(300, 2400),
         matched_stale=[ev.predecessor] if verdict == STALE and ev.predecessor else [],
         matched_fresh=[ev.answer] if verdict == FRESH else [],
-        n_results=5, chars=_chars(provider, mode, rung),
-        cost_usd=cost, raw_ref="", note=note, render=render)
+        n_results=5, cost_usd=cost, raw_ref="", note=note, render=render)
 
 
-def _chars(provider: str, mode: str, rung: int) -> int:
-    base = CHARS_PER_RESULT.get(provider)
-    if base is None:            # the origin control reads a page, not results
-        return 0
-    jitter = random.Random(zlib.crc32(f"chars:{provider}:{mode}:{rung}".encode())).randint(-8, 8)
-    return 5 * (base + jitter)
+def _payload(ev: Event, r: ProbeResult) -> dict:
+    """A provider response that grades to the verdict the generator drew.
+
+    The fact sits at a seeded position inside one result's text: early or
+    late in a long excerpt, wherever it lands in a short snippet. That is the
+    property the `snippet-window` sensitivity variant is sensitive to, and it
+    is why the demo can show that variant doing something.
+    """
+    key, size = TEXT_SHAPE[r.provider]
+    rng = random.Random(zlib.crc32(f"payload:{r.probe_id}".encode()))
+
+    def filler(n: int) -> str:
+        out: list[str] = []
+        length = 0
+        while length < n:
+            w = rng.choice(_WORDS)
+            out.append(w)
+            length += len(w) + 1
+        return " ".join(out)[:n]
+
+    token = ev.answer if r.verdict == FRESH else (ev.predecessor if r.verdict == STALE else None)
+    hit = rng.randrange(5) if token else -1
+    results = []
+    for i in range(5):
+        body = filler(size + rng.randint(-8, 8))
+        if i == hit:
+            pos = rng.randint(0, max(0, len(body) - 24))
+            body = body[:pos] + f" version {token} " + body[pos:]
+        results.append({"url": f"https://example.invalid/{ev.subject}/{i}",
+                        "title": f"{ev.subject} — {key}",
+                        key: [body] if key == "excerpts" else body})
+    return {"results": results}
+
+
+def _attach_payloads(led: Ledger, events: list[Event], results: list[ProbeResult]) -> None:
+    from .grader import grade
+    by_id = {e.event_id: e for e in events}
+    for r in results:
+        if r.provider == "origin" or r.verdict in ("ERROR", "SKIPPED"):
+            continue
+        ev = by_id[r.event_id]
+        payload = _payload(ev, r)
+        verdict, fresh, stale, chars = grade(ev, payload)
+        if verdict != r.verdict:   # the generator and the grader must agree, by construction
+            raise RuntimeError(f"demo payload for {r.probe_id} graded {verdict}, drew {r.verdict}")
+        r.raw_ref = led.store_raw(r.provider, r.probe_id, payload)
+        r.chars, r.matched_fresh, r.matched_stale = chars, fresh, stale
 
 
 BANNER = """
@@ -225,8 +276,12 @@ def render(run_dir: pathlib.Path, out: pathlib.Path, ladder: list[int]) -> str:
                     recall_by_render(events, results, sc.provider, sc.mode)
                     for sc in scores}
     render_table = {k: v for k, v in render_table.items() if v}
+    # The demo stores a payload per provider probe, so the sensitivity pass
+    # runs for real here rather than rendering "not evaluated".
+    from . import sensitivity
+    sens_rows = sensitivity.run(led)
     html = report.dashboard_html(scores, events, results, by_class, pairs, powers,
-                                 stale_series, (), render_table or None,
+                                 stale_series, sens_rows, render_table or None,
                                  prereg_panel=report.prereg_panel_html("synthetic"))
     html = html.replace("<h1>Time to Index</h1>", "<h1>Time to Index</h1>" + BANNER)
     html = html.replace("<title>Time to Index</title>",

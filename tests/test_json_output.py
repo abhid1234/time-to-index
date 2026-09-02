@@ -92,7 +92,7 @@ def test_power_json_says_when_it_cannot_support_a_claim(tmp_path, capsys):
 def test_sensitivity_json_marks_variants_it_could_not_evaluate(tmp_path, capsys):
     """The dangerous reading is a perfect rank correlation that only means
     nothing was re-graded."""
-    demo.generate(tmp_path, LADDER)          # no raw payloads
+    demo.generate(tmp_path, LADDER, payloads=False)   # a ledger with no raw payloads
     _, raw = emit(capsys, tmp_path, ["sensitivity"])
     variants = json.loads(raw)["variants"]
     skipped = [v for v in variants if not v["evaluated"]]

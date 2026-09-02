@@ -250,7 +250,9 @@ def test_cli_demo_renders_and_checks_the_estimator(capsys, tmp_path):
 
 def test_cli_report_writes_a_dashboard_after_a_run(tmp_path, monkeypatch, capsys):
     from tti import demo
-    demo.generate(tmp_path, [300, 900, 3600, 21600, 86400, 259200])
+    # payloads=False: a ledger whose raw payloads are missing is a state a
+    # real run can be in (disk pruned, directory copied without runs/raw/).
+    demo.generate(tmp_path, [300, 900, 3600, 21600, 86400, 259200], payloads=False)
     assert main(["--run-dir", str(tmp_path), "score"]) == 0
     assert "median TTI" in capsys.readouterr().out
     assert main(["--run-dir", str(tmp_path), "report",
@@ -262,6 +264,16 @@ def test_cli_report_writes_a_dashboard_after_a_run(tmp_path, monkeypatch, capsys
     out = capsys.readouterr().out
     assert "index.html" in out and "hazard ratio" in out
     assert "no stored payloads to re-grade" in out
+
+
+def test_the_default_demo_ledger_evaluates_every_variant(tmp_path, capsys):
+    from tti import demo
+    demo.generate(tmp_path, [300, 900, 3600, 21600, 86400, 259200])
+    assert (tmp_path / "raw" / "provider-a").is_dir()
+    assert main(["--run-dir", str(tmp_path), "sensitivity"]) == 0
+    out = capsys.readouterr().out
+    assert "no stored payloads" not in out
+    assert "snippet-window" in out and "titles-only" in out
 
 
 def test_cli_placeholder_page_says_no_run_has_happened(capsys, tmp_path):

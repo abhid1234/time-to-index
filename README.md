@@ -160,8 +160,13 @@ the checkout path contains a space, which the console script's `sh` wrapper
 does not. SETUP.md has the rest.)
 
 `tti demo` runs a synthetic corpus with made-up providers (`provider-a/b/c`)
-whose indexing latencies are drawn from a seeded generator, then reports
-whether the estimator recovered the latencies it was never shown:
+whose indexing latencies are drawn from a seeded generator, writes a payload
+for every probe in each arm's text shape (long excerpts, short snippets,
+mid-length text) and grades it with the real grader, then reports whether
+the estimator recovered the latencies it was never shown. Because the
+payloads exist, the demo page's sensitivity panel is computed, not
+placeholder: under the `snippet-window` variant the snippet arm overtakes the
+excerpt arm, which is the text-volume effect described above, made visible.
 
 ```
 OK  provider-a/fast: estimated     5m–15m  true      7m  (n=106, indexed 105)
