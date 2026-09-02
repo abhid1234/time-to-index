@@ -351,6 +351,14 @@ bound, which at small n is large, and that is the number that goes beside the
 recall column. Reporting 0% would be the same mistake as reporting a median
 from the events that happened to index.
 
+It is beside the recall column: the dashboard carries this table directly
+under the leaderboard, and RESULTS.md carries it too. The dashboard is built
+offline, so that rendering does not ask any registry whether the
+counterfactuals are really unpublished, and the panel says so; `tti decoy`
+asks, and its figure is the one to quote. The origin control is re-graded as
+well, and reported as a sentence rather than a row — it is the grader's own
+rate on raw page bytes, with no provider in the loop.
+
 ## Pre-registration
 
 See [PREREGISTRATION.md](PREREGISTRATION.md) for the plan itself. The
