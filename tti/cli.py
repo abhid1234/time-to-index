@@ -210,9 +210,12 @@ def cmd_prereg(args) -> int:
         return 2
 
     led = _ledger(args)
+    from .demo import DEMO_MARKER
+    synthetic = (led.root / DEMO_MARKER).exists()
     st = prereg.status(led.root, plan, started=bool(led.results()))
     if args.json:
         return _emit({
+            "synthetic": synthetic,
             "hash": plan.hash, "version": plan.version,
             "registered": plan.registered,
             "primary_endpoint": plan.primary_endpoint,
@@ -256,7 +259,12 @@ def cmd_prereg(args) -> int:
         print(f"  {line}")
 
     print("\nlock")
-    if not st.started:
+    if synthetic:
+        # `tti demo` ledgers carry results and never a lock: the plan is a
+        # claim about a measurement of somebody's product, and a generator
+        # is not one. The warning below is for real runs.
+        print("  synthetic run — the plan does not apply, and no lock is expected")
+    elif not st.started:
         print("  no results yet — the plan locks on the first dispatched probe")
     elif st.locked is None:
         print("  ! results exist but no lock file; the plan cannot be shown "

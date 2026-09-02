@@ -347,3 +347,13 @@ def test_the_dashboard_carries_the_plan_panel(tmp_path):
     assert "what was promised, and what would falsify it" in page
     assert "H1" in page and "H2" in page and "H3" in page
     assert (out_dir / "RESULTS.md").read_text().count("Pre-registration") == 1
+
+
+def test_prereg_on_a_synthetic_ledger_does_not_warn_about_a_missing_lock(tmp_path, capsys):
+    from tti import config, demo
+    demo.generate(tmp_path, config.ladder())
+    assert main(["--run-dir", str(tmp_path), "prereg"]) == 0
+    out = capsys.readouterr().out
+    assert "synthetic run" in out and "cannot be shown to predate" not in out
+    assert main(["--run-dir", str(tmp_path), "prereg", "--json"]) == 0
+    assert json.loads(capsys.readouterr().out)["synthetic"] is True
