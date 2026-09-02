@@ -270,3 +270,22 @@ sends both.
 github.com pages (403), arxiv.org, and every vercel.com / nextjs.org /
 ai-sdk.dev / v0.app property. Those need a residential connection.
 
+**2026-09-02, the forecast, before and after one bound.** `tti forecast`
+against the live registries, same watchlist, same hour, the only change
+being whether the twelve largest npm packuments were readable:
+
+| | before | after |
+|---|---|---|
+| subjects readable | 82 | 94 |
+| observed rate | 11.3 events/day | 13.1 events/day |
+| effective subjects | 37 | 44 |
+| top-subject share | 7.7% | 6.6% |
+| days to 191 events (HR 1.5) | 17 | 15 |
+
+The stopping rule reads the after column. The before column is what the
+tool reported an hour earlier with a straight face, `next` listed as
+unreachable, and nothing in the number to say a bound had been applied in
+one module and not another. 13.1 per day is the rate the watchlist was
+sized to when it was built; the bug had quietly returned the corpus to
+roughly its pre-expansion rate.
+
