@@ -9,13 +9,17 @@
 providers:
   parallel:
     docs: https://docs.parallel.ai/getting-started/pricing
-    pricing_checked: "2026-08-26"
+    # Search API v1. Ten results are included per request in every mode;
+    # the previous entry said five and named two modes (base, pro) that are
+    # Task API processors, not Search modes. Verified against the pricing
+    # page and the OpenAPI document.
+    pricing_checked: "2026-09-02"
     env: PARALLEL_API_KEY
     modes:
-      turbo:    {usd_per_1k_requests: 1.0, usd_per_1k_extra_results: 1.0, results_included: 5}
-      fast:     {usd_per_1k_requests: 1.0, usd_per_1k_extra_results: 1.0, results_included: 5}
-      base:     {usd_per_1k_requests: 5.0, usd_per_1k_extra_results: 1.0, results_included: 5}
-      pro:      {usd_per_1k_requests: 5.0, usd_per_1k_extra_results: 1.0, results_included: 5}
+      turbo:    {usd_per_1k_requests: 1.0, usd_per_1k_extra_results: 1.0, results_included: 10}
+      fast:     {usd_per_1k_requests: 1.0, usd_per_1k_extra_results: 1.0, results_included: 10}
+      basic:    {usd_per_1k_requests: 5.0, usd_per_1k_extra_results: 1.0, results_included: 10}
+      advanced: {usd_per_1k_requests: 5.0, usd_per_1k_extra_results: 1.0, results_included: 10}
 
   exa:
     docs: https://docs.exa.ai/reference/pricing

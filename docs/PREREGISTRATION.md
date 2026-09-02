@@ -62,8 +62,8 @@ secondary_endpoints:
     shell.
 
 arms_declared_in_advance:
-  - parallel/base
-  - parallel/pro
+  - parallel/advanced
+  - parallel/fast
   - exa/auto
   - tavily/basic
   - brave/web

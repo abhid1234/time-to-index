@@ -177,6 +177,7 @@ actually made here, in this repository, in the form described.
 | "distinguishable, p = 0.03" | one of fifteen pairwise tests, each judged against a raw 0.05 — a 54% chance of at least one spurious call | Holm–Bonferroni across the whole family; the verdict uses the adjusted value |
 | a 32 MB bound, "twice the largest seen" | five packuments measured in compressed bytes, none of them the largest | the bound is sized from the collector's own decompressed measurement of every package that failed, and the comment says which megabyte |
 | a quiet five-minute poll | the same 30 MB packument fetched 288 times a day per subject, because late drops were never remembered | late drops advance the high-water mark; the second poll must fetch zero packuments |
+| two Parallel arms, `base` and `pro` | Task API processor names in a Search API adapter, against a retired endpoint; every probe would 403 | the adapter is checked against the published OpenAPI document, and a test asserts every configured arm is a mode its adapter declares |
 | 78% recall | possibly 78% minus an unmeasured false-positive rate | every payload is re-graded against a counterfactual answer that was never published |
 | an analysis plan declaring `exa/base` | the runner dispatches `exa/auto`; every real arm would have read "exploratory" and every declared arm "produced nothing" | the plan's arms and ladder are asserted equal to `data/settings.yaml` |
 
@@ -202,25 +203,36 @@ Every provider here sells more than one tier, and the arms in
 `data/settings.yaml` pick one or two of them. That choice is not neutral and
 this section exists so it is not silent.
 
-As registered, the plan probes two Parallel modes, `base` and `pro`, and one
-mode each of Exa (`auto`), Tavily (`basic`), Brave (`web`) and Serper
-(`search`). Parallel also sells `turbo` and `fast` at a fifth of the price of
-the two selected; they are priced in `data/providers.yaml` and not probed.
+As registered, the plan probes two Parallel Search modes, `advanced` and
+`fast`, and one mode each of Exa (`auto`), Tavily (`basic`), Brave (`web`)
+and Serper (`search`). Parallel also sells `turbo` and `basic`; all four are
+priced in `data/providers.yaml`.
 
-That is a comparison of one vendor's two premium tiers against four other
-vendors' defaults. It can be defended — the question the project asks is
-"how fresh can this API be", and a premium tier is the fairest answer to that
-— but it is a choice, it affects the cost column directly, and it gives one
-provider two rows in a table where the others have one. A reader from any of
-these companies will notice it before they notice anything else.
+Why those two. `advanced` is Parallel's default and its quality tier, at $5
+per thousand requests. `fast` is the mode their own documentation recommends
+for most agents, at $1. One is the best answer to "how fresh can this API
+be"; the other is the answer to "how fresh is it the way people are told to
+use it". Both questions are worth asking and they have different prices.
 
-It is recorded here rather than resolved here because it is a decision about
-whose money buys which measurement, and it must be made **before the first
-probe** — after that it is a plan change, and the lock will say so. The
-alternatives, each with a cost: one arm per provider at each vendor's
-cheapest tier (comparable, and unflattering to everyone); one arm per
-provider at each vendor's best tier (comparable, and the most expensive run);
-or two tiers for every vendor (symmetric, and doubles the bill).
+A correction, recorded because it would otherwise be invisible. Until
+2026-09-02 this plan and the adapter named the two Parallel arms `base` and
+`pro`. Those are processors in Parallel's Task API and have never been Search
+modes; the adapter was also built against the retired `/v1beta` contract.
+Every Parallel probe would have returned 403 and been graded as an ERROR that
+looked like an outage. It was caught by reading the published OpenAPI
+document before the first probe, not after. The plan had not yet been locked
+to any data, so this is the plan being written, not revised — and this
+paragraph is here so that distinction is checkable rather than asserted.
+
+It is still a comparison of one vendor's two tiers against four other
+vendors' one, and it still gives one provider two rows in a table where the
+others have one. It is recorded here rather than resolved here because it is
+a decision about whose money buys which measurement, and it must be made
+**before the first probe** — after that it is a plan change, and the lock
+will say so. The alternatives, each with a cost: one arm per provider at each
+vendor's cheapest tier (comparable, and unflattering to everyone); one arm
+per provider at each vendor's best tier (comparable, and the most expensive
+run); or two tiers for every vendor (symmetric, and doubles the bill).
 
 ## The number of comparisons a leaderboard invites
 

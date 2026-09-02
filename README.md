@@ -328,7 +328,7 @@ which is ours, and it answers offline:
   ✓ grader     4 version-boundary cases graded as expected
   ✓ ledger     runs/: every line parses, 1,284 result(s), no duplicate probe ids
   ✓ platform   advisory file locking available; overlapping discover/probe runs are prevented
-  ✓ prereg     plan 1257222a75b5735c · v1 · 4 hypotheses, each with a falsification condition — locked, unchanged
+  ✓ prereg     plan bac218770f209b20 · v1 · 4 hypotheses, each with a falsification condition — locked, unchanged
 ```
 
 The test suite proves the repository is correct at the commit CI ran. It says

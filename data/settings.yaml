@@ -39,8 +39,14 @@ sources: [npm, pypi, github_release, edgar, arxiv, federal_register]
 # Provider/mode pairs probed on every rung. Each added pair multiplies the
 # call volume by one, so this list is where cost is actually decided.
 arms:
-  - {provider: parallel, mode: base}
-  - {provider: parallel, mode: pro}
+  # Search API v1 modes. `advanced` is Parallel's default and quality tier;
+  # `fast` is the mode their documentation recommends for most agents. The
+  # earlier entries, base and pro, are Task API processors and would have
+  # returned 403 on every probe. Which tiers to buy is a decision -- see
+  # METHODOLOGY, "Which mode of each provider" -- and must be settled before
+  # the first probe locks the plan.
+  - {provider: parallel, mode: advanced}
+  - {provider: parallel, mode: fast}
   - {provider: exa,      mode: auto}
   - {provider: tavily,   mode: basic}
   - {provider: brave,    mode: web}

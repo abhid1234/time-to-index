@@ -61,8 +61,8 @@ anything already written here.
   leaderboard lists arms as `provider/mode` and never aggregates a provider's
   modes into one row, because averaging a cheap mode with an expensive one
   produces a number that describes no purchasable product.
-- **One vendor's request contract is genuinely different.** Parallel's search
-  endpoint takes an `objective` plus literal `search_queries`, which assumes
+- **One vendor's request contract is genuinely different.** Parallel's Search
+  API v1 takes an `objective` plus literal `search_queries`, which assumes
   the caller is an agent that knows its own goal rather than a person typing
   keywords. That is a real design position and it does not fit a
   lowest-common-denominator harness cleanly: sending only the objective
@@ -175,4 +175,19 @@ collected 82 events and dropped all 82 as detected-late. This is the documented
 cold-start behaviour, not a fault: every watched package looks new on the first
 poll and shipped days ago. A populated ledger needs the collector to be running
 when a release lands, which is what the timers are for.
+
+**2026-09-02, Parallel Search API, from the published spec.** The adapter
+targeted `/v1beta/search`, sent the mode as `processor`, put `max_results`
+and `max_chars_per_result` at the top level, and offered `base` and `pro` as
+modes. Against the current OpenAPI document: the endpoint is `/v1/search`,
+the field is `mode`, both settings live under `advanced_settings`, and the
+modes are `turbo`, `fast`, `basic`, `advanced`. `base` and `pro` are Task API
+processors. Their error catalogue lists `Forbidden: invalid processor in
+request`; every probe would have returned it. Pricing was also off: ten
+results are included per request, not five. Caught by reading the spec before
+the first probe. The adapter now refuses an unknown mode locally, with a
+message, rather than letting the API 403 and having that graded as an outage.
+`search_queries` is kept as the same full sentence every other arm receives,
+against Parallel's 3–6-keyword guidance, deliberately — see the adapter
+docstring.
 
