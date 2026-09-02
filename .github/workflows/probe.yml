@@ -31,8 +31,20 @@ jobs:
 
       - name: Restore ledger
         run: |
-          mkdir -p runs
-          if [ -d ledger ]; then cp -r ledger/* runs/ 2>/dev/null || true; fi
+          # The ledger files, the plan lock, and every earlier day's raw
+          # payloads. Without the lock, each run would write a fresh one and
+          # plan drift could never be detected; without the payloads, the
+          # dashboard's sensitivity and false-positive panels would be
+          # computed on this run's handful alone.
+          mkdir -p runs/raw
+          if [ -d ledger ]; then
+            cp ledger/*.jsonl runs/ 2>/dev/null || true
+            cp ledger/prereg.lock runs/ 2>/dev/null || true
+            for f in ledger/raw/*.tar.gz; do
+              [ -e "$f" ] && tar -xzf "$f" -C runs
+            done
+          fi
+          touch runs/.checkout-stamp
 
       - name: Discover and probe
         env:
@@ -57,13 +69,17 @@ jobs:
         run: |
           mkdir -p ledger/raw
           cp runs/*.jsonl ledger/ 2>/dev/null || true
+          cp runs/prereg.lock ledger/ 2>/dev/null || true
           # Raw payloads are the evidence, so they ship -- but one file per
           # probe would put six figures of tiny blobs in git history. One
-          # gzipped archive per UTC day keeps them auditable and the repo
-          # clonable.
-          DAY=$(date -u +%F)
-          if [ -n "$(ls -A runs/raw 2>/dev/null)" ]; then
-            tar -czf "ledger/raw/${DAY}.tar.gz" -C runs raw
+          # gzipped archive per run, holding only the payloads this run
+          # wrote (restored ones are older than the stamp), keeps them
+          # auditable, the repo clonable, and the archives non-overlapping.
+          NEW=$(mktemp)
+          find runs/raw -type f -newer runs/.checkout-stamp > "$NEW"
+          if [ -s "$NEW" ]; then
+            tar -czf "ledger/raw/$(date -u +%FT%H%MZ)-${{ github.run_id }}.tar.gz" \
+                -C runs -T <(sed 's#^runs/##' "$NEW")
           fi
 
       - name: Commit

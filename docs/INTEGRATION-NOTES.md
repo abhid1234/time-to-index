@@ -425,3 +425,19 @@ a line, and no CI runner would ever show it because they all ship tzdata.
 The zone is built on first use now, a missing database is a per-subject
 error naming the fix, `tzdata` is a declared dependency, and a test runs
 the CLI in a subprocess with zoneinfo's search path emptied.
+
+**2026-09-02, the GitHub Actions path, read as a runner would execute it.**
+The workflow restored `ledger/*` into `runs/` and persisted `runs/*.jsonl`
+plus one gzipped archive of `runs/raw` per day. Two things that meant. The
+plan lock, `runs/prereg.lock`, is not a `.jsonl`, so it was never persisted:
+every run would have found results and no lock, written a fresh lock, and
+plan drift could never have been detected on that path. And earlier days'
+raw payloads came back as unopened tarballs, so `tti report`'s sensitivity
+and false-positive panels would have been computed on the payloads of the
+current ten-minute run alone, while reading as if they covered the ledger.
+The restore step now copies the lock and extracts every archive; the
+persist step copies the lock and archives only the files this run wrote
+(newer than a stamp taken at checkout), one archive per run, so archives
+never overlap. Simulated end to end in a scratch directory before commit:
+day two restores day one's payloads, writes one more, and archives only
+that one.
