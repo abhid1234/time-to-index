@@ -190,7 +190,8 @@ On the first probe of a run, that hash is written to the ledger. From then on:
 | plan unchanged | reported quantities are marked `pre-registered` |
 | plan edited after collection began | every score, report and verify names the change and the arms it affects |
 | an arm appears in the data that the plan never declared | that arm is marked `exploratory` in the leaderboard |
-| an arm the plan declared produced nothing | named as a declared arm with no data, rather than silently absent |
+| an arm the plan declared was enabled and produced nothing | named as a declared arm with no data, rather than silently absent |
+| an arm the plan declared was never given a key | named as declared but not enabled — a configuration state, not a result |
 
 The last row matters as much as the others. A declared arm that vanishes from a
 table is how a benchmark loses its worst result without anybody deciding to.
