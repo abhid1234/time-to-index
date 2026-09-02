@@ -274,6 +274,23 @@ When no false positive is observed, the reported number is **not** 0%. It is
 the Wilson upper bound, which at small n is large — and that bound is the
 figure that belongs beside the recall numbers.
 
+### Where the cost column comes from
+
+Every arm's `$/1k events` and `$/1k fresh answers` are computed from
+`data/providers.yaml`, where each price carries the vendor page it was read
+from and the date it was last checked by hand. That is this repository's
+reading of a page that changes: on 2026-09-02 one vendor's entry was 29% low
+and another's named two modes that were not products.
+
+Where a vendor states its own charge in the response — Exa does, as
+`costDollars.total` — the ledger records that number instead, marks the row
+`cost_source: reported`, and settles the day's spend to it. The cap gates
+dispatch on the list estimate; settlement records what was billed, with no
+cap check, because a call that has already happened has already cost what it
+cost. `tti status` sums how far reported charges have diverged from the table
+across the whole ledger, so a stale price shows up as dollars before it shows
+up on an invoice.
+
 ### Pre-registration
 
 The analysis plan is in [docs/PREREGISTRATION.md](docs/PREREGISTRATION.md),

@@ -540,6 +540,30 @@ def cmd_score(args) -> int:
     return 0
 
 
+def _cost_reconciliation(led, max_results: int) -> dict:
+    """How far vendor-reported charges have diverged from the price table.
+
+    Computed from the ledger, not from the in-memory Budget, because the
+    Budget is rebuilt every run and forgets. Rows marked `cost_source:
+    reported` are re-priced at today's list price and the difference summed.
+    A table that has drifted shows up here as dollars, with a sign.
+    """
+    reported = list_rows = 0
+    drift = 0.0
+    for r in led.results():
+        if r.verdict in (ERROR, SKIPPED) or r.provider == ORIGIN_ARM:
+            continue
+        if getattr(r, "cost_source", "list") == "reported":
+            reported += 1
+            # An unpriced arm is skipped here; the status command names it.
+            with contextlib.suppress(config.ConfigError):
+                drift += r.cost_usd - unit_cost(r.provider, r.mode, max_results)
+        else:
+            list_rows += 1
+    return {"reported_rows": reported, "list_rows": list_rows,
+            "drift_usd": round(drift, 6)}
+
+
 def cmd_status(args) -> int:
     led = _ledger(args)
     if args.json:
@@ -558,6 +582,8 @@ def cmd_status(args) -> int:
                                   default=float("nan"))),
             "budget": {"day": day, "cap_usd": b.cap, "spent_usd": b.spent,
                        "remaining_usd": b.remaining()},
+            "cost_reconciliation": _cost_reconciliation(
+                led, int(config.settings().get("max_results", 5))),
             "integrity": led.integrity(),
         })
     events, probes = led.events(), led.probes()
@@ -575,6 +601,15 @@ def cmd_status(args) -> int:
         print(f"next due  {dt.datetime.fromtimestamp(nxt, dt.timezone.utc):%H:%M:%S UTC} "
               f"(in {fmt_duration(nxt - now)})")
     print(f"budget    ${b.spent:.4f} / ${b.cap:.2f} today")
+    rec = _cost_reconciliation(led, int(config.settings().get("max_results", 5)))
+    if rec["reported_rows"]:
+        sign = "+" if rec["drift_usd"] >= 0 else "-"
+        print(f"cost      {rec['reported_rows']} vendor-reported row(s), "
+              f"{rec['list_rows']} list-priced; reported minus list = "
+              f"{sign}${abs(rec['drift_usd']):.4f}")
+        if abs(rec["drift_usd"]) > 0.05 * max(b.spent, 1e-9):
+            print("          data/providers.yaml has drifted from what vendors "
+                  "charge; re-check the pricing pages.")
     est = 0.0
     unpriced: set[str] = set()
     for pr in due:

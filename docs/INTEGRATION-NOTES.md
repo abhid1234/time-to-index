@@ -208,3 +208,12 @@ A generic test now asserts that every mode any adapter *declares* is priced,
 not only the configured ones. An unpriced mode is $0.00 in the cost column,
 which is the cheapest way to win a benchmark.
 
+**2026-09-02, Parallel `usage`.** The v1 response schema lists `usage`
+(array or null, "usage metrics for the search request") with no field
+detail in the published document. It may carry cost the way Exa's
+`costDollars` does; it may not. No `reported_cost` hook was written for it,
+because inventing a field name is the class of error this evening was spent
+removing. First real call: store the raw response (the ledger does this
+anyway under `runs/raw/`), read `usage`, and if it states a charge, add the
+hook and the test alongside Exa's.
+
