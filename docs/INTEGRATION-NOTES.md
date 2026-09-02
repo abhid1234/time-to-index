@@ -36,7 +36,11 @@ anything already written here.
   that returns 200-with-nothing at its limit is indistinguishable, to this
   harness, from a provider whose index does not have the document — and would
   silently score as a recall failure. `tti doctor` and the ERROR verdict
-  exist to catch this, but only if the taxonomy is known.
+  exist to catch this, but only if the taxonomy is known. Since 2026-09-02
+  the runner treats a 200 whose body has an error/message key and no
+  results container as an ERROR with the vendor's words in the note; a
+  200 with `results: []` at the limit is the case that still needs the
+  taxonomy, and the first real run should record what each vendor sends.
 - **Whether free-tier credit behaves as documented.** Specifically: does a
   free allowance ever return an insufficient-balance error while still inside
   the stated free quota? This is worth checking deliberately rather than

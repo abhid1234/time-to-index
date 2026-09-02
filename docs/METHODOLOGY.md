@@ -235,6 +235,7 @@ actually made here, in this repository, in the form described.
 | "36 control probes graded, 0 confirmed retrievable, and every provider arm produced nothing" | 28 carry-forward rows counted as observations, a confirmed-count read off a provider score that did not exist, and six arms that were never asked | control tables skip carry-forward rows; the confirmed count is taken from the control rows themselves; provider and control counts are printed separately; a declared arm with no key is "not enabled", never "produced nothing" |
 | "distinguishable", beside a dash in the adjusted-p column | the demo page's own copy of the pairwise loop, which never called Holm; the verdict fell back to the raw p | one `pairwise_family` function for every caller, and a test that reads the rendered column |
 | "0/0" in a robots column, beside "0/12" | a robots.txt that could not be fetched, printed with the glyphs of one that blocks nobody | an unfetched robots.txt renders as "not checked" |
+| an ABSENT at every rung from one arm | HTTP 200 with `{"error": "rate limit exceeded"}` and no results, graded as a search that found nothing | a response with an error key and no results container is an ERROR row carrying the vendor's own words; `results: []` still belongs to the grader |
 
 The pattern is the same every time: something that is not a measurement
 classifies perfectly as one. Each guard costs data — dropped events, excluded

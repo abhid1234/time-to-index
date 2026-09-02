@@ -348,6 +348,25 @@ def run_due(ledger: Ledger, now: float | None = None, limit: int | None = None,
             continue
 
         latency = int((time.perf_counter() - t0) * 1000)
+        if not is_control:
+            err = error_body(payload)
+            if err:
+                # HTTP 200 with an error body and no results. Graded, this
+                # would be an ABSENT -- a recall failure charged to the
+                # vendor for a call that never searched anything. It is an
+                # ERROR, the payload is kept as evidence, and the note
+                # carries the vendor's own words. The reservation is
+                # released as for any other failed call.
+                budget.refund(cost)
+                raw_ref = ledger.store_raw(probe.provider, probe.probe_id, payload)
+                out.append(ProbeResult(
+                    probe_id=probe.probe_id, event_id=event.event_id,
+                    provider=probe.provider, mode=probe.mode, rung=probe.rung,
+                    phrasing=probe.phrasing, requested_at=t, lag=lag,
+                    verdict=ERROR, cost_usd=0.0, latency_ms=latency,
+                    raw_ref=raw_ref, note=f"error body with HTTP 200: {err}"[:400]))
+                rep.errors += 1
+                continue
         verdict, fresh_hits, stale_hits, chars = grade(event, payload)
         note = ""
         render = ""
@@ -435,6 +454,28 @@ def _skip(probe: Probe, event: Event, now: float, lag: float, note: str) -> Prob
         probe_id=probe.probe_id, event_id=event.event_id, provider=probe.provider,
         mode=probe.mode, rung=probe.rung, phrasing=probe.phrasing,
         requested_at=now, lag=lag, verdict=SKIPPED, cost_usd=0.0, note=note)
+
+
+_RESULT_KEYS = ("results", "data", "organic", "items", "web")
+_ERROR_KEYS = ("error", "errors", "message", "detail", "code")
+
+
+def error_body(payload) -> str:
+    """The vendor's own description of a failure returned with HTTP 200, or "".
+
+    Only when there is no results container at all. A response that carries
+    `results: []` is a search that found nothing, and belongs to the grader;
+    a response that carries only `error` or `message` never searched.
+    """
+    if not isinstance(payload, dict):
+        return ""
+    if any(k in payload for k in _RESULT_KEYS):
+        return ""
+    for k in _ERROR_KEYS:
+        if k in payload and payload[k] not in (None, "", [], {}):
+            v = payload[k]
+            return f"{k}={v if isinstance(v, str) else repr(v)}"[:200]
+    return ""
 
 
 def _count_results(payload) -> int:
