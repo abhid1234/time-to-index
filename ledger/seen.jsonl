@@ -165,3 +165,5 @@
 {"answer":"v0.33.3","marked_at":1788465391.3200614,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
 {"answer":"0.16.6","marked_at":1788465391.3200614,"reason":"detected_late","source":"github_release","subject":"astral-sh/ruff"}
 {"answer":"@cloudflare/workers-auth@0.6.8","marked_at":1788465391.3200614,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"7.10.0","marked_at":1788474201.4720714,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"3.8.5","marked_at":1788474201.4720714,"reason":"detected_late","source":"pypi","subject":"prefect"}
