@@ -1,27 +1,13 @@
 # Results
 
-**No real run has happened yet.** This file is written by `tti report` and
-will be replaced by measured numbers the first time the harness runs against
-live provider APIs.
+_Generated 2026-09-03 13:33 UTC · 2 events · 0 provider probes graded · 1 control probes · $0.00 spent_
 
-Nothing in this repository currently contains a finding about any product.
-`docs/demo.html` is a synthetic run with made-up providers (`provider-a/b/c`)
-whose latencies are drawn from a seeded generator; it exists to show what the
-instrument renders and to check that the estimator recovers latencies it was
-never shown. It is labelled as such on the page itself.
+| provider | median TTI | p90 | 24h recall | staleness | text/result | $/1k events | $/1k fresh answers | n |
+|---|---|---|---|---|---|---|---|---|
 
-Saying this in the file that will eventually hold the leaderboard is
-deliberate. An empty results file that looks like a template is how a repo
-gets read as having found something it has not.
+## Pre-registration
 
-## When results do land
-
-They get published on schedule regardless of which provider wins, including
-if the provider I find most interesting comes last, and including if the
-answer is that the differences are inside the noise and the metric is boring.
-`tti power` is in the repo precisely so that last outcome can be stated with
-a number attached rather than as a shrug.
-
-Corrections are issued in-repo rather than silently re-run. If a vendor
-shows that an adapter sends a call their API was not designed for, the fix is
-a commit and a note here, not a quiet re-render.
+```
+  plan bac218770f209b20 · v1 · registered 2026-08-31
+  · Declared in the plan, not enabled in this run (no key): brave/web, exa/auto, parallel/advanced, parallel/fast, serper/search, tavily/basic
+```
