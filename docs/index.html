@@ -61,9 +61,9 @@ footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);
 <h1>Time to Index</h1>
 <p class="sub">How long a newly published fact takes to become retrievable through each
 web-search API, and how often the API confidently returns the answer it replaced.
-Generated 2026-09-03 17:12 UTC.</p>
+Generated 2026-09-03 19:56 UTC.</p>
 
-<div class='panel'><p style='margin-top:0'><b>Only the origin control has results</b> — 1 graded probe(s), no provider arm. The leaderboard compares provider arms and there are none: every provider key is unset, or every provider probe is still pending.</p><p class='note'>The control panel below is the whole finding for this run. It is the yardstick, not a result about any provider.</p></div>
+<div class='panel'><p style='margin-top:0'><b>Only the origin control has results</b> — 2 graded probe(s), no provider arm. The leaderboard compares provider arms and there are none: every provider key is unset, or every provider probe is still pending.</p><p class='note'>The control panel below is the whole finding for this run. It is the yardstick, not a result about any provider.</p></div>
 <div class='panel'><p style='margin-top:0'><b>Pre-registered.</b> Plan <code>bac218770f209b20</code> (v1, registered 2026-08-31) was locked to this run on its first probe and has not changed since.</p><p class='note'><b>Declared in the plan, not enabled in this run:</b> brave/web, exa/auto, parallel/advanced, parallel/fast, serper/search, tavily/basic. No key was set, so no probe was ever dispatched to these arms. That is a configuration state, not a result — they did not fail, they were never asked.</p><details><summary>The plan: what was promised, and what would falsify it</summary><div class='scroll'><table><thead><tr><th>id</th><th>hypothesis</th><th>threshold</th><th>falsified if</th></tr></thead><tbody><tr><td><code>H1</code></td><td>Arms differ in time-to-index by more than sampling noise.
 </td><td>p &lt; 0.05</td><td>p &gt;= 0.05, or the estimated hazard ratio between the fastest and slowest arm has a confidence interval containing 1.
 </td></tr><tr><td><code>H2</code></td><td>ABSENT and STALE are not interchangeable: at least one arm returns the superseded answer, rather than nothing, for more than 20% of its not-yet-FRESH observations at the 1-hour rung.
@@ -134,7 +134,7 @@ Generated 2026-09-03 17:12 UTC.</p>
   <p class="note">Two causes, both invisible in a leaderboard: the grader matching a
   version-shaped token in unrelated prose, or a provider's answer layer inventing one.
   Zero observed is not a zero rate — the last column is the Wilson upper bound, and
-  it is the number that belongs beside each arm's recall. This render did not ask any registry whether the counterfactuals are really unpublished — the page is built offline. <code>tti decoy</code> does, and its figure is the one to quote. 1 event(s) could not be decoyed: 1 not a plain semantic version.</p>
+  it is the number that belongs beside each arm's recall. This render did not ask any registry whether the counterfactuals are really unpublished — the page is built offline. <code>tti decoy</code> does, and its figure is the one to quote. 1 event(s) could not be decoyed: 1 not a plain semantic version. The origin control&#x27;s own re-grade: 0 of 1 page fetches matched the counterfactual (upper bound 79%) — the grader&#x27;s rate on raw page bytes, with no provider in the loop.</p>
 </div>
 
 <h2>Time to index</h2>
@@ -146,11 +146,11 @@ Generated 2026-09-03 17:12 UTC.</p>
 <div class="panel">
   <p style="margin-top:0">At every rung, each event's canonical URL is also fetched
   directly, with robots.txt honoured, and checked for the answer token. Of the events
-  in this run, <b>1</b> were confirmed retrievable from their own origin
+  in this run, <b>2</b> were confirmed retrievable from their own origin
   within 24 hours.</p>
   <div class="scroll"><table>
     <thead><tr><th>origin outcome</th><th>events</th><th>what it means</th></tr></thead>
-    <tbody><tr><td class='k'>found</td><td class='k'>1</td><td>fetchable, and the answer was in the served bytes</td></tr></tbody></table></div>
+    <tbody><tr><td class='k'>found</td><td class='k'>2</td><td>fetchable, and the answer was in the served bytes</td></tr></tbody></table></div>
   <p class="note">Without this arm, every ABSENT is ambiguous: a provider that does not
   return the fact might have a slow crawler, or the fact might not be fetchable from its
   own page yet. The <b>24h recall vs origin</b> column asks the question only of events

@@ -159,3 +159,9 @@
 {"answer":"0.16.6","marked_at":1788455529.0900197,"reason":"detected_late","source":"pypi","subject":"ruff"}
 {"answer":"langchain==1.4.0","marked_at":1788455529.0900197,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
 {"answer":"1.136.1","marked_at":1788455529.0900197,"reason":"detected_late","source":"github_release","subject":"microsoft/vscode"}
+{"answer":"4.129.0","marked_at":1788465391.3200614,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"1.13.21","marked_at":1788465391.3200614,"reason":"detected_late","source":"pypi","subject":"dagster"}
+{"answer":"1.43.88","marked_at":1788465391.3200614,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"v0.33.3","marked_at":1788465391.3200614,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
+{"answer":"0.16.6","marked_at":1788465391.3200614,"reason":"detected_late","source":"github_release","subject":"astral-sh/ruff"}
+{"answer":"@cloudflare/workers-auth@0.6.8","marked_at":1788465391.3200614,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
