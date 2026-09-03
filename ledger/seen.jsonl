@@ -154,3 +154,8 @@
 {"answer":"2026-18093","marked_at":1788442416.2533803,"reason":"detected_late","source":"federal_register","subject":"2026-18093"}
 {"answer":"2026-18092","marked_at":1788442416.2533803,"reason":"detected_late","source":"federal_register","subject":"2026-18092"}
 {"answer":"2026-18091","marked_at":1788442416.2533803,"reason":"detected_late","source":"federal_register","subject":"2026-18091"}
+{"answer":"2.115.0","marked_at":1788455529.0900197,"reason":"detected_late","source":"npm","subject":"@supabase/supabase-js"}
+{"answer":"1.4.0","marked_at":1788455529.0900197,"reason":"detected_late","source":"pypi","subject":"langchain"}
+{"answer":"0.16.6","marked_at":1788455529.0900197,"reason":"detected_late","source":"pypi","subject":"ruff"}
+{"answer":"langchain==1.4.0","marked_at":1788455529.0900197,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"1.136.1","marked_at":1788455529.0900197,"reason":"detected_late","source":"github_release","subject":"microsoft/vscode"}
