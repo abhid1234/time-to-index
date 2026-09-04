@@ -194,3 +194,6 @@
 {"answer":"2609.03834","marked_at":1788497060.8713474,"reason":"detected_late","source":"arxiv","subject":"2609.03834"}
 {"answer":"2609.03712","marked_at":1788497060.8713474,"reason":"detected_late","source":"arxiv","subject":"2609.03712"}
 {"answer":"2609.03672","marked_at":1788497060.8713474,"reason":"detected_late","source":"arxiv","subject":"2609.03672"}
+{"answer":"5.12.3","marked_at":1788512855.3735745,"reason":"detected_late","source":"npm","subject":"fastify"}
+{"answer":"3.16.0","marked_at":1788512855.3735745,"reason":"detected_late","source":"pypi","subject":"mlflow"}
+{"answer":"bun-v1.4.1","marked_at":1788512855.3735745,"reason":"detected_late","source":"github_release","subject":"oven-sh/bun"}
