@@ -209,3 +209,4 @@
 {"answer":"2026-18182","marked_at":1788528659.145215,"reason":"detected_late","source":"federal_register","subject":"2026-18182"}
 {"answer":"12.0.1","marked_at":1788541563.7015007,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
 {"answer":"10.10.0","marked_at":1788541563.7015007,"reason":"detected_late","source":"npm","subject":"eslint"}
+{"answer":"4.13.7","marked_at":1788550388.18751,"reason":"detected_late","source":"npm","subject":"hono"}
