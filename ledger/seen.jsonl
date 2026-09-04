@@ -210,3 +210,5 @@
 {"answer":"12.0.1","marked_at":1788541563.7015007,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
 {"answer":"10.10.0","marked_at":1788541563.7015007,"reason":"detected_late","source":"npm","subject":"eslint"}
 {"answer":"4.13.7","marked_at":1788550388.18751,"reason":"detected_late","source":"npm","subject":"hono"}
+{"answer":"v0.4.0","marked_at":1788558505.8900094,"reason":"detected_late","source":"github_release","subject":"ggml-org/llama.cpp"}
+{"answer":"langchain-core==1.6.2","marked_at":1788558505.8900094,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
