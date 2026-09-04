@@ -197,3 +197,13 @@
 {"answer":"5.12.3","marked_at":1788512855.3735745,"reason":"detected_late","source":"npm","subject":"fastify"}
 {"answer":"3.16.0","marked_at":1788512855.3735745,"reason":"detected_late","source":"pypi","subject":"mlflow"}
 {"answer":"bun-v1.4.1","marked_at":1788512855.3735745,"reason":"detected_late","source":"github_release","subject":"oven-sh/bun"}
+{"answer":"2026-18194","marked_at":1788528659.145215,"reason":"detected_late","source":"federal_register","subject":"2026-18194"}
+{"answer":"2026-18192","marked_at":1788528659.145215,"reason":"detected_late","source":"federal_register","subject":"2026-18192"}
+{"answer":"2026-18190","marked_at":1788528659.145215,"reason":"detected_late","source":"federal_register","subject":"2026-18190"}
+{"answer":"2026-18188","marked_at":1788528659.145215,"reason":"detected_late","source":"federal_register","subject":"2026-18188"}
+{"answer":"2026-18187","marked_at":1788528659.145215,"reason":"detected_late","source":"federal_register","subject":"2026-18187"}
+{"answer":"2026-18186","marked_at":1788528659.145215,"reason":"detected_late","source":"federal_register","subject":"2026-18186"}
+{"answer":"2026-18185","marked_at":1788528659.145215,"reason":"detected_late","source":"federal_register","subject":"2026-18185"}
+{"answer":"2026-18184","marked_at":1788528659.145215,"reason":"detected_late","source":"federal_register","subject":"2026-18184"}
+{"answer":"2026-18183","marked_at":1788528659.145215,"reason":"detected_late","source":"federal_register","subject":"2026-18183"}
+{"answer":"2026-18182","marked_at":1788528659.145215,"reason":"detected_late","source":"federal_register","subject":"2026-18182"}
