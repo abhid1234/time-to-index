@@ -217,3 +217,4 @@
 {"answer":"1.4.0","marked_at":1788564387.5244703,"reason":"detected_late","source":"pypi","subject":"anthropic"}
 {"answer":"0.12.10","marked_at":1788564387.5244703,"reason":"detected_late","source":"pypi","subject":"uv"}
 {"answer":"bun-v1.4.2","marked_at":1788602682.901383,"reason":"detected_late","source":"github_release","subject":"oven-sh/bun"}
+{"answer":"12.3.4","marked_at":1788632623.0695243,"reason":"detected_late","source":"npm","subject":"pnpm"}
