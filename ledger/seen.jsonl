@@ -246,3 +246,4 @@
 {"answer":"0001628280-26-060402","marked_at":1788652540.0929632,"reason":"detected_late","source":"edgar","subject":"1798100:8-K"}
 {"answer":"5.20260906.1","marked_at":1788668638.573447,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"1.100.0","marked_at":1788668638.573447,"reason":"detected_late","source":"pypi","subject":"litellm"}
+{"answer":"v1.100.0","marked_at":1788684424.1770775,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
