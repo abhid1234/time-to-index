@@ -16,6 +16,11 @@ Scored as "wrong", these are identical. In production they are not remotely
 the same event, because nothing downstream of a stale citation can tell that
 it is wrong.
 
+**[Walk through it interactively →](docs/playground.html)** — run the probe
+ladder against four indexes, then change the scoring rule and watch the
+ranking invert. Hand-authored responses, anonymous providers: it shows how the
+instrument reasons, not how any product performs.
+
 ---
 
 ## How it works
