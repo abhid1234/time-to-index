@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  # The probe workflow commits with GITHUB_TOKEN, and pushes made with that
+  # token do not trigger other workflows. Without this, every runner commit
+  # lands on main untested and the suite can go red unnoticed -- it did.
+  schedule:
+    - cron: "17 6 * * *"
 
 jobs:
   test:
