@@ -1162,7 +1162,16 @@ def cmd_crawlability(args) -> int:
         llms = ""
         with contextlib.suppress(Exception):
             llms = _http.get_text(fw.llms_txt_url(url), timeout=10, retries=0)
-        if llms and len(llms) > 40:
+        if llms and fw.serves_html(llms):
+            # A 200 carrying the application, not a file. Reported as its own
+            # state: "absent" would understate it, because a crawler following
+            # the convention gets a page and no error to notice.
+            row["llms_txt"] = {"shell": True, "bytes": len(llms)}
+            print(f"  llms.txt: the site answers with its own page — "
+                  f"{len(llms):,} bytes of HTML, not a file.")
+            print("    The route did not match and the app rendered instead, so the")
+            print("    fetch succeeds and yields nothing an agent can use.")
+        elif llms and len(llms) > 40:
             info = fw.summarise_llms_txt(llms)
             row["llms_txt"] = info
             print(f"  llms.txt: present — {info['bytes']:,} bytes, "
