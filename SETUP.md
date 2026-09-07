@@ -143,3 +143,38 @@ was built, so the 13.1 figure is a floor.
    more than any number in the results table — it is the part a vendor
    cannot get anywhere else.
 5. **Then publish**, and only then.
+
+## The live compare endpoint (optional)
+
+`docs/playground.html` is a static page and its ladder is a simulation. The
+panel that asks the *real* providers needs a backend, because a static page
+cannot hold provider keys and none of the vendors send CORS headers. That
+backend is `api/compare.py`, one function, deployable to Vercel with the
+committed `vercel.json`:
+
+```
+vercel deploy --prod          # from the repo root
+```
+
+Set the same provider keys as environment variables on the project
+(`EXA_API_KEY`, `PARALLEL_API_KEY`, `TAVILY_API_KEY`, …) — an arm without a
+key is skipped, not substituted, so a partial set gives a partial table
+rather than an error. `TTI_ALLOW_ORIGIN` defaults to
+`https://abhid1234.github.io`; widen it only if you want another page
+spending your cap.
+
+Then open the playground with the endpoint attached:
+
+```
+https://abhid1234.github.io/time-to-index/playground.html?api=https://YOUR-DEPLOYMENT.vercel.app
+```
+
+Without `?api=`, the panel stays hidden. Cost is bounded three ways: only
+the six allow-listed packages in `tti/live.py` may be asked, the response
+carries `Cache-Control: s-maxage=900` so the edge serves fifty readers from
+one fan-out, and every response states its own `spend_usd`.
+
+One caveat worth repeating on the page itself: this asks once, at whatever
+age the fact happens to be when someone presses the button. It shows the
+mechanism. It is not a measurement of anyone's indexing speed — that is what
+the six-rung ladder in the benchmark is for.

@@ -1,0 +1,6 @@
+# Vercel installs this for the api/ functions. Both are reached from
+# `tti.live`'s import chain -- requests via tti.http, PyYAML via the plan
+# loader -- so a deploy without them fails at import, not at request time.
+# Kept in step with pyproject.toml's dependencies.
+requests>=2.31
+PyYAML>=6.0
