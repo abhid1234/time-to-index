@@ -275,3 +275,9 @@
 {"answer":"2609.05014","marked_at":1788760999.645971,"reason":"detected_late","source":"arxiv","subject":"2609.05014"}
 {"answer":"2609.04509","marked_at":1788760999.645971,"reason":"detected_late","source":"arxiv","subject":"2609.04509"}
 {"answer":"6.6.3","marked_at":1788783803.9964557,"reason":"detected_late","source":"npm","subject":"antd"}
+{"answer":"2.116.0","marked_at":1788803463.0662417,"reason":"detected_late","source":"npm","subject":"@supabase/supabase-js"}
+{"answer":"26.5.0","marked_at":1788803463.0662417,"reason":"detected_late","source":"npm","subject":"@types/node"}
+{"answer":"1.82.0","marked_at":1788803463.0662417,"reason":"detected_late","source":"npm","subject":"oxlint"}
+{"answer":"4.129.1","marked_at":1788803463.0662417,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"create-cloudflare@2.72.6","marked_at":1788803463.0662417,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"v3.13.3","marked_at":1788803463.0662417,"reason":"detected_late","source":"github_release","subject":"prometheus/prometheus"}
