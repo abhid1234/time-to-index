@@ -64,6 +64,23 @@ h1{font-family:Newsreader,Georgia,serif;font-weight:500;font-size:clamp(34px,5vw
   text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:5px}
 .scenario .val{font-family:"IBM Plex Mono",monospace;font-size:16px;color:var(--ink);font-weight:500}
 .scenario .q{font-size:15px;color:var(--ink-2);font-style:italic}
+.live{background:var(--panel);border:1px solid var(--rule);border-left:3px solid var(--fresh);
+  border-radius:5px;padding:20px 24px;margin:30px 0 0;box-shadow:var(--shadow)}
+.live .hdr{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.live .hdr h2{font-size:16px;font-weight:600;margin:0}
+.live .dot{width:7px;height:7px;border-radius:50%;background:var(--fresh);display:inline-block}
+.live .src{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);margin-left:auto}
+.live .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:16px 22px}
+.live .cell .k{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:4px}
+.live .cell .v{font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--ink);font-weight:500;
+  font-variant-numeric:tabular-nums;word-break:break-word}
+.live .pkgs{display:flex;gap:7px;flex-wrap:wrap;margin-top:16px}
+.live .pkgs button{font-family:"IBM Plex Mono",monospace;font-size:12.5px;padding:6px 12px;border-radius:4px}
+.live .pkgs button.on{border-color:var(--fresh);color:var(--fresh)}
+.live .note{font-size:13.5px;color:var(--ink-3);line-height:1.5;margin:16px 0 0}
+.live .err{color:var(--stale);font-size:13.5px;margin:12px 0 0}
 
 /* controls */
 .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:24px 0 0}
@@ -158,6 +175,25 @@ footer{margin-top:52px;padding-top:22px;border-top:1px solid var(--rule);
   <h1>The Staleness Playground</h1>
   <p class="sub">Watch a brand-new fact travel into four search indexes. Then change how you score the result, and watch the ranking turn upside down.</p>
 </header>
+
+<div class="live">
+  <div class="hdr">
+    <span class="dot"></span><h2>Ground truth, fetched live right now</h2>
+    <span class="src">registry.npmjs.org · no key, no crawl</span>
+  </div>
+  <div class="grid">
+    <div class="cell"><span class="k">Package</span><span class="v" id="lv-pkg">astro</span></div>
+    <div class="cell"><span class="k">Latest version</span><span class="v" id="lv-ver">…</span></div>
+    <div class="cell"><span class="k">Published at</span><span class="v" id="lv-at">…</span></div>
+    <div class="cell"><span class="k">That was</span><span class="v" id="lv-ago">…</span></div>
+  </div>
+  <div class="pkgs" id="lv-pkgs"></div>
+  <p class="note">This is the whole trick, and it is running in your browser as you read it.
+  Nothing was crawled. npm publishes the timestamp itself, so the clock can start the
+  instant a fact becomes true — which is what makes it possible to ask a search index
+  five minutes later whether it knows yet.</p>
+  <p class="err" id="lv-err" hidden></p>
+</div>
 
 <div class="scenario">
   <div class="fact">
@@ -327,6 +363,45 @@ document.getElementById("m-new").onclick=()=>{mode="new";
   document.getElementById("m-new").classList.add("sel");document.getElementById("m-old").classList.remove("sel");board();};
 
 t=RUNGS.length-1;paint();   // open at rest, fully resolved, so the page shows what it does
+
+/* ---- live ground truth -------------------------------------------------
+   registry.npmjs.org sends access-control-allow-origin: *, so this needs no
+   key, no backend and no crawl. It is the honest half of the demo: the
+   comparison below is illustrative, this is real and checkable. */
+const PKGS=["astro","next","react","vite","typescript"];
+function ago(iso){
+  const s=Math.max(0,(Date.now()-new Date(iso).getTime())/1000);
+  if(s<3600) return Math.round(s/60)+" min ago";
+  if(s<86400) return (s/3600).toFixed(1)+" hours ago";
+  return (s/86400).toFixed(1)+" days ago";
+}
+async function loadPkg(name){
+  const err=document.getElementById("lv-err");
+  document.getElementById("lv-pkg").textContent=name;
+  ["lv-ver","lv-at","lv-ago"].forEach(i=>document.getElementById(i).textContent="…");
+  err.hidden=true;
+  [...document.querySelectorAll("#lv-pkgs button")]
+    .forEach(b=>b.classList.toggle("on", b.dataset.p===name));
+  try{
+    const r=await fetch("https://registry.npmjs.org/"+encodeURIComponent(name));
+    if(!r.ok) throw new Error("registry returned "+r.status);
+    const d=await r.json();
+    const v=d["dist-tags"] && d["dist-tags"].latest;
+    const at=d.time && d.time[v];
+    if(!v||!at) throw new Error("no publish time in the registry response");
+    document.getElementById("lv-ver").textContent=v;
+    document.getElementById("lv-at").textContent=at.replace("T"," ").replace(/\.\d+Z$/,"Z");
+    document.getElementById("lv-ago").textContent=ago(at);
+  }catch(e){
+    err.hidden=false;
+    err.textContent="Could not reach the npm registry: "+e.message+
+      ". The rest of the page still works — it needs no network.";
+  }
+}
+const pkgBar=document.getElementById("lv-pkgs");
+PKGS.forEach(n=>{const b=document.createElement("button");b.textContent=n;b.dataset.p=n;
+  b.onclick=()=>loadPkg(n);pkgBar.appendChild(b);});
+loadPkg("astro");
 </script>
 
 </body>
