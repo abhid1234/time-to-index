@@ -280,6 +280,27 @@ def llms_txt_url(url: str) -> str:
     return f"{parts.scheme}://{parts.netloc}/llms.txt"
 
 
+def serves_html(body: str) -> bool:
+    """Whether a response that should have been a text file is a web page.
+
+    A single-page app that does not match a route commonly renders its shell
+    and returns 200, so a fetch of /llms.txt succeeds and yields the whole
+    application. Measured on v0.app: 1,283,713 bytes at /llms.txt against
+    1,283,166 for the home page, and the sign-in links inside it carried
+    `next=%2Fllms.txt` -- the router had taken the path as a route.
+
+    Without this check the summary below counts an app bundle's braces as
+    links and reports a file that is not there, which is the same failure the
+    grader exists to avoid: something that looks like an answer is worse than
+    nothing, because nothing prompts a second look.
+
+    Only the opening bytes are examined. A real llms.txt is markdown and may
+    legitimately quote HTML further down in a fenced block.
+    """
+    head = body.lstrip("\ufeff \t\r\n")[:1024].lower()
+    return head.startswith("<!doctype html") or head.startswith("<html")
+
+
 def summarise_llms_txt(body: str) -> dict:
     """What a site's /llms.txt actually offers an agent.
 
