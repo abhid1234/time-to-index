@@ -300,3 +300,10 @@
 {"answer":"1.136.2","marked_at":1788893293.63208,"reason":"detected_late","source":"github_release","subject":"microsoft/vscode"}
 {"answer":"wrangler@4.130.0","marked_at":1788893293.63208,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
 {"answer":"astro@7.3.2","marked_at":1788893293.63208,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
+{"answer":"12.0.2","marked_at":1788902967.8686244,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"44.3.0","marked_at":1788902967.8686244,"reason":"detected_late","source":"npm","subject":"electron"}
+{"answer":"1.43.90","marked_at":1788902967.8686244,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"0.12.11","marked_at":1788902967.8686244,"reason":"detected_late","source":"pypi","subject":"uv"}
+{"answer":"0.12.11","marked_at":1788902967.8686244,"reason":"detected_late","source":"github_release","subject":"astral-sh/uv"}
+{"answer":"0000796343-26-000144","marked_at":1788902967.8686244,"reason":"detected_late","source":"edgar","subject":"796343:8-K"}
+{"answer":"0001193125-26-385199","marked_at":1788902967.8686244,"reason":"detected_late","source":"edgar","subject":"1564408:8-K"}
