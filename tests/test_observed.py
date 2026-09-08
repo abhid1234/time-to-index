@@ -233,3 +233,34 @@ def test_the_whole_structure_survives_a_round_trip_through_json(tmp_path):
     led = _led(tmp_path, [ev], probes, [_result(ev, probes[0], ABSENT)])
     data = observed.build(led, now=NOW)
     assert json.loads(json.dumps(data)) == data
+
+
+def test_a_limited_page_still_reports_the_whole_run(tmp_path):
+    """`limit` caps what is drawn, never what is claimed.
+
+    The page prints these totals under "across the whole run so far". If they
+    shrank with the limit, a long-running collection would quietly understate
+    its own sample size and its own spend -- and sample size is the number a
+    reader most needs to be able to trust.
+    """
+    old = _event("react", "18.0.0", PUBLISHED - 86400)
+    new = _event("astro", "7.3.1", PUBLISHED)
+    op, np_ = _probes(old, "exa", "auto"), _probes(new, "exa", "auto")
+    led = _led(tmp_path, [old, new], op + np_, [
+        _result(old, op[0], ABSENT, cost_usd=0.007),
+        _result(new, np_[0], ABSENT, cost_usd=0.007),
+    ])
+    everything = observed.build(led, now=NOW)["totals"]
+    just_one = observed.build(led, now=NOW, limit=1)["totals"]
+
+    assert just_one["events"] == 1 and everything["events"] == 2
+    assert {k: v for k, v in just_one.items() if k != "events"} == \
+           {k: v for k, v in everything.items() if k != "events"}
+    assert just_one["provider_cells"] == 2
+    assert just_one["spend_usd"] == 0.014
+
+
+def test_the_default_limit_exists_so_the_file_cannot_grow_without_bound(tmp_path):
+    """Every visitor downloads this file; a year of collection must not be
+    a multi-megabyte page load."""
+    assert observed.DEFAULT_LIMIT > 0

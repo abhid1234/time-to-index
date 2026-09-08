@@ -21,13 +21,19 @@ from typing import Any
 
 from .ledger import Ledger
 from .metrics import ORIGIN
-from .models import Event, Probe, ProbeResult
+from .models import ABSENT, ERROR, FRESH, SKIPPED, STALE, Event, Probe, ProbeResult
 
 # The ladder, in the order a reader walks it. Kept here rather than imported
 # from report.RUNGS so that a page rendered from this file states the rungs
 # the data actually used, not the ones the current config prefers.
 RUNG_LABELS = {300: "5m", 900: "15m", 3600: "1h",
                21600: "6h", 86400: "24h", 259200: "72h"}
+
+# How many events the page ships by default. Every visitor downloads this
+# file, and a run left going for a year would otherwise put megabytes of
+# ladder into it. The totals are computed over the whole ledger regardless,
+# so capping what is drawn never understates what was collected.
+DEFAULT_LIMIT = 60
 
 
 def rung_label(rung: int) -> str:
@@ -155,25 +161,26 @@ def build(led: Ledger, *, now: float | None = None,
             "arms": arms,
         })
 
-    graded_rows = [c for e in out_events for a in e["arms"] for c in a["cells"]
-                   if c["state"] == "graded"]
-    provider_rows = [c for e in out_events for a in e["arms"]
-                     if not a["control"] for c in a["cells"]
-                     if c["state"] == "graded"]
+    # Totals are computed over the whole ledger, never over the events that
+    # survived `limit`. The page renders them under "across the whole run",
+    # and a run that silently reported the newest fifty events as its total
+    # would understate its own spend and its own sample size -- the second of
+    # which is the number a reader most needs to be able to trust.
+    provider_results = [r for r in results if r.provider != ORIGIN]
     return {
         "generated_at": now,
         "events": out_events,
         "totals": {
-            "events": len(out_events),
-            "events_in_ledger": len(events),
-            "graded_cells": len(graded_rows),
-            "provider_cells": len(provider_rows),
-            "fresh": len([c for c in provider_rows if c["verdict"] == "FRESH"]),
-            "stale": len([c for c in provider_rows if c["verdict"] == "STALE"]),
-            "absent": len([c for c in provider_rows if c["verdict"] == "ABSENT"]),
-            "error": len([c for c in provider_rows if c["verdict"] == "ERROR"]),
-            "skipped": len([c for c in provider_rows if c["verdict"] == "SKIPPED"]),
-            "spend_usd": round(sum(c.get("cost_usd") or 0.0
-                                   for c in provider_rows), 6),
+            "events": len(out_events),           # rendered here
+            "events_in_ledger": len(events),     # collected in total
+            "graded_cells": len(results),
+            "provider_cells": len(provider_results),
+            "fresh": len([r for r in provider_results if r.verdict == FRESH]),
+            "stale": len([r for r in provider_results if r.verdict == STALE]),
+            "absent": len([r for r in provider_results if r.verdict == ABSENT]),
+            "error": len([r for r in provider_results if r.verdict == ERROR]),
+            "skipped": len([r for r in provider_results if r.verdict == SKIPPED]),
+            "spend_usd": round(sum(r.cost_usd or 0.0
+                                   for r in provider_results), 6),
         },
     }

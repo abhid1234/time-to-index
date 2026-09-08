@@ -29,7 +29,7 @@ import sys
 import time
 import urllib.parse
 
-from . import __version__, config, providers, report, sources
+from . import __version__, config, observed, providers, report, sources
 from .budget import Budget, unit_cost, utc_day
 from .grader import grade
 from .ledger import Ledger
@@ -1551,7 +1551,10 @@ def cmd_observed(args) -> int:
     """
     from . import observed as observed_mod
     led = _ledger(args)
-    data = observed_mod.build(led, limit=getattr(args, "limit", None))
+    limit = getattr(args, "limit", None)
+    if limit is None:
+        limit = observed_mod.DEFAULT_LIMIT
+    data = observed_mod.build(led, limit=limit or None)
     out = _out_dir(args) / "data"
     out.mkdir(parents=True, exist_ok=True)
     path = out / "observed.json"
@@ -1695,7 +1698,9 @@ def main(argv: list[str] | None = None) -> int:
                              "ladder, one cell per arm per rung")
     ob.add_argument("--out-dir", help="where to write the page")
     ob.add_argument("--limit", type=int,
-                    help="keep only the newest N events")
+                    help=f"draw only the newest N events "
+                         f"(default {observed.DEFAULT_LIMIT}; 0 for all). "
+                         f"Totals always cover the whole ledger.")
     ob.set_defaults(fn=cmd_observed)
     ph = sub.add_parser("placeholder", help="write the pre-run docs/index.html")
     ph.add_argument("--out-dir", help="where to write the page")
