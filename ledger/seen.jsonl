@@ -292,3 +292,11 @@
 {"answer":"2026-18257","marked_at":1788880615.1764915,"reason":"detected_late","source":"federal_register","subject":"2026-18257"}
 {"answer":"2026-18256","marked_at":1788880615.1764915,"reason":"detected_late","source":"federal_register","subject":"2026-18256"}
 {"answer":"2026-18255","marked_at":1788880615.1764915,"reason":"detected_late","source":"federal_register","subject":"2026-18255"}
+{"answer":"7.3.2","marked_at":1788893293.63208,"reason":"detected_late","source":"npm","subject":"astro"}
+{"answer":"6.35.0","marked_at":1788893293.63208,"reason":"detected_late","source":"npm","subject":"knip"}
+{"answer":"4.130.0","marked_at":1788893293.63208,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"3.14.1","marked_at":1788893293.63208,"reason":"detected_late","source":"pypi","subject":"google-cloud-storage"}
+{"answer":"3.9.0","marked_at":1788893293.63208,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"1.136.2","marked_at":1788893293.63208,"reason":"detected_late","source":"github_release","subject":"microsoft/vscode"}
+{"answer":"wrangler@4.130.0","marked_at":1788893293.63208,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"astro@7.3.2","marked_at":1788893293.63208,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
