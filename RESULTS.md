@@ -1,6 +1,6 @@
 # Results
 
-_Generated 2026-09-08 04:49 UTC · 7 events · 4 provider probes graded · 7 control probes · $0.02 spent_
+_Generated 2026-09-08 06:18 UTC · 7 events · 4 provider probes graded · 7 control probes · $0.02 spent_
 
 | provider | median TTI | p90 | 24h recall | staleness | text/result | $/1k events | $/1k fresh answers | n |
 |---|---|---|---|---|---|---|---|---|
@@ -9,6 +9,16 @@ _Generated 2026-09-08 04:49 UTC · 7 events · 4 provider probes graded · 7 con
 | `parallel/advanced` | >6m | >6m | — | 0% (0–79) | 772 chars | $5.00 | no answers | 1 |
 | `parallel/fast` | >6m | >6m | — | 0% (0–79) | 790 chars | $1.00 | no answers | 1 |
 
+## Pipeline false-positive rate
+
+| arm | payloads re-graded | false positives | rate (95% CI) | upper bound |
+|---|---|---|---|---|
+| `brave/web` | 1 | 0 | 0.0% (0–79) | 79% |
+| `exa/auto` | 1 | 0 | 0.0% (0–79) | 79% |
+| `parallel/advanced` | 1 | 0 | 0.0% (0–79) | 79% |
+| `parallel/fast` | 1 | 0 | 0.0% (0–79) | 79% |
+
+_Counterfactuals not registry-verified in this render; `tti decoy` verifies them. Zero observed is not a zero rate; quote the upper bound._
 ## Pre-registration
 
 ```
