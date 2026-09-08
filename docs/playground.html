@@ -641,10 +641,17 @@ async function loadObs(){
     OBS.events.forEach((e,i)=>{const b=document.createElement("button");
       const cells=e.arms.filter(a=>!a.control).flatMap(a=>a.cells);
       const done=cells.filter(c=>c.state==="graded").length;
-      b.textContent=e.subject+" "+e.answer+(cells.length?"  "+done+"/"+cells.length:"");
+      b.textContent=e.subject+" "+e.answer+(cells.length?"  "+done+"/"+cells.length
+                                                          :"  origin only");
+      // Probes are enqueued when an event is discovered, so an event that
+      // predates a provider key has no arm for it and never will. Saying
+      // "origin only" is the difference between a reader seeing a gap in the
+      // schedule and a reader seeing four providers that failed to answer.
       b.title=cells.length? done+" of "+cells.length+
         " provider calls on this event have been made and graded"
-        : "no provider arm was scheduled on this event";
+        : "No provider arm was scheduled on this event -- it was discovered "+
+          "before any provider key was configured, and probes are enqueued at "+
+          "discovery. Only the origin control ran.";
       b.onclick=()=>{obsIdx=i;drawObs();};
       bar.appendChild(b);});
     document.getElementById("meas-src").textContent=
