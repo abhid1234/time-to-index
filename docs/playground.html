@@ -639,7 +639,13 @@ async function loadObs(){
     if(!OBS.events||!OBS.events.length) throw new Error("no events measured yet");
     const bar=document.getElementById("meas-evs");bar.innerHTML="";
     OBS.events.forEach((e,i)=>{const b=document.createElement("button");
-      b.textContent=e.subject+" "+e.answer;b.onclick=()=>{obsIdx=i;drawObs();};
+      const cells=e.arms.filter(a=>!a.control).flatMap(a=>a.cells);
+      const done=cells.filter(c=>c.state==="graded").length;
+      b.textContent=e.subject+" "+e.answer+(cells.length?"  "+done+"/"+cells.length:"");
+      b.title=cells.length? done+" of "+cells.length+
+        " provider calls on this event have been made and graded"
+        : "no provider arm was scheduled on this event";
+      b.onclick=()=>{obsIdx=i;drawObs();};
       bar.appendChild(b);});
     document.getElementById("meas-src").textContent=
       "generated "+new Date(OBS.generated_at*1000).toISOString().replace("T"," ").slice(0,16)+"Z";
