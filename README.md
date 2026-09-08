@@ -16,10 +16,17 @@ Scored as "wrong", these are identical. In production they are not remotely
 the same event, because nothing downstream of a stale citation can tell that
 it is wrong.
 
-**[Walk through it interactively →](https://abhid1234.github.io/time-to-index/playground.html)** — run the probe
-ladder against four indexes, then change the scoring rule and watch the
-ranking invert. Hand-authored responses, anonymous providers: it shows how the
-instrument reasons, not how any product performs.
+**[Walk through it interactively →](https://abhid1234.github.io/time-to-index/playground.html)** — two
+things on one page. A simulation you can drive: run the ladder against four
+anonymous indexes, then change the scoring rule and watch the ranking invert.
+And below it, the real thing: every probe this project has actually run, named
+providers, one square per arm per rung, read straight from the committed
+ledger.
+
+Read them for different things. The simulation is hand-authored and shows how
+the instrument reasons, not how any product performs. The measured panel is
+real but still small — see [What can and cannot be
+claimed](#what-can-and-cannot-be-claimed) before drawing a conclusion from it.
 
 ---
 
@@ -151,6 +158,49 @@ version of one was wrong:
 This half is deliberately vendor-neutral and framework-neutral. Posture
 predicts retrievability; framework only correlates with it, and the
 aggregation says so.
+
+## What can and cannot be claimed
+
+The measured panel on the playground is real. It is also, as of this writing,
+small — and the difference between "real" and "enough" is the whole reason
+this section exists rather than a headline number.
+
+**What the run supports right now.** That the instrument works end to end: a
+package publishes, the collector notices it within minutes, four search arms
+and an origin control are asked the same question at the same fixed lags, and
+the answers come back graded and priced. The first event measured is the
+argument in miniature — at t+5m none of the four indexes returned the new
+version, while the origin control fetched it at that same moment, so the fact
+was genuinely published and retrievable and the indexes simply had not seen it
+yet.
+
+**What it does not support.** Any comparison between providers. Any median,
+any percentile, any statement of the form "X is faster than Y". A handful of
+graded calls on a handful of events is one draw from a distribution nobody has
+characterised, and the arms have not yet been asked about enough events for a
+difference between them to mean anything. `tti power` will tell you, for the
+current run, which pairwise claims the data can carry — and until it says a
+pair is separable, the leaderboard's ordering is noise with a confidence
+interval drawn around it.
+
+**Why the run is small.** Probes are enqueued when an event is discovered, and
+an event is only accepted if it is discovered within
+`max_detection_lag_seconds` of publication — 600 by default. The hosted runner
+requests a ten-minute cron and is actually delivered one every few hours, so
+almost every publish is noticed far too late and is dropped rather than
+recorded at a lag the ladder cannot honestly place. Dropping is the correct
+behaviour; the fix is a runner with real timers, not a looser bound. See
+`deploy/systemd/`.
+
+**Why nothing here is quietly padded.** A rung with no result is never drawn
+or counted as an ABSENT — not in the JSON, not on the page, not in the
+estimator. It is not-yet-due, due-and-unrun, or never-scheduled, and each is
+reported as itself. Carry-forward skips stay skips. An arm whose call failed
+records ERROR and is excluded from every rate rather than being charged with
+an absence caused by our own network. The interval-censored estimator brackets
+an unobserved transition to `(previous rung, this rung]` rather than pinning
+it to a point. All of this makes the numbers smaller and slower to arrive,
+which is the trade being made on purpose.
 
 ## Look at it without paying for it
 

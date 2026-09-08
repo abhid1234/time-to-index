@@ -82,6 +82,55 @@ h1{font-family:Newsreader,Georgia,serif;font-weight:500;font-size:clamp(34px,5vw
 .live .note{font-size:13.5px;color:var(--ink-3);line-height:1.5;margin:16px 0 0}
 .live .err{color:var(--stale);font-size:13.5px;margin:12px 0 0}
 
+/* measured -- the real ladder, read from the committed ledger */
+.meas{background:var(--panel);border:1px solid var(--rule);border-left:3px solid var(--accent);
+  border-radius:5px;padding:20px 24px;margin:22px 0 0;box-shadow:var(--shadow)}
+.meas .hdr{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.meas .hdr h2{font-size:16px;font-weight:600;margin:0}
+.meas .src{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);margin-left:auto}
+.meas .lead{font-size:13.5px;color:var(--ink-3);line-height:1.55;margin:0 0 14px;max-width:700px}
+.meas .evs{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 16px}
+.meas .evs button{font-family:"IBM Plex Mono",monospace;font-size:12px;padding:6px 11px;border-radius:4px}
+.meas .evs button.on{border-color:var(--accent);color:var(--accent)}
+.meas .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:14px 20px;margin:0 0 16px}
+.meas .facts .k{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:4px}
+.meas .facts .v{font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--ink);
+  font-weight:500;word-break:break-word}
+.meas .q{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-2);
+  background:var(--sunken);border-radius:3px;padding:9px 12px;margin:0 0 16px;word-break:break-word}
+.meas .mwrap{overflow-x:auto}
+.meas table{border-collapse:separate;border-spacing:0;width:100%;min-width:660px}
+.meas th{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);font-weight:500;padding:0 0 9px;text-align:center}
+.meas th.armcol{text-align:left;width:180px}
+.meas td{padding:0 3px 6px 0}
+.meas td.arm{padding:0 14px 6px 2px;vertical-align:middle;font-size:14px}
+.meas td.arm b{font-weight:600;display:block;line-height:1.3}
+.meas td.arm span{font-size:11.5px;color:var(--ink-3)}
+.meas .sq{height:40px;border-radius:3px;background:var(--sunken);display:flex;
+  align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace;
+  font-size:10.5px;font-weight:600;letter-spacing:.04em;text-align:center;padding:0 4px}
+.meas .sq.FRESH{background:color-mix(in srgb,var(--fresh) 16%,transparent);color:var(--fresh)}
+.meas .sq.STALE{background:color-mix(in srgb,var(--stale) 16%,transparent);color:var(--stale)}
+.meas .sq.ABSENT{color:var(--ink-3)}
+.meas .sq.ERROR{background:color-mix(in srgb,var(--stale) 9%,transparent);color:var(--stale)}
+.meas .sq.SKIPPED,.meas .sq.waiting{color:var(--ink-3);opacity:.72;font-weight:500}
+.meas .sq.waiting{border:1px dashed var(--rule);background:transparent}
+.meas tr.ctl .sq{opacity:.82}
+.meas .punch{font-size:15px;color:var(--ink);line-height:1.5;margin:16px 0 0;
+  padding:12px 15px;background:var(--sunken);border-radius:4px;max-width:720px}
+.meas .punch b{font-weight:600}
+.meas .legend{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:12.5px;
+  color:var(--ink-3);line-height:1.5;margin:16px 0 0;max-width:720px;align-items:baseline}
+.meas .legend dt{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.08em;
+  font-weight:600;color:var(--ink-2);white-space:nowrap}
+.meas .legend dd{margin:0}
+.meas .tot{font-size:12.5px;color:var(--ink-3);line-height:1.6;margin:14px 0 0;max-width:720px}
+.meas .err{color:var(--stale);font-size:13.5px;margin:12px 0 0}
+
 /* ask -- the real fan-out, only present when an endpoint is configured */
 .ask{background:var(--panel);border:1px solid var(--rule);border-left:3px solid var(--accent);
   border-radius:5px;padding:20px 24px;margin:22px 0 0;box-shadow:var(--shadow)}
@@ -220,6 +269,26 @@ footer{margin-top:52px;padding-top:22px;border-top:1px solid var(--rule);
   instant a fact becomes true — which is what makes it possible to ask a search index
   five minutes later whether it knows yet.</p>
   <p class="err" id="lv-err" hidden></p>
+</div>
+
+<div class="meas" id="meas" hidden>
+  <div class="hdr">
+    <span class="dot"></span><h2>The real ladder, as actually measured</h2>
+    <span class="src" id="meas-src">from the committed ledger</span>
+  </div>
+  <p class="lead">Not a simulation. Every square below is a real API call this project
+  made to a real search product, at a fixed lag after a real package was published,
+  graded by the same code that produces the leaderboard. Pick an event.</p>
+  <div class="evs" id="meas-evs"></div>
+  <div class="facts" id="meas-facts"></div>
+  <p class="q" id="meas-q"></p>
+  <p class="punch" id="meas-punch"></p>
+  <div class="mwrap"><table>
+    <thead><tr id="meas-head"><th class="armcol">Arm</th></tr></thead>
+    <tbody id="meas-body"></tbody>
+  </table></div>
+  <dl class="legend" id="meas-legend"></dl>
+  <p class="tot" id="meas-tot"></p>
 </div>
 
 <div class="ask" id="ask" hidden>
@@ -452,6 +521,161 @@ const pkgBar=document.getElementById("lv-pkgs");
 PKGS.forEach(n=>{const b=document.createElement("button");b.textContent=n;b.dataset.p=n;
   b.onclick=()=>loadPkg(n);pkgBar.appendChild(b);});
 loadPkg("astro");
+
+/* ---- the measured ladder ------------------------------------------------
+   Read from docs/data/observed.json, which `tti report` regenerates on every
+   probe run. Same origin as this page, so no CORS, no key, no backend and no
+   cost per visitor -- and unlike a live one-shot fan-out it is the actual
+   six-rung ladder, which is the thing the project claims to measure.
+
+   The one rule that matters here: a square with no result is never drawn as
+   ABSENT. Not-yet-due, overdue and never-scheduled each say so, because
+   collapsing them into "the index didn't have it" is precisely the error
+   this whole project exists to name. */
+let OBS=null, obsIdx=0;
+function dur(s){
+  s=Math.abs(Math.round(s));
+  if(s<90) return s+"s";
+  if(s<5400) return Math.round(s/60)+"m";
+  if(s<172800) return (s/3600).toFixed(1)+"h";
+  return (s/86400).toFixed(1)+"d";
+}
+function sqFor(c){
+  const d=document.createElement("div");
+  if(c.state==="graded"){
+    d.className="sq "+c.verdict;
+    d.textContent=c.verdict==="SKIPPED"?"skipped":c.verdict;
+    const bits=[];
+    if(c.verdict==="SKIPPED"&&c.note)bits.push(c.note);
+    if(c.latency_ms)bits.push(c.latency_ms+" ms");
+    if(c.n_results!=null)bits.push(c.n_results+" results");
+    if(c.cost_usd)bits.push("$"+c.cost_usd.toFixed(4));
+    if(c.fresh_hits)bits.push(c.fresh_hits+" fresh hit(s)");
+    if(c.stale_hits)bits.push(c.stale_hits+" stale hit(s)");
+    d.title=bits.join(" · ");
+  }else if(c.state==="scheduled"){
+    d.className="sq waiting";d.textContent="in "+dur(c.due_in);
+    d.title="Scheduled, not yet due. Not an ABSENT.";
+  }else if(c.state==="pending"){
+    d.className="sq waiting";d.textContent="due";
+    d.title="Due "+dur(c.overdue_by)+" ago, waiting on the next runner tick. Not an ABSENT.";
+  }else{
+    d.className="sq waiting";d.textContent="—";
+    d.title="Never scheduled: this arm had no key when the event was discovered, "+
+      "which is when probes are enqueued.";
+  }
+  return d;
+}
+function drawObs(){
+  const e=OBS.events[obsIdx];
+  [...document.querySelectorAll("#meas-evs button")]
+    .forEach((b,i)=>b.classList.toggle("on",i===obsIdx));
+  document.getElementById("meas-facts").innerHTML=
+    [["Subject",e.subject],["Truth at t=0",e.answer],
+     ["It replaced",e.predecessor||"—"],
+     ["Detected after",dur(e.detection_lag)],
+     ["Published",dur(e.age_seconds)+" ago"]]
+    .map(([k,v])=>'<div><span class="k">'+k+'</span><span class="v">'+v+"</span></div>").join("");
+  document.getElementById("meas-q").textContent='Asked of every arm: "'+e.question+'"';
+  const head=document.getElementById("meas-head");
+  head.innerHTML='<th class="armcol">Arm</th>'+
+    e.rung_labels.map(l=>"<th>t + "+l+"</th>").join("");
+  const body=document.getElementById("meas-body");body.innerHTML="";
+  e.arms.forEach(a=>{
+    const tr=document.createElement("tr");if(a.control)tr.className="ctl";
+    const td=document.createElement("td");td.className="arm";
+    td.innerHTML="<b>"+a.provider+(a.mode?" · "+a.mode:"")+"</b><span>"+
+      (a.control?"origin control — fetches the page directly, not a search index"
+                :"$"+a.spend_usd.toFixed(4)+" spent on this event")+"</span>";
+    tr.appendChild(td);
+    a.cells.forEach(c=>{const cell=document.createElement("td");
+      cell.appendChild(sqFor(c));tr.appendChild(cell);});
+    body.appendChild(tr);
+  });
+  document.getElementById("meas-punch").innerHTML=punchline(e);
+  const t=OBS.totals;
+  document.getElementById("meas-tot").textContent=
+    "Across the whole run so far: "+t.provider_cells+" graded provider calls — "+
+    t.fresh+" fresh, "+t.stale+" stale, "+t.absent+" absent, "+t.error+
+    " errored — over "+t.events_in_ledger+" events, for $"+
+    t.spend_usd.toFixed(4)+" total.";
+}
+/* The sentence a visitor should leave with, computed from the row rather
+   than written into the page, so it can never describe data that is not
+   there. Reports the earliest rung at which anything was graded, because a
+   claim about "5 minutes" is worthless if 5 minutes was never measured. */
+function punchline(e){
+  const searchers=e.arms.filter(a=>!a.control);
+  for(let i=0;i<e.rungs.length;i++){
+    const graded=searchers.map(a=>a.cells[i]).filter(c=>c.state==="graded"
+      &&c.verdict!=="SKIPPED"&&c.verdict!=="ERROR");
+    if(!graded.length) continue;
+    const lab=e.rung_labels[i];
+    const had=graded.filter(c=>c.verdict==="FRESH").length;
+    const wrong=graded.filter(c=>c.verdict==="STALE").length;
+    const ctl=e.arms.find(a=>a.control), c0=ctl&&ctl.cells[i];
+    const ctlTxt=(c0&&c0.state==="graded"&&c0.verdict==="FRESH")
+      ? " The origin control had it at the same moment, so the fact was "+
+        "genuinely published and fetchable — the indexes simply had not seen it."
+      : "";
+    let head;
+    if(had===0) head="<b>At t + "+lab+", none of the "+graded.length+
+      " search indexes had this fact.</b>";
+    else head="<b>At t + "+lab+", "+had+" of "+graded.length+
+      " search indexes had this fact.</b>";
+    const wrongTxt=wrong?" "+wrong+" returned the superseded answer instead — "+
+      "a confident wrong answer, which every conventional benchmark would have "+
+      "scored as a hit.":"";
+    return head+wrongTxt+ctlTxt;
+  }
+  return "<b>Nothing graded on this event yet.</b> Its probes are queued; "+
+    "the squares below say when each one is due.";
+}
+async function loadObs(){
+  try{
+    const r=await fetch("data/observed.json",{cache:"no-cache"});
+    if(!r.ok) throw new Error("observed.json returned "+r.status);
+    OBS=await r.json();
+    if(!OBS.events||!OBS.events.length) throw new Error("no events measured yet");
+    const bar=document.getElementById("meas-evs");bar.innerHTML="";
+    OBS.events.forEach((e,i)=>{const b=document.createElement("button");
+      const cells=e.arms.filter(a=>!a.control).flatMap(a=>a.cells);
+      const done=cells.filter(c=>c.state==="graded").length;
+      b.textContent=e.subject+" "+e.answer+(cells.length?"  "+done+"/"+cells.length
+                                                          :"  origin only");
+      // Probes are enqueued when an event is discovered, so an event that
+      // predates a provider key has no arm for it and never will. Saying
+      // "origin only" is the difference between a reader seeing a gap in the
+      // schedule and a reader seeing four providers that failed to answer.
+      b.title=cells.length? done+" of "+cells.length+
+        " provider calls on this event have been made and graded"
+        : "No provider arm was scheduled on this event -- it was discovered "+
+          "before any provider key was configured, and probes are enqueued at "+
+          "discovery. Only the origin control ran.";
+      b.onclick=()=>{obsIdx=i;drawObs();};
+      bar.appendChild(b);});
+    document.getElementById("meas-src").textContent=
+      "generated "+new Date(OBS.generated_at*1000).toISOString().replace("T"," ").slice(0,16)+"Z";
+    document.getElementById("meas-legend").innerHTML=[
+      ["FRESH","the new answer came back"],
+      ["STALE","the superseded answer came back and the new one did not"],
+      ["ABSENT","neither answer came back"],
+      ["skipped","never dispatched — carry-forward once an arm has answered fresh, "+
+                 "the budget cap, or a rung that slipped too far to record honestly"],
+      ["dashed","not measured yet. A dashed square is not an ABSENT, and keeping "+
+                "those two apart is the entire point of the project"],
+    ].map(([t,d])=>"<dt>"+t+"</dt><dd>"+d+"</dd>").join("");
+    drawObs();
+    document.getElementById("meas").hidden=false;
+  }catch(e){
+    // The panel stays hidden rather than showing an empty grid: before the
+    // first run there is genuinely nothing measured, and an empty matrix
+    // reads as six absences. Nothing is rendered, so the reason goes to the
+    // console -- the page above it needs no network and is unaffected.
+    console.warn("measured ladder unavailable:",e.message);
+  }
+}
+loadObs();
 
 /* ---- the real fan-out --------------------------------------------------
    A static page cannot do this itself: the provider keys would be public and
