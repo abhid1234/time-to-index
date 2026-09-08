@@ -82,6 +82,11 @@ h1{font-family:Newsreader,Georgia,serif;font-weight:500;font-size:clamp(34px,5vw
 .live .note{font-size:13.5px;color:var(--ink-3);line-height:1.5;margin:16px 0 0}
 .live .err{color:var(--stale);font-size:13.5px;margin:12px 0 0}
 
+.takeaway p.aa{font-size:13.5px;color:var(--ink-3);border-left:2px solid var(--rule);
+  padding-left:14px;margin-top:16px}
+.takeaway p.aa a{color:var(--accent)}
+.takeaway p.aa b{color:var(--ink-2)}
+
 /* measured -- the real ladder, read from the committed ledger */
 .meas{background:var(--panel);border:1px solid var(--rule);border-left:3px solid var(--accent);
   border-radius:5px;padding:20px 24px;margin:22px 0 0;box-shadow:var(--shadow)}
@@ -374,7 +379,8 @@ footer{margin-top:52px;padding-top:22px;border-top:1px solid var(--rule);
   <p><b>Provider D answered instantly at every rung — and was wrong every time.</b> It served version 7.2.4 with total confidence for three full days. Under conventional scoring, which asks only "did a plausible result come back," D looks like the fastest index in the test.</p>
   <p><b>Provider A returned nothing for the first fifteen minutes.</b> It scored a miss twice. But it never once handed over a wrong answer, and it had the correct one within the hour.</p>
   <p>In production these are not close. An agent that gets nothing retries, widens its search, or tells the user it doesn't know. An agent that gets 7.2.4 <b>cites it</b> — in your product, to your customer, with no signal anywhere downstream that the number is a week old.</p>
-  <p>That is the entire argument. The distinction costs nothing to measure and no existing retrieval benchmark makes it.</p>
+  <p>That is the entire argument. The distinction costs nothing to measure and the benchmarks in this space do not make it.</p>
+  <p class="aa">The clearest current example is the <a href="https://artificialanalysis.ai/articles/search-api">Artificial Analysis Search Index</a>, launched August 2026 — serious work, same providers, published methodology. Its score is the mean of three answer-correctness benchmarks run through a 25-turn agent loop. Correctness scores D and A the same on a question both get wrong, so the index cannot separate them, and its agent loop makes that worse rather than better: given unlimited tool calls, an agent that gets <b>nothing</b> retries its way to the answer, while an agent that gets <b>7.2.4</b> has no signal to retry on and stops. The more agentic the harness, the more absence is absorbed and the more staleness survives into the graded answer. Different axis, not a worse one — nothing here scores answer quality, and nothing there measures time to retrievability.</p>
 </div>
 
 <footer>
