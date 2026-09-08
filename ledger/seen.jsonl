@@ -281,3 +281,14 @@
 {"answer":"4.129.1","marked_at":1788803463.0662417,"reason":"detected_late","source":"npm","subject":"wrangler"}
 {"answer":"create-cloudflare@2.72.6","marked_at":1788803463.0662417,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
 {"answer":"v3.13.3","marked_at":1788803463.0662417,"reason":"detected_late","source":"github_release","subject":"prometheus/prometheus"}
+{"answer":"langchain-openai==1.6.1","marked_at":1788880615.1764915,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"2026-18282","marked_at":1788880615.1764915,"reason":"detected_late","source":"federal_register","subject":"2026-18282"}
+{"answer":"2026-18279","marked_at":1788880615.1764915,"reason":"detected_late","source":"federal_register","subject":"2026-18279"}
+{"answer":"2026-18262","marked_at":1788880615.1764915,"reason":"detected_late","source":"federal_register","subject":"2026-18262"}
+{"answer":"2026-18261","marked_at":1788880615.1764915,"reason":"detected_late","source":"federal_register","subject":"2026-18261"}
+{"answer":"2026-18260","marked_at":1788880615.1764915,"reason":"detected_late","source":"federal_register","subject":"2026-18260"}
+{"answer":"2026-18259","marked_at":1788880615.1764915,"reason":"detected_late","source":"federal_register","subject":"2026-18259"}
+{"answer":"2026-18258","marked_at":1788880615.1764915,"reason":"detected_late","source":"federal_register","subject":"2026-18258"}
+{"answer":"2026-18257","marked_at":1788880615.1764915,"reason":"detected_late","source":"federal_register","subject":"2026-18257"}
+{"answer":"2026-18256","marked_at":1788880615.1764915,"reason":"detected_late","source":"federal_register","subject":"2026-18256"}
+{"answer":"2026-18255","marked_at":1788880615.1764915,"reason":"detected_late","source":"federal_register","subject":"2026-18255"}
