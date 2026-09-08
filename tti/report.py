@@ -639,7 +639,39 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
     control_graded = sum(1 for r in results
                          if r.provider == "origin" and r.verdict not in ("ERROR", "SKIPPED"))
     if scoreable:
-        empty_note = ""
+        # Scoreable is not the same as conclusive. The table has an order and
+        # a reader will read it as a ranking, so when nothing in the run
+        # separates one arm from another, the page has to say so above the
+        # table rather than leave it to the p-value column below it.
+        #
+        # The threshold is not a hand-picked n. It is the analysis's own
+        # answer: a pair is separable when its Holm-adjusted p-value clears
+        # 0.05, and if no pair does, the ordering is noise with intervals
+        # drawn around it.
+        computable = [r for r in powers if r.p_adjusted == r.p_adjusted]
+        separable = [r for r in computable if r.p_adjusted < 0.05]
+        n_events = max((s.n_events for s in scoreable), default=0)
+        if separable:
+            empty_note = ""
+        else:
+            reason = ("no pair of arms could be compared yet"
+                      if not computable else
+                      f"none of the {len(computable)} pairwise comparisons "
+                      "reaches significance after adjustment")
+            empty_note = (
+                "<div class='panel'><p style='margin-top:0'><b>This run does "
+                "not support an ordering of these arms.</b> The table below "
+                f"has {len(scoreable)} arm(s) over at most {n_events} "
+                f"event(s), and {reason}. Read it as what each arm did, not "
+                "as which arm is faster.</p>"
+                "<p class='note'>Rendered rather than withheld, because the "
+                "instrument working on a small run is itself worth showing "
+                "&#8212; and because a page that quietly waits until the "
+                "numbers look conclusive is a page that only ever publishes "
+                "flattering ones. <b>Are the differences real</b> below is "
+                "the panel that answers this properly, and "
+                "<code>tti power</code> says how many more events each "
+                "comparison would need.</p></div>")
     elif not scores and control_graded:
         # Not "every probe failed". Nothing failed; there is simply no
         # provider arm, which is the state before the first key arrives.
