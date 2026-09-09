@@ -1,22 +1,22 @@
 # Results
 
-_Generated 2026-09-09 11:53 UTC · 8 events · 4 provider probes graded · 7 control probes · $0.02 spent_
+_Generated 2026-09-09 16:03 UTC · 9 events · 8 provider probes graded · 8 control probes · $0.04 spent_
 
 | provider | median TTI | p90 | 24h recall | staleness | text/result | $/1k events | $/1k fresh answers | n |
 |---|---|---|---|---|---|---|---|---|
-| `brave/web` | >6m | >6m | — | 0% (0–79) | 279 chars | $5.00 | no answers | 1 |
-| `exa/auto` | >6m | >6m | — | 0% (0–79) | 1.4k chars | $7.00 | no answers | 1 |
-| `parallel/advanced` | >6m | >6m | — | 0% (0–79) | 772 chars | $5.00 | no answers | 1 |
-| `parallel/fast` | >6m | >6m | — | 0% (0–79) | 790 chars | $1.00 | no answers | 1 |
+| `brave/web` | >9m | >9m | — | 0% (0–66) | 279 chars | $5.00 | no answers | 2 |
+| `exa/auto` | >9m | >9m | — | 0% (0–66) | 1.5k chars | $7.00 | no answers | 2 |
+| `parallel/advanced` | >9m | >9m | — | 50% (9–91) | 772 chars | $5.00 | no answers | 2 |
+| `parallel/fast` | >9m | >9m | — | 0% (0–66) | 790 chars | $1.00 | no answers | 2 |
 
 ## Pipeline false-positive rate
 
 | arm | payloads re-graded | false positives | rate (95% CI) | upper bound |
 |---|---|---|---|---|
-| `brave/web` | 1 | 0 | 0.0% (0–79) | 79% |
-| `exa/auto` | 1 | 0 | 0.0% (0–79) | 79% |
-| `parallel/advanced` | 1 | 0 | 0.0% (0–79) | 79% |
-| `parallel/fast` | 1 | 0 | 0.0% (0–79) | 79% |
+| `brave/web` | 2 | 0 | 0.0% (0–66) | 66% |
+| `exa/auto` | 2 | 0 | 0.0% (0–66) | 66% |
+| `parallel/advanced` | 2 | 0 | 0.0% (0–66) | 66% |
+| `parallel/fast` | 2 | 0 | 0.0% (0–66) | 66% |
 
 _Counterfactuals not registry-verified in this render; `tti decoy` verifies them. Zero observed is not a zero rate; quote the upper bound._
 ## Pre-registration
