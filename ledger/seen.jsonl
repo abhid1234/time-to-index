@@ -357,3 +357,8 @@
 {"answer":"2609.08869","marked_at":1788935985.7361104,"reason":"detected_late","source":"arxiv","subject":"2609.08869"}
 {"answer":"2609.08556","marked_at":1788935985.7361104,"reason":"detected_late","source":"arxiv","subject":"2609.08556"}
 {"answer":"2609.08508","marked_at":1788935985.7361104,"reason":"detected_late","source":"arxiv","subject":"2609.08508"}
+{"answer":"6.35.1","marked_at":1788954794.838094,"reason":"detected_late","source":"npm","subject":"knip"}
+{"answer":"1.44.2","marked_at":1788954794.838094,"reason":"detected_late","source":"pypi","subject":"polars"}
+{"answer":"0.29.0","marked_at":1788954794.838094,"reason":"detected_late","source":"pypi","subject":"vllm"}
+{"answer":"v0.29.0","marked_at":1788954794.838094,"reason":"detected_late","source":"github_release","subject":"vllm-project/vllm"}
+{"answer":"py-1.44.2","marked_at":1788954794.838094,"reason":"detected_late","source":"github_release","subject":"pola-rs/polars"}
