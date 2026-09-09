@@ -382,3 +382,11 @@
 {"answer":"19.3.0","marked_at":1788981329.0965083,"reason":"detected_late","source":"npm","subject":"react"}
 {"answer":"0.12.12","marked_at":1788981329.0965083,"reason":"detected_late","source":"pypi","subject":"uv"}
 {"answer":"0.12.12","marked_at":1788981329.0965083,"reason":"detected_late","source":"github_release","subject":"astral-sh/uv"}
+{"answer":"22.1.6","marked_at":1788990312.7270648,"reason":"detected_late","source":"npm","subject":"@angular/core"}
+{"answer":"12.0.3","marked_at":1788990312.7270648,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"12.19.0","marked_at":1788990312.7270648,"reason":"detected_late","source":"npm","subject":"firebase"}
+{"answer":"1.5.11","marked_at":1788990312.7270648,"reason":"detected_late","source":"npm","subject":"langchain"}
+{"answer":"22.6.2","marked_at":1788990312.7270648,"reason":"detected_late","source":"npm","subject":"stripe"}
+{"answer":"1.43.91","marked_at":1788990312.7270648,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"langchain-openai==1.6.2","marked_at":1788990312.7270648,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"0001018724-26-000036","marked_at":1788990312.7270648,"reason":"detected_late","source":"edgar","subject":"1018724:8-K"}
