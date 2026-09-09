@@ -279,53 +279,85 @@ def summary_md(scores: list[ProviderScore], events: dict[str, Event],
 # HTML dashboard
 # ---------------------------------------------------------------------------
 
+_FONTS = """<style>
+/* Served from docs/fonts, the same files the playground uses. A dashboard
+   that renders in Times behind a corporate proxy undercuts the argument it
+   is making about care. */
+@font-face{font-family:Newsreader;src:url(fonts/newsreader-var.woff2)format("woff2");font-weight:400 700;font-display:swap}
+@font-face{font-family:"IBM Plex Sans";src:url(fonts/plex-sans-var.woff2)format("woff2");font-weight:100 700;font-display:swap}
+@font-face{font-family:"IBM Plex Mono";src:url(fonts/plex-mono-400.woff2)format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"IBM Plex Mono";src:url(fonts/plex-mono-500.woff2)format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"IBM Plex Mono";src:url(fonts/plex-mono-600.woff2)format("woff2");font-weight:600;font-display:swap}
+</style>"""
+
 _CSS = """
+/* The same tokens the playground uses, so the dashboard and the walkthrough
+   read as one project rather than two. The verdict hues are the load-bearing
+   part: green is the new answer, orange-red is the superseded one, and
+   nothing else in the palette may use them. */
 :root{
-  --bg:#faf9f7; --panel:#ffffff; --ink:#1b1a18; --muted:#6d6a63;
-  --line:#e3e0da; --grid:#eeece7; --accent:#c2571a; --good:#2f7d5c; --bad:#b03a4a;
-  --mono:"SFMono-Regular",ui-monospace,Menlo,Consolas,monospace;
-  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --bg:#FBFAF8; --panel:#FFFFFF; --inset:#F2F3F5;
+  --ink:#12161C; --muted:#767F8C; --ink2:#464F5B;
+  --line:#E2E5EA; --grid:#EFF1F4; --accent:#2B5CA8; --accent-soft:#EDF2FA;
+  --good:#0B7A4F; --good-bg:#E4F4EC; --bad:#BC3E12; --bad-bg:#FCE9E0;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,sans-serif;
+  --serif:Newsreader,Georgia,"Times New Roman",serif;
+  --shadow:0 1px 3px rgba(16,22,30,.05),0 10px 28px -12px rgba(16,22,30,.16);
 }
 :root:not([data-theme="light"]){}
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#14151a; --panel:#1b1d23; --ink:#e8e6e1; --muted:#93908a;
-    --line:#2b2e36; --grid:#232630; --accent:#e08a4c; --good:#5cb894; --bad:#e0707f;
+    --bg:#0B0E13; --panel:#141920; --inset:#1B222B;
+    --ink:#EAEEF4; --muted:#7C8695; --ink2:#AFB9C6;
+    --line:#242C37; --grid:#1C232C; --accent:#7FB2F0; --accent-soft:#152234;
+    --good:#4FCB96; --good-bg:#0E2E23; --bad:#F2895A; --bad-bg:#331A11;
+    --shadow:0 1px 3px rgba(0,0,0,.5),0 12px 30px -14px rgba(0,0,0,.7);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#14151a; --panel:#1b1d23; --ink:#e8e6e1; --muted:#93908a;
-  --line:#2b2e36; --grid:#232630; --accent:#e08a4c; --good:#5cb894; --bad:#e0707f;
+  --bg:#0B0E13; --panel:#141920; --inset:#1B222B;
+  --ink:#EAEEF4; --muted:#7C8695; --ink2:#AFB9C6;
+  --line:#242C37; --grid:#1C232C; --accent:#7FB2F0; --accent-soft:#152234;
+  --good:#4FCB96; --good-bg:#0E2E23; --bad:#F2895A; --bad-bg:#331A11;
+  --shadow:0 1px 3px rgba(0,0,0,.5),0 12px 30px -14px rgba(0,0,0,.7);
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
-     font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1100px;margin:0 auto;padding:48px 24px 80px}
-h1{font-size:30px;letter-spacing:-.02em;margin:0 0 6px;text-wrap:balance}
-h2{font-size:15px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);
-   margin:44px 0 14px;font-weight:600}
-.sub{color:var(--muted);margin:0 0 28px;font-size:14px}
+     font-size:15.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1100px;margin:0 auto;padding:60px 26px 90px}
+h1{font-family:var(--serif);font-weight:500;font-size:42px;letter-spacing:-.022em;
+   line-height:1.08;margin:0 0 10px;text-wrap:balance}
+h2{font-family:var(--mono);font-size:11px;text-transform:uppercase;
+   letter-spacing:.14em;color:var(--muted);margin:52px 0 14px;font-weight:600}
+.sub{color:var(--ink2);margin:0 0 30px;font-size:16px;max-width:70ch}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;
-       padding:20px 22px;margin-bottom:18px}
+       padding:22px 24px;margin-bottom:18px;box-shadow:var(--shadow)}
 table{width:100%;border-collapse:collapse;font-size:13.5px;
       font-variant-numeric:tabular-nums}
-th{text-align:left;font-weight:600;color:var(--muted);font-size:11px;
-   text-transform:uppercase;letter-spacing:.06em;padding:0 10px 9px 0;
-   border-bottom:1px solid var(--line);white-space:nowrap}
-td{padding:9px 10px 9px 0;border-bottom:1px solid var(--grid)}
+/* The leaderboard has twelve columns and they crush before they scroll.
+   A floor plus the .scroll wrapper means a narrow window pans instead of
+   wrapping "no answers" onto two lines. */
+.scroll table{min-width:880px}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+td.k{white-space:nowrap}
+th{text-align:left;font-weight:500;color:var(--muted);font-size:10.5px;
+   font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;
+   padding:0 10px 10px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px 10px 10px 0;border-bottom:1px solid var(--grid)}
 tr:last-child td{border-bottom:none}
 td.k{font-family:var(--mono);font-size:12.5px}
 .scroll{overflow-x:auto}
-.legend{display:flex;flex-wrap:wrap;gap:16px;margin:12px 0 0;font-size:12px;
+.legend{display:flex;flex-wrap:wrap;gap:18px;margin:14px 0 0;font-size:12px;
         font-family:var(--mono);color:var(--muted)}
-.legend i{display:inline-block;width:11px;height:3px;vertical-align:middle;
-          margin-right:6px;border-radius:2px}
-.note{font-size:13px;color:var(--muted);border-left:2px solid var(--accent);
-      padding-left:14px;margin:14px 0}
-.big{font-family:var(--mono);font-size:22px}
+.legend i{display:inline-block;width:12px;height:3px;vertical-align:middle;
+          margin-right:7px;border-radius:2px}
+.note{font-size:13.5px;color:var(--muted);border-left:2px solid var(--accent);
+      padding-left:16px;margin:16px 0;line-height:1.6}
+.big{font-family:var(--mono);font-size:23px}
 .bad{color:var(--bad)} .good{color:var(--good)}
-footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);
-       color:var(--muted);font-size:12.5px}
+footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);
+       color:var(--muted);font-size:13px;line-height:1.65}
 """
 
 
@@ -453,9 +485,7 @@ def corpus_html(sv, hist=None, changes=(), coverage=None) -> str:
                   f"ranging {ratios[0]*100:.2f}% to {ratios[-1]*100:.1f}%.")
 
     return f"""<title>Can an Agent Read the Web</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+{_FONTS}
 <style>{_CSS}</style>
 <div class="wrap">
 <h1>Can an Agent Read the Web</h1>
@@ -524,9 +554,7 @@ def placeholder_page() -> str:
     is. `tti report` overwrites this file on the first real run.
     """
     return full_page(f"""<title>Time to Index</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+{_FONTS}
 <style>{_CSS}</style>
 <div class="wrap">
 <h1>Time to Index</h1>
@@ -894,9 +922,7 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
             + (' because no provider arm has results.' if not ordered else '.') + '</p>')
 
     return f"""<title>Time to Index</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+{_FONTS}
 <style>{_CSS}</style>
 <div class="wrap">
 <h1>Time to Index</h1>
