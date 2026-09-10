@@ -451,3 +451,12 @@
 {"answer":"2026-18511","marked_at":1789053203.2009218,"reason":"detected_late","source":"federal_register","subject":"2026-18511"}
 {"answer":"2026-18510","marked_at":1789053203.2009218,"reason":"detected_late","source":"federal_register","subject":"2026-18510"}
 {"answer":"2026-18509","marked_at":1789053203.2009218,"reason":"detected_late","source":"federal_register","subject":"2026-18509"}
+{"answer":"0.125.0","marked_at":1789065157.6956298,"reason":"detected_late","source":"npm","subject":"@anthropic-ai/sdk"}
+{"answer":"7.14.0","marked_at":1789065157.6956298,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"4.131.0","marked_at":1789065157.6956298,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"1.5.0","marked_at":1789065157.6956298,"reason":"detected_late","source":"pypi","subject":"anthropic"}
+{"answer":"3.12.0","marked_at":1789065157.6956298,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"0.16.7","marked_at":1789065157.6956298,"reason":"detected_late","source":"pypi","subject":"ruff"}
+{"answer":"0.16.7","marked_at":1789065157.6956298,"reason":"detected_late","source":"github_release","subject":"astral-sh/ruff"}
+{"answer":"v1.100.1","marked_at":1789065157.6956298,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
+{"answer":"@cloudflare/cli-shared-helpers@0.1.29","marked_at":1789065157.6956298,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
