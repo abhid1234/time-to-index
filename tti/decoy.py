@@ -126,7 +126,7 @@ def run(ledger, verify_absent=None, verbose: bool = True) -> Report:
     that the token really was never released. None means "could not ask" --
     counted separately, because an unverified counterfactual is weaker
     evidence than a verified one and pretending otherwise would overstate the
-    check that exists to keep us honest.
+    check that exists to keep us straight.
     """
     events = ledger.events()
     rep = Report()

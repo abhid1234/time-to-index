@@ -62,7 +62,7 @@ def test_a_missing_rung_widens_rather_than_invents():
 
     Two arms index identically. One had its 15m and 1h probes dropped (budget
     cap, say). A point estimator must either discard that arm's event or
-    record it at a rung nobody observed. Turnbull records the honest wider
+    record it at a rung nobody observed. Turnbull records the truthful wider
     interval, and the resulting bracket is wider -- not shifted.
     """
     full = intervals_from_ladder([(300, False), (900, False), (3600, True)])

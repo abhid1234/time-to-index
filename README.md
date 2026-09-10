@@ -199,7 +199,7 @@ samples evenly across the sorted route list (deterministically, so two runs
 examine the same routes and a site that changed is distinguishable from a
 sample that moved), and reports the spread.
 
-Four things keep these claims honest, and each was added because an earlier
+Four things keep these claims straight, and each was added because an earlier
 version of one was wrong:
 
 - **A verdict needs repeat fetches to agree.** The same URL returned 5,056
@@ -254,7 +254,7 @@ an event is only accepted if it is discovered within
 `max_detection_lag_seconds` of publication — 600 by default. The hosted runner
 requests a ten-minute cron and is actually delivered one every few hours, so
 almost every publish is noticed far too late and is dropped rather than
-recorded at a lag the ladder cannot honestly place. Dropping is the correct
+recorded at a lag the ladder cannot truthfully place. Dropping is the correct
 behaviour; the fix is a runner with real timers, not a looser bound. See
 `deploy/systemd/`.
 
@@ -384,11 +384,11 @@ positive by construction.
 | arm | payloads re-graded | false positives | rate (95% CI) |
 |---|---|---|---|
 | `guesser/base` | 40 | 4 | 10.0% (4–23) |
-| `honest/base`  | 40 | 0 |  0.0% (0–9)  |
+| `candid/base`  | 40 | 0 |  0.0% (0–9)  |
 
 Each arm's recall carries its own upper error bar from the column above:
   guesser/base: up to 23% of its FRESH verdicts could be spurious.
-  honest/base: up to 9% of its FRESH verdicts could be spurious.
+  candid/base: up to 9% of its FRESH verdicts could be spurious.
 ```
 
 Two properties make it worth running rather than merely worth describing:

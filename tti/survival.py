@@ -20,7 +20,7 @@ Gentleman and Geyer 1994).
 
 The payoff is not academic. It means a run with a flaky provider, an
 exhausted budget, or a runner that missed a cron tick still contributes its
-events at the correct, honestly widened, precision instead of being dropped
+events at the correct, candidly widened, precision instead of being dropped
 or silently mis-binned.
 
 The survival function it produces is undefined *inside* a support interval:
@@ -219,7 +219,7 @@ def bootstrap_quantile(
     Resamples the observations with replacement, refits, and reports the
     2.5th and 97.5th percentiles of the bracket's upper edge, plus the share
     of resamples in which the quantile was never reached at all. That last
-    number is the honest one for a slow arm: if 30% of resamples never get
+    number is the truthful one for a slow arm: if 30% of resamples never get
     there, the point estimate is not the story.
 
     Deterministic by default -- a confidence interval that moves when you

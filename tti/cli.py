@@ -140,7 +140,7 @@ def _plan_status(led, scores):
     Returns None if there is no readable plan — a repo can be forked without
     one, and refusing to score in that case would punish the fork rather than
     the omission. Everything downstream treats None as "unregistered" and says
-    so, which is the honest label.
+    so, which is the truthful label.
     """
     from . import prereg
     from .demo import DEMO_MARKER
@@ -920,7 +920,7 @@ def cmd_power(args) -> int:
     """Can this run support the claim its leaderboard invites?
 
     Printed as its own command rather than buried in the report, because the
-    honest answer early in a run is "no", and that is the moment it matters.
+    straight answer early in a run is "no", and that is the moment it matters.
     """
 
     led = _ledger(args)

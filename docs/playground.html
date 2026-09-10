@@ -514,7 +514,7 @@ plausible come back</em>, or <em>did the current answer come back</em>.</p>
 
   <div class="card">
     <h2>What the statistics actually record</h2>
-    <p class="hint">An index seen ABSENT at 15 min and FRESH at 1 hour was indexed <em>somewhere in between</em>. The honest answer is a bracket, not a point.</p>
+    <p class="hint">An index seen ABSENT at 15 min and FRESH at 1 hour was indexed <em>somewhere in between</em>. The truthful answer is a bracket, not a point.</p>
     <div class="brackets" id="brackets"></div>
     <p class="hint" style="margin:18px 0 0">This is why the benchmark uses survival analysis rather than averages — the same maths used for clinical trials where many patients outlive the study. Most facts are still un-indexed at the final rung.</p>
   </div>
@@ -594,7 +594,7 @@ const F="FRESH",S="STALE",A="ABSENT";
 const ARMS=[
  {id:"ctl",name:"Origin control",desc:"fetches the package page directly",control:true,v:[F,F,F,F,F,F]},
  {id:"A",name:"Provider A",desc:"slow to answer, never wrong",v:[A,A,F,F,F,F]},
- {id:"B",name:"Provider B",desc:"honest, but a full day behind",v:[A,A,A,A,F,F]},
+ {id:"B",name:"Provider B",desc:"accurate, but a full day behind",v:[A,A,A,A,F,F]},
  {id:"C",name:"Provider C",desc:"quick, wrong for the first hour",v:[S,S,S,F,F,F]},
  {id:"D",name:"Provider D",desc:"instant, confident, wrong throughout",v:[S,S,S,S,S,S]},
 ];
@@ -691,7 +691,7 @@ t=RUNGS.length-1;paint();   // open at rest, fully resolved, so the page shows w
 
 /* ---- live ground truth -------------------------------------------------
    registry.npmjs.org sends access-control-allow-origin: *, so this needs no
-   key, no backend and no crawl. It is the honest half of the demo: the
+   key, no backend and no crawl. It is the unsimulated half of the demo: the
    comparison below is illustrative, this is real and checkable. */
 const PKGS=["astro","next","react","vite","typescript"];
 function ago(iso){
@@ -889,7 +889,7 @@ async function loadObs(){
       ["STALE","the superseded answer came back and the new one did not"],
       ["ABSENT","neither answer came back"],
       ["skipped","never dispatched — carry-forward once an arm has answered fresh, "+
-                 "the budget cap, or a rung that slipped too far to record honestly"],
+                 "the budget cap, or a rung that slipped too far to record truthfully"],
       ["dashed","not measured yet. A dashed square is not an ABSENT, and keeping "+
                 "those two apart is the entire point of the project"],
     ].map(([t,d])=>"<dt>"+t+"</dt><dd>"+d+"</dd>").join("");
