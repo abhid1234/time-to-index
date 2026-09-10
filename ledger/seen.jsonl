@@ -460,3 +460,11 @@
 {"answer":"0.16.7","marked_at":1789065157.6956298,"reason":"detected_late","source":"github_release","subject":"astral-sh/ruff"}
 {"answer":"v1.100.1","marked_at":1789065157.6956298,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
 {"answer":"@cloudflare/cli-shared-helpers@0.1.29","marked_at":1789065157.6956298,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"7.15.0","marked_at":1789074678.689315,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"1.43.92","marked_at":1789074678.689315,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"3.13.0","marked_at":1789074678.689315,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"0.12.13","marked_at":1789074678.689315,"reason":"detected_late","source":"pypi","subject":"uv"}
+{"answer":"0.12.13","marked_at":1789074678.689315,"reason":"detected_late","source":"github_release","subject":"astral-sh/uv"}
+{"answer":"langchain-anthropic==1.7.2","marked_at":1789074678.689315,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"0001193125-26-387905","marked_at":1789074678.689315,"reason":"detected_late","source":"edgar","subject":"1341439:8-K"}
+{"answer":"0000796343-26-000147","marked_at":1789074678.689315,"reason":"detected_late","source":"edgar","subject":"796343:8-K"}
