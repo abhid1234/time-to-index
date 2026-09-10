@@ -435,3 +435,9 @@
 {"answer":"2609.10412","marked_at":1789021693.1473072,"reason":"detected_late","source":"arxiv","subject":"2609.10412"}
 {"answer":"2609.10407","marked_at":1789021693.1473072,"reason":"detected_late","source":"arxiv","subject":"2609.10407"}
 {"answer":"2609.10397","marked_at":1789021693.1473072,"reason":"detected_late","source":"arxiv","subject":"2609.10397"}
+{"answer":"2.5.13","marked_at":1789040640.9361165,"reason":"detected_late","source":"npm","subject":"@biomejs/biome"}
+{"answer":"8.3.0","marked_at":1789040640.9361165,"reason":"detected_late","source":"npm","subject":"vite"}
+{"answer":"1.31.0","marked_at":1789040640.9361165,"reason":"detected_late","source":"pypi","subject":"huggingface-hub"}
+{"answer":"@biomejs/biome@2.5.13","marked_at":1789040640.9361165,"reason":"detected_late","source":"github_release","subject":"biomejs/biome"}
+{"answer":"0001730168-26-000080","marked_at":1789040640.9361165,"reason":"detected_late","source":"edgar","subject":"1730168:10-Q"}
+{"answer":"0001666700-26-000055","marked_at":1789040640.9361165,"reason":"detected_late","source":"edgar","subject":"1666700:8-K"}
