@@ -506,3 +506,16 @@
 {"answer":"2609.11677","marked_at":1789106807.4157314,"reason":"detected_late","source":"arxiv","subject":"2609.11677"}
 {"answer":"13.0.0","marked_at":1789125335.018063,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
 {"answer":"5.12.4","marked_at":1789125335.018063,"reason":"detected_late","source":"npm","subject":"fastify"}
+{"answer":"12.4.1","marked_at":1789139098.270756,"reason":"detected_late","source":"npm","subject":"pnpm"}
+{"answer":"4.131.1","marked_at":1789139098.270756,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"@cloudflare/containers-shared@0.16.1","marked_at":1789139098.270756,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"2026-18739","marked_at":1789139098.270756,"reason":"detected_late","source":"federal_register","subject":"2026-18739"}
+{"answer":"2026-18738","marked_at":1789139098.270756,"reason":"detected_late","source":"federal_register","subject":"2026-18738"}
+{"answer":"2026-18670","marked_at":1789139098.270756,"reason":"detected_late","source":"federal_register","subject":"2026-18670"}
+{"answer":"2026-18648","marked_at":1789139098.270756,"reason":"detected_late","source":"federal_register","subject":"2026-18648"}
+{"answer":"2026-18645","marked_at":1789139098.270756,"reason":"detected_late","source":"federal_register","subject":"2026-18645"}
+{"answer":"2026-18631","marked_at":1789139098.270756,"reason":"detected_late","source":"federal_register","subject":"2026-18631"}
+{"answer":"2026-18630","marked_at":1789139098.270756,"reason":"detected_late","source":"federal_register","subject":"2026-18630"}
+{"answer":"2026-18625","marked_at":1789139098.270756,"reason":"detected_late","source":"federal_register","subject":"2026-18625"}
+{"answer":"2026-18624","marked_at":1789139098.270756,"reason":"detected_late","source":"federal_register","subject":"2026-18624"}
+{"answer":"2026-18623","marked_at":1789139098.270756,"reason":"detected_late","source":"federal_register","subject":"2026-18623"}
