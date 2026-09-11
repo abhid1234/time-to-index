@@ -58,3 +58,21 @@ def test_the_check_can_fail() -> None:
     assert BANNED.search("Honestly, it drifted")
     assert not BANNED.search("dishonestly")   # word boundary, not substring
     assert not BANNED.search("a straight answer")
+
+
+def test_the_page_does_not_call_undispatched_squares_graded() -> None:
+    """The totals line is where a sceptical reader checks the sample size.
+
+    `provider_cells` counts every provider square in the matrix, carry-forward
+    skips included. The page printed all 56 of them as "graded provider calls"
+    and then itemised twelve verdicts in the same sentence -- overstating its
+    own sample by more than four times, in the one place it must not.
+
+    The fix is to print both numbers. This pins it: the string "graded
+    provider calls" may not be concatenated with `t.provider_cells`.
+    """
+    page = (ROOT / "docs" / "playground.html").read_text()
+    assert "t.provider_cells+\" graded provider calls" not in page
+    assert "graded provider calls" in page, "the totals line went missing"
+    # And the two numbers must both be derivable where it is built.
+    assert "const graded=" in page and "const carried=" in page

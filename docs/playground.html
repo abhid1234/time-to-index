@@ -822,11 +822,16 @@ function drawObs(){
   });
   document.getElementById("meas-punch").innerHTML=punchline(e);
   const t=OBS.totals;
+  const graded=t.fresh+t.stale+t.absent+t.error;
+  const carried=t.provider_cells-graded;
   document.getElementById("meas-tot").textContent=
-    "Across the whole run so far: "+t.provider_cells+" graded provider calls — "+
+    "Across the whole run so far: "+graded+" graded provider calls — "+
     t.fresh+" fresh, "+t.stale+" stale, "+t.absent+" absent, "+t.error+
     " errored — over "+t.events_in_ledger+" events, for $"+
-    t.spend_usd.toFixed(4)+" total.";
+    t.spend_usd.toFixed(4)+" total"+
+    (carried>0 ? ". A further "+carried+" provider squares were never "+
+      "dispatched — carry-forward, budget cap, or a rung that slipped — and "+
+      "are not counted as anything." : ".");
 }
 /* The sentence a visitor should leave with, computed from the row rather
    than written into the page, so it can never describe data that is not
