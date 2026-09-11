@@ -240,6 +240,23 @@ version, while the origin control fetched it at that same moment, so the fact
 was genuinely published and retrievable and the indexes simply had not seen it
 yet.
 
+**The first two STALE verdicts.** As of 10 September the ladder has ten
+events and twelve graded provider calls; ten came back ABSENT and two did
+not come back empty at all. At t+5m on `@sentry/node@10.74.0`, `parallel`
+in `advanced` mode returned `10.73.0` — the version that had been current
+until five minutes earlier. At t+5m on
+`@cloudflare/workers-types@5.20260910.1`, `brave/web` returned
+`5.20260908.1`, the build from two days before. In both cases the origin
+control fetched the current version at that same moment, so the new fact
+was published, live and retrievable, and the index returned the superseded
+answer with nothing in the response marking it as old. Both raw payloads
+are in `ledger/raw/`.
+
+That is one observation per arm, on two packages, at one rung. It is not a
+rate, it is not a ranking, and it is not a claim that these two arms are
+worse than the others — see the next paragraph, which applies to these two
+verdicts exactly as much as to everything else here.
+
 **What it does not support.** Any comparison between providers. Any median,
 any percentile, any statement of the form "X is faster than Y". A handful of
 graded calls on a handful of events is one draw from a distribution nobody has
