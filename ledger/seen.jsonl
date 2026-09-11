@@ -504,3 +504,5 @@
 {"answer":"2609.11824","marked_at":1789106807.4157314,"reason":"detected_late","source":"arxiv","subject":"2609.11824"}
 {"answer":"2609.11728","marked_at":1789106807.4157314,"reason":"detected_late","source":"arxiv","subject":"2609.11728"}
 {"answer":"2609.11677","marked_at":1789106807.4157314,"reason":"detected_late","source":"arxiv","subject":"2609.11677"}
+{"answer":"13.0.0","marked_at":1789125335.018063,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"5.12.4","marked_at":1789125335.018063,"reason":"detected_late","source":"npm","subject":"fastify"}
