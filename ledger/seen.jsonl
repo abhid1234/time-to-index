@@ -519,3 +519,6 @@
 {"answer":"2026-18625","marked_at":1789139098.270756,"reason":"detected_late","source":"federal_register","subject":"2026-18625"}
 {"answer":"2026-18624","marked_at":1789139098.270756,"reason":"detected_late","source":"federal_register","subject":"2026-18624"}
 {"answer":"2026-18623","marked_at":1789139098.270756,"reason":"detected_late","source":"federal_register","subject":"2026-18623"}
+{"answer":"16.3.5","marked_at":1789151237.4895303,"reason":"detected_late","source":"npm","subject":"next"}
+{"answer":"1.13.22","marked_at":1789151237.4895303,"reason":"detected_late","source":"pypi","subject":"dagster"}
+{"answer":"langchain-core==1.6.3","marked_at":1789151237.4895303,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
