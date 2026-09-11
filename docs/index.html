@@ -89,10 +89,10 @@ footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);
 <h1>Time to Index</h1>
 <p class="sub">How long a newly published fact takes to become retrievable through each
 web-search API, and how often the API confidently returns the answer it replaced.
-Generated 2026-09-10 05:29 UTC.</p>
+Generated 2026-09-11 02:18 UTC.</p>
 
-<div class='panel'><p style='margin-top:0'><b>Only the origin control has results</b> — 5 graded probe(s), no provider arm. The leaderboard compares provider arms and there are none: every provider key is unset, or every provider probe is still pending.</p><p class='note'>The control panel below is the whole finding for this run. It is the yardstick, not a result about any provider.</p></div>
-<div class='panel'><p style='margin-top:0'><b>Pre-registered.</b> Plan <code>bac218770f209b20</code> (v1, registered 2026-08-31) was locked to this run on its first probe and has not changed since.</p><p class='note'><b>Declared in the plan, not enabled in this run:</b> brave/web, exa/auto, parallel/advanced, parallel/fast, serper/search, tavily/basic. No key was set, so no probe was ever dispatched to these arms. That is a configuration state, not a result — they did not fail, they were never asked.</p><details><summary>The plan: what was promised, and what would falsify it</summary><div class='scroll'><table><thead><tr><th>id</th><th>hypothesis</th><th>threshold</th><th>falsified if</th></tr></thead><tbody><tr><td><code>H1</code></td><td>Arms differ in time-to-index by more than sampling noise.
+<div class='panel'><p style='margin-top:0'><b>This run does not support an ordering of these arms.</b> The table below has 4 arm(s) over at most 3 event(s), and none of the 6 pairwise comparisons reaches significance after adjustment. Read it as what each arm did, not as which arm is faster.</p><p class='note'>Rendered rather than withheld, because the instrument working on a small run is itself worth showing &#8212; and because a page that quietly waits until the numbers look conclusive is a page that only ever publishes flattering ones. <b>Are the differences real</b> below is the panel that answers this properly, and <code>tti power</code> says how many more events each comparison would need.</p></div>
+<div class='panel'><p style='margin-top:0'><b>Pre-registered.</b> Plan <code>bac218770f209b20</code> (v1, registered 2026-08-31) was locked to this run on its first probe and has not changed since.</p><p class='note'><b>Declared in the plan, not enabled in this run:</b> serper/search, tavily/basic. No key was set, so no probe was ever dispatched to these arms. That is a configuration state, not a result — they did not fail, they were never asked.</p><details><summary>The plan: what was promised, and what would falsify it</summary><div class='scroll'><table><thead><tr><th>id</th><th>hypothesis</th><th>threshold</th><th>falsified if</th></tr></thead><tbody><tr><td><code>H1</code></td><td>Arms differ in time-to-index by more than sampling noise.
 </td><td>p &lt; 0.05</td><td>p &gt;= 0.05, or the estimated hazard ratio between the fastest and slowest arm has a confidence interval containing 1.
 </td></tr><tr><td><code>H2</code></td><td>ABSENT and STALE are not interchangeable: at least one arm returns the superseded answer, rather than nothing, for more than 20% of its not-yet-FRESH observations at the 1-hour rung.
 </td><td>lower bound of the Wilson interval &gt; 0.20 for at least one arm</td><td>Every arm&#x27;s upper Wilson bound at rung 3600 is at or below 0.20. That result would mean retrieval misses are overwhelmingly silent, and the distinction this project is built on would not matter in practice. It is a real possible outcome and is stated here so it cannot later be quietly dropped.
@@ -114,7 +114,7 @@ Generated 2026-09-10 05:29 UTC.</p>
     <th>$/1k events</th>
     <th>$/1k fresh<br><span style="text-transform:none;letter-spacing:0">answers</span></th>
     <th>events</th></tr></thead>
-    <tbody><tr><td colspan='12'>No provider arm has results yet: every provider key is unset, or every provider probe is still pending. This fills in with the first graded probe.</td></tr></tbody></table></div>
+    <tbody><tr><td class='k'>brave/web</td><td class='k'>>9m</td><td class='k'>—</td><td class='k'>>9m</td><td class='k'>—</td><td class='k'>0% (0–56)</td><td class='k bad'>33% (6–79)</td><td class='k'>487ms</td><td class='k'>279</td><td class='k'>$5.00</td><td class='k'>no answers</td><td class='k'>3</td></tr><tr><td class='k'>exa/auto</td><td class='k'>>9m</td><td class='k'>—</td><td class='k'>>9m</td><td class='k'>—</td><td class='k'>0% (0–56)</td><td class='k'>0% (0–56)</td><td class='k'>1516ms</td><td class='k'>1.4k</td><td class='k'>$7.00</td><td class='k'>no answers</td><td class='k'>3</td></tr><tr><td class='k'>parallel/advanced</td><td class='k'>>9m</td><td class='k'>—</td><td class='k'>>9m</td><td class='k'>—</td><td class='k'>0% (0–56)</td><td class='k bad'>33% (6–79)</td><td class='k'>2162ms</td><td class='k'>757</td><td class='k'>$5.00</td><td class='k'>no answers</td><td class='k'>3</td></tr><tr><td class='k'>parallel/fast</td><td class='k'>>9m</td><td class='k'>—</td><td class='k'>>9m</td><td class='k'>—</td><td class='k'>0% (0–56)</td><td class='k'>0% (0–56)</td><td class='k'>565ms</td><td class='k'>790</td><td class='k'>$1.00</td><td class='k'>no answers</td><td class='k'>3</td></tr></tbody></table></div>
   
   
   
@@ -167,18 +167,48 @@ Generated 2026-09-10 05:29 UTC.</p>
 
 <h2>Time to index</h2>
 <div class="panel">
-  <p class='note' style='margin-top:0'>No curve yet. No provider arm has results yet: every provider key is unset, or every provider probe is still pending. This fills in with the first graded probe. The control arm's outcomes are in the next panel.</p>
+  <svg viewBox="0 0 720 300" width="100%" role="img" aria-label="time to index, all sources" style="max-width:720px;font-family:var(--mono)">
+<line x1="56.0" y1="16" x2="56.0" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="56.0" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">1m</text>
+<line x1="180.2" y1="16" x2="180.2" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="180.2" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">5m</text>
+<line x1="265.0" y1="16" x2="265.0" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="265.0" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">15m</text>
+<line x1="372.0" y1="16" x2="372.0" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="372.0" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">1h</text>
+<line x1="510.2" y1="16" x2="510.2" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="510.2" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">6h</text>
+<line x1="617.2" y1="16" x2="617.2" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="617.2" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">24h</text>
+<line x1="702.0" y1="16" x2="702.0" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="702.0" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">72h</text>
+<line x1="56" y1="260.0" x2="702" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="48" y="263.0" font-size="10" text-anchor="end" fill="var(--muted)">0%</text>
+<line x1="56" y1="199.0" x2="702" y2="199.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="48" y="202.0" font-size="10" text-anchor="end" fill="var(--muted)">25%</text>
+<line x1="56" y1="138.0" x2="702" y2="138.0" stroke="var(--grid)" stroke-width="1" stroke-dasharray="3 3"/>
+<text x="48" y="141.0" font-size="10" text-anchor="end" fill="var(--muted)">50%</text>
+<line x1="56" y1="77.0" x2="702" y2="77.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="48" y="80.0" font-size="10" text-anchor="end" fill="var(--muted)">75%</text>
+<line x1="56" y1="16.0" x2="702" y2="16.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="48" y="19.0" font-size="10" text-anchor="end" fill="var(--muted)">100%</text>
+<polyline points="56.0,260.0 702.0,260.0" fill="none" stroke="#3b6ea5" stroke-width="2" stroke-linejoin="round"/>
+<polyline points="56.0,260.0 702.0,260.0" fill="none" stroke="#c2571a" stroke-width="2" stroke-linejoin="round"/>
+<polyline points="56.0,260.0 702.0,260.0" fill="none" stroke="#2f7d5c" stroke-width="2" stroke-linejoin="round"/>
+<polyline points="56.0,260.0 702.0,260.0" fill="none" stroke="#8a4f9e" stroke-width="2" stroke-linejoin="round"/>
+<text x="56" y="294" font-size="10" fill="var(--muted)">lag since publication (log scale) &#183; shaded band = 95% CI</text>
+</svg><div class="legend"><span><i style="background:#3b6ea5"></i>brave/web</span><span><i style="background:#c2571a"></i>exa/auto</span><span><i style="background:#2f7d5c"></i>parallel/advanced</span><span><i style="background:#8a4f9e"></i>parallel/fast</span></div>
 </div>
 
 <h2>The control arm</h2>
 <div class="panel">
   <p style="margin-top:0">At every rung, each event's canonical URL is also fetched
   directly, with robots.txt honoured, and checked for the answer token. Of the events
-  in this run, <b>5</b> were confirmed retrievable from their own origin
+  in this run, <b>8</b> were confirmed retrievable from their own origin
   within 24 hours.</p>
   <div class="scroll"><table>
     <thead><tr><th>origin outcome</th><th>events</th><th>what it means</th></tr></thead>
-    <tbody><tr><td class='k'>found</td><td class='k'>5</td><td>fetchable, and the answer was in the served bytes</td></tr></tbody></table></div>
+    <tbody><tr><td class='k'>found</td><td class='k'>9</td><td>fetchable, and the answer was in the served bytes</td></tr></tbody></table></div>
   <p class="note">Without this arm, every ABSENT is ambiguous: a provider that does not
   return the fact might have a slow crawler, or the fact might not be fetchable from its
   own page yet. The <b>24h recall vs origin</b> column asks the question only of events
@@ -188,12 +218,28 @@ Generated 2026-09-10 05:29 UTC.</p>
 </div>
 
 
+<h2>Where the fact lived</h2>
+<div class="panel">
+  <div class="scroll"><table>
+    <thead><tr><th>arm</th><th>api only</th></tr></thead><tbody><tr><td class='k'>brave/web</td><td class='k'>0/3 <span style='color:var(--muted)'>(0%)</span></td></tr><tr><td class='k'>exa/auto</td><td class='k'>0/3 <span style='color:var(--muted)'>(0%)</span></td></tr><tr><td class='k'>parallel/advanced</td><td class='k'>0/3 <span style='color:var(--muted)'>(0%)</span></td></tr><tr><td class='k'>parallel/fast</td><td class='k'>0/3 <span style='color:var(--muted)'>(0%)</span></td></tr></tbody></table></div>
+  <div class="scroll" style="margin-top:14px"><table>
+    <thead><tr><th>class</th><th>meaning</th></tr></thead>
+    <tbody><tr><td class='k'>api only</td><td>the crawler-facing page did not answer; an API fallback did</td></tr></tbody></table></div>
+  <p class="note">24-hour recall split by where the answer sat in its own document.
+  The control arm already fetches every page, so this axis costs nothing, and it is the
+  one that turns "provider X missed it" into something a buyer can act on. A fact in an
+  <code>&lt;h1&gt;</code> and a fact buried in a <code>__NEXT_DATA__</code> blob are
+  different retrieval problems. An arm strong on the first and weak on the second is not
+  slow &#8212; it does not execute JavaScript, and that is a sourcing decision, not a
+  latency one. Denominators are events the control arm confirmed were on the web.</p>
+</div>
+
 <h2>Estimator check</h2>
 <div class="panel">
   <div class="scroll"><table>
     <thead><tr><th>arm</th><th>Turnbull (reported)</th><th>Kaplan&#8211;Meier on the rung</th>
     <th>overstatement</th></tr></thead>
-    <tbody><tr><td colspan='4'>No provider arm has results yet: every provider key is unset, or every provider probe is still pending. This fills in with the first graded probe.</td></tr></tbody></table></div>
+    <tbody><tr><td class='k'>brave/web</td><td class='k'>>9m</td><td class='k'>>3.0d</td><td class='k'>—</td></tr><tr><td class='k'>exa/auto</td><td class='k'>>9m</td><td class='k'>>3.0d</td><td class='k'>—</td></tr><tr><td class='k'>parallel/advanced</td><td class='k'>>9m</td><td class='k'>>3.0d</td><td class='k'>—</td></tr><tr><td class='k'>parallel/fast</td><td class='k'>>9m</td><td class='k'>>3.0d</td><td class='k'>—</td></tr></tbody></table></div>
   <p class="note">Kaplan&#8211;Meier needs a point event time, so feeding it the rung records
   an arm as indexing <i>at</i> the probe that first saw it. That overstates every latency
   by up to a bracket width, and it cannot represent a widened interval at all when a
@@ -204,13 +250,45 @@ Generated 2026-09-10 05:29 UTC.</p>
 
 <h2>Staleness</h2>
 <div class="panel">
-  <p style="margin-top:0"><b>No staleness opportunities yet.</b> An opportunity is a provider probe graded ABSENT or STALE on a question whose answer has a superseded value; none has been recorded because no provider arm has results.</p>
+  <p style="margin-top:0">Across every probe where the provider had not yet indexed the new answer and the question had a superseded one, it returned the superseded answer <span class="big bad">17%</span> of the time (2 of 12 opportunities).</p>
   <p class="note">Existing search benchmarks score a miss and a confidently-wrong
   stale answer identically. In production they are not the same event. An agent that
   gets nothing back retries, widens, or says it does not know. An agent that gets last
   quarter's number back cites it, and nothing downstream can tell that it is wrong.</p>
-  
-  <div class="legend"></div>
+  <svg viewBox="0 0 720 300" width="100%" role="img" aria-label="staleness by lag" style="max-width:720px;font-family:var(--mono)">
+<line x1="56.0" y1="16" x2="56.0" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="56.0" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">5m</text>
+<line x1="161.0" y1="16" x2="161.0" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="161.0" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">15m</text>
+<line x1="293.4" y1="16" x2="293.4" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="293.4" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">1h</text>
+<line x1="464.6" y1="16" x2="464.6" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="464.6" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">6h</text>
+<line x1="597.0" y1="16" x2="597.0" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="597.0" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">24h</text>
+<line x1="702.0" y1="16" x2="702.0" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="702.0" y="276" font-size="10" text-anchor="middle" fill="var(--muted)">72h</text>
+<line x1="56" y1="260.0" x2="702" y2="260.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="48" y="263.0" font-size="10" text-anchor="end" fill="var(--muted)">0%</text>
+<line x1="56" y1="199.0" x2="702" y2="199.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="48" y="202.0" font-size="10" text-anchor="end" fill="var(--muted)">25%</text>
+<line x1="56" y1="138.0" x2="702" y2="138.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="48" y="141.0" font-size="10" text-anchor="end" fill="var(--muted)">50%</text>
+<line x1="56" y1="77.0" x2="702" y2="77.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="48" y="80.0" font-size="10" text-anchor="end" fill="var(--muted)">75%</text>
+<line x1="56" y1="16.0" x2="702" y2="16.0" stroke="var(--grid)" stroke-width="1"/>
+<text x="48" y="19.0" font-size="10" text-anchor="end" fill="var(--muted)">100%</text>
+<polyline points="56.0,178.7" fill="none" stroke="#3b6ea5" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="56.0" cy="178.7" r="2.5" fill="#3b6ea5"/>
+<polyline points="56.0,260.0" fill="none" stroke="#c2571a" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="56.0" cy="260.0" r="2.5" fill="#c2571a"/>
+<polyline points="56.0,178.7" fill="none" stroke="#2f7d5c" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="56.0" cy="178.7" r="2.5" fill="#2f7d5c"/>
+<polyline points="56.0,260.0" fill="none" stroke="#8a4f9e" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="56.0" cy="260.0" r="2.5" fill="#8a4f9e"/>
+<text x="56" y="294" font-size="10" fill="var(--muted)">lag since publication (log scale) &#183; share of not-yet-fresh probes that returned the superseded answer</text>
+</svg>
+  <div class="legend"><span><i style="background:#3b6ea5"></i>brave/web</span><span><i style="background:#c2571a"></i>exa/auto</span><span><i style="background:#2f7d5c"></i>parallel/advanced</span><span><i style="background:#8a4f9e"></i>parallel/fast</span></div>
   <p class="note" style="border-color:var(--muted)">Staleness should fall as an index
   catches up, so the shape matters as much as the level. A line that stays flat means
   the provider is holding a superseded answer with confidence rather than slowly
@@ -221,15 +299,15 @@ Generated 2026-09-10 05:29 UTC.</p>
 </div>
 
 <h2>By source class</h2>
-<div class='panel'><p class='note' style='margin-top:0'>Per-class tables appear once a provider arm has events in a source class.</p></div>
+<div class='panel'><h2 style='margin-top:0'>package registry</h2><div class='scroll'><table><thead><tr><th>arm</th><th>median</th><th>24h recall</th><th>staleness</th><th>n</th></tr></thead><tbody><tr><td class='k'>brave/web</td><td class='k'>>9m</td><td class='k'>—</td><td class='k'>33% (6–79)</td><td class='k'>3</td></tr><tr><td class='k'>exa/auto</td><td class='k'>>9m</td><td class='k'>—</td><td class='k'>0% (0–56)</td><td class='k'>3</td></tr><tr><td class='k'>parallel/advanced</td><td class='k'>>9m</td><td class='k'>—</td><td class='k'>33% (6–79)</td><td class='k'>3</td></tr><tr><td class='k'>parallel/fast</td><td class='k'>>9m</td><td class='k'>—</td><td class='k'>0% (0–56)</td><td class='k'>3</td></tr></tbody></table></div></div>
 
 <h2>Does the ranking survive the rules that produced it</h2>
 <div class="panel">
   <div class="scroll"><table>
     <thead><tr><th>rule variant</th><th>verdict churn</th><th>rank correlation</th>
     <th>medians moved</th><th>arms lost</th></tr></thead>
-    <tbody><tr><td colspan='5'>No provider arm has results yet: every provider key is unset, or every provider probe is still pending. This fills in with the first graded probe.</td></tr></tbody></table></div>
-  <p class="note">This panel fills in once probes have run against live providers and their responses are on disk.</p>
+    <tbody><tr><td class='k'>strict<span style='color:var(--muted)'> (reported)</span></td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/4</td><td class='k'>0</td></tr><tr><td class='k'>naive-substring</td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/4</td><td class='k'>0</td></tr><tr><td class='k'>no-v-prefix</td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/4</td><td class='k'>0</td></tr><tr><td class='k'>canonical-token-only</td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/4</td><td class='k'>0</td></tr><tr><td class='k'>urls-count-as-evidence</td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/4</td><td class='k'>0</td></tr><tr><td class='k'>titles-only</td><td class='k'>100.0%</td><td class='k'>1.00</td><td class='k'>0/4</td><td class='k'>0</td></tr><tr><td class='k'>shallow-walk</td><td class='k'>0.0%</td><td class='k'>1.00</td><td class='k'>0/4</td><td class='k'>0</td></tr><tr><td class='k'>snippet-window</td><td class='k'>100.0%</td><td class='k'>1.00</td><td class='k'>0/4</td><td class='k'>0</td></tr></tbody></table></div>
+  <p class="note">the ranking is identical under every rule variant tested; the grading choices did not decide it</p>
   <p class="note" style="border-color:var(--muted)">Every grading rule here is a
   judgement call: match on token boundaries or not, count a <code>v</code> prefix,
   trust aliases, treat a URL as evidence. Each variant re-grades the stored payloads
@@ -246,8 +324,8 @@ Generated 2026-09-10 05:29 UTC.</p>
     <thead><tr><th>comparison</th><th>hazard ratio</th><th>events</th><th>log-rank p</th>
     <th>p adjusted<br><span style="text-transform:none;letter-spacing:0">Holm–Bonferroni</span></th>
     <th>power</th><th>read</th></tr></thead>
-    <tbody><tr><td colspan='7'>not enough events yet</td></tr></tbody></table></div>
-  
+    <tbody><tr><td class='k'>brave/web vs exa/auto</td><td class='k'>—</td><td class='k'>0</td><td class='k'>1.0000</td><td class='k'>1.0000</td><td class='k'>—</td><td>no difference to detect</td></tr><tr><td class='k'>brave/web vs parallel/advanced</td><td class='k'>—</td><td class='k'>0</td><td class='k'>1.0000</td><td class='k'>1.0000</td><td class='k'>—</td><td>no difference to detect</td></tr><tr><td class='k'>brave/web vs parallel/fast</td><td class='k'>—</td><td class='k'>0</td><td class='k'>1.0000</td><td class='k'>1.0000</td><td class='k'>—</td><td>no difference to detect</td></tr><tr><td class='k'>exa/auto vs parallel/advanced</td><td class='k'>—</td><td class='k'>0</td><td class='k'>1.0000</td><td class='k'>1.0000</td><td class='k'>—</td><td>no difference to detect</td></tr><tr><td class='k'>exa/auto vs parallel/fast</td><td class='k'>—</td><td class='k'>0</td><td class='k'>1.0000</td><td class='k'>1.0000</td><td class='k'>—</td><td>no difference to detect</td></tr><tr><td class='k'>parallel/advanced vs parallel/fast</td><td class='k'>—</td><td class='k'>0</td><td class='k'>1.0000</td><td class='k'>1.0000</td><td class='k'>—</td><td>no difference to detect</td></tr></tbody></table></div>
+  <p class='note'><b>6 comparisons, so the adjusted column is the one to read.</b> Judging each pair against a raw &alpha; = 0.05 would give a 26% chance that at least one pair is called different when neither is &#8212; a leaderboard with six arms invites fifteen comparisons, and that is how a benchmark ships a difference it invented. Holm&#8211;Bonferroni rather than plain Bonferroni: same control of the family-wise error rate, uniformly more power, and no independence assumption, which matters because pairs sharing an arm are correlated. The <b>read</b> column uses the adjusted value.</p>
   <p class="note">Log-rank rather than a t-test on the indexed subset, because most
   observations are censored and a test that ignores censoring finds differences that are
   artefacts of who ran out of window first. The power column is here because the truthful
