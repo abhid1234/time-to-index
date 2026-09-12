@@ -99,7 +99,7 @@ nothing here is a finding about any product. Real runs are published at
 
 <p class="sub">How long a newly published fact takes to become retrievable through each
 web-search API, and how often the API confidently returns the answer it replaced.
-Generated 2026-09-09 04:15 UTC.</p>
+Generated 2026-09-10 04:20 UTC.</p>
 
 
 <div class='panel'><p style='margin-top:0'><b>Synthetic run.</b> These arms are a generator whose latencies are already known. The pre-registered plan does not apply, because nothing here is a measurement of anybody's product.</p></div>
@@ -344,7 +344,7 @@ Generated 2026-09-09 04:15 UTC.</p>
   <p class='note'><b>3 comparisons, so the adjusted column is the one to read.</b> Judging each pair against a raw &alpha; = 0.05 would give a 14% chance that at least one pair is called different when neither is &#8212; a leaderboard with six arms invites fifteen comparisons, and that is how a benchmark ships a difference it invented. Holm&#8211;Bonferroni rather than plain Bonferroni: same control of the family-wise error rate, uniformly more power, and no independence assumption, which matters because pairs sharing an arm are correlated. The <b>read</b> column uses the adjusted value.</p>
   <p class="note">Log-rank rather than a t-test on the indexed subset, because most
   observations are censored and a test that ignores censoring finds differences that are
-  artefacts of who ran out of window first. The power column is here because the honest
+  artefacts of who ran out of window first. The power column is here because the truthful
   answer early in a run is "not yet", and a leaderboard invites a claim long before the
   data can carry it: at the observed hazard ratio, Schoenfeld's formula says how many
   events 80% power would take. A hazard ratio of 2 needs 66 events; a ratio of 1.2 needs

@@ -1066,7 +1066,7 @@ Generated {gen}.</p>
   {multiplicity_note}
   <p class="note">Log-rank rather than a t-test on the indexed subset, because most
   observations are censored and a test that ignores censoring finds differences that are
-  artefacts of who ran out of window first. The power column is here because the honest
+  artefacts of who ran out of window first. The power column is here because the truthful
   answer early in a run is "not yet", and a leaderboard invites a claim long before the
   data can carry it: at the observed hazard ratio, Schoenfeld's formula says how many
   events 80% power would take. A hazard ratio of 2 needs 66 events; a ratio of 1.2 needs

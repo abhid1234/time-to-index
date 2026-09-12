@@ -52,6 +52,68 @@ def _ledger(args) -> Ledger:
     return Ledger(pathlib.Path(args.run_dir) if args.run_dir else None)
 
 
+def _committed_ledger_ahead(led: Ledger) -> list[str]:
+    """Event ids the committed ledger has that the working one does not.
+
+    This repo keeps two: `runs/` is where a probe writes and is gitignored,
+    `ledger/` is the committed mirror that the hosted runner copies back after
+    every run. So a checkout pulls new events into `ledger/` while the local
+    `runs/` stays wherever it was left -- and `tti report`, which reads
+    `runs/`, will then happily regenerate the published pages from the older
+    state and overwrite the newer numbers with smaller ones.
+
+    That happened: a merge regenerated RESULTS.md from a six-event `runs/`
+    over a ten-event `ledger/`, and the published page went from twelve graded
+    provider calls to zero while every test passed. A project whose entire
+    argument is that a page must not understate what was collected cannot
+    ship the command that does it silently.
+    """
+    committed = ROOT / "ledger" / "events.jsonl"
+    working = led.root / "events.jsonl"
+    if not committed.exists() or committed.resolve() == working.resolve():
+        return []
+
+    def ids(path: pathlib.Path) -> set[str]:
+        if not path.exists():
+            return set()
+        out = set()
+        for line in path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                out.add(json.loads(line)["event_id"])
+            except (ValueError, KeyError):
+                continue        # integrity() is where malformed rows are reported
+        return out
+
+    return sorted(ids(committed) - ids(working))
+
+
+def _refuse_if_stale(led: Ledger, *, explicit_run_dir: bool) -> int | None:
+    """Only guards the default path.
+
+    Someone who passed `--run-dir` has named the ledger they mean -- a test
+    fixture, a second machine's run, a replay -- and comparing that against
+    this checkout's committed ledger would be nonsense. The trap is the
+    default: `runs/`, silently diverging from `ledger/` on every pull.
+    """
+    if explicit_run_dir:
+        return None
+    missing = _committed_ledger_ahead(led)
+    if not missing:
+        return None
+    print(f"refusing to publish: ledger/ has {len(missing)} event(s) that "
+          f"{led.root}/ does not.", file=sys.stderr)
+    print("Regenerating now would overwrite the published pages with an older, "
+          "smaller run.", file=sys.stderr)
+    print("\nSync the way the runner does, then re-run:", file=sys.stderr)
+    print("  cp ledger/*.jsonl ledger/prereg.lock runs/", file=sys.stderr)
+    print(f"\nmissing: {', '.join(m[:12] for m in missing[:6])}"
+          + (" ..." if len(missing) > 6 else ""), file=sys.stderr)
+    return 3
+
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 # The control arm's name, taken from metrics rather than repeated, so an
@@ -140,7 +202,7 @@ def _plan_status(led, scores):
     Returns None if there is no readable plan — a repo can be forked without
     one, and refusing to score in that case would punish the fork rather than
     the omission. Everything downstream treats None as "unregistered" and says
-    so, which is the honest label.
+    so, which is the truthful label.
     """
     from . import prereg
     from .demo import DEMO_MARKER
@@ -920,7 +982,7 @@ def cmd_power(args) -> int:
     """Can this run support the claim its leaderboard invites?
 
     Printed as its own command rather than buried in the report, because the
-    honest answer early in a run is "no", and that is the moment it matters.
+    straight answer early in a run is "no", and that is the moment it matters.
     """
 
     led = _ledger(args)
@@ -1551,6 +1613,9 @@ def cmd_observed(args) -> int:
     """
     from . import observed as observed_mod
     led = _ledger(args)
+    if (rc := _refuse_if_stale(led,
+                               explicit_run_dir=bool(args.run_dir))) is not None:
+        return rc
     limit = getattr(args, "limit", None)
     if limit is None:
         limit = observed_mod.DEFAULT_LIMIT
@@ -1560,14 +1625,18 @@ def cmd_observed(args) -> int:
     path = out / "observed.json"
     path.write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     t = data["totals"]
+    graded = t["fresh"] + t["stale"] + t["absent"] + t["error"]
     print(f"wrote {path} ({path.stat().st_size // 1024}KB) — "
-          f"{t['events']} events, {t['provider_cells']} graded provider cells, "
+          f"{t['events']} events, {graded} graded provider cells "
+          f"({t['provider_cells'] - graded} never dispatched), "
           f"${t['spend_usd']:.4f}")
     return 0
 
 
 def cmd_report(args) -> int:
     led = _ledger(args)
+    if (rc := _refuse_if_stale(led, explicit_run_dir=bool(args.run_dir))) is not None:
+        return rc
     events, results = led.events(), led.results()
     scores = _all_scores(led)
     if not scores and not _control_summary(led):

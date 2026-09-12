@@ -20,7 +20,7 @@ testable without spending anything, and shipping a benchmark whose code has
 only ever run against one vendor's live API is how bias gets in early.
 
 That means this section is currently all Open. It is the section that
-matters most, and filling it in honestly on first run is worth more than
+matters most, and filling it in truthfully on first run is worth more than
 anything already written here.
 
 ### Open — to record on first run, per provider

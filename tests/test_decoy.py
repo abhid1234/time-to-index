@@ -147,7 +147,7 @@ def test_a_counterfactual_that_turns_out_to_exist_is_dropped(wired, tmp_path, mo
 def test_an_unverifiable_counterfactual_is_used_but_counted_separately(
         wired, tmp_path, monkeypatch):
     """Weaker evidence than a verified one. Pretending otherwise would
-    overstate the check that exists to keep us honest."""
+    overstate the check that exists to keep us straight."""
     led, _ = _collect(wired, tmp_path, monkeypatch, {300: "the latest is 9.9.9"})
     rep = decoy.run(led, verify_absent=lambda ev, tok: None, verbose=False)
     assert rep.events_decoyed == 1 and rep.unverified == 1
@@ -189,7 +189,7 @@ def test_decoy_json_carries_the_interval_and_the_examples(
 def test_zero_observed_false_positives_still_reports_a_nonzero_upper_bound(
         wired, tmp_path, monkeypatch, capsys):
     """The number that would be wrong to print is 0%. With one payload the
-    honest upper bound is enormous, and the interval is what says so."""
+    truthful upper bound is enormous, and the interval is what says so."""
     _collect(wired, tmp_path, monkeypatch, {300: "the latest is 9.9.9"})
     assert main(["--run-dir", str(tmp_path), "decoy", "--no-verify"]) == 0
     out = capsys.readouterr().out
