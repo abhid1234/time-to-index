@@ -526,3 +526,4 @@
 {"answer":"v16.3.5","marked_at":1789161075.1116607,"reason":"detected_late","source":"github_release","subject":"vercel/next.js"}
 {"answer":"0001193125-26-389274","marked_at":1789161075.1116607,"reason":"detected_late","source":"edgar","subject":"1341439:10-Q"}
 {"answer":"4.63.2","marked_at":1789210573.084559,"reason":"detected_late","source":"npm","subject":"rollup"}
+{"answer":"26.5.1","marked_at":1789296148.3381176,"reason":"detected_late","source":"npm","subject":"@types/node"}
