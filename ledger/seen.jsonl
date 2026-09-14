@@ -534,3 +534,17 @@
 {"answer":"0.53.0","marked_at":1789382418.1314225,"reason":"detected_late","source":"pypi","subject":"uvicorn"}
 {"answer":"@cloudflare/workers-utils@0.38.1","marked_at":1789382418.1314225,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
 {"answer":"0001193125-26-389753","marked_at":1789382418.1314225,"reason":"detected_late","source":"edgar","subject":"1341439:8-K"}
+{"answer":"12.0.2","marked_at":1789403803.674441,"reason":"detected_late","source":"npm","subject":"@nestjs/core"}
+{"answer":"1.83.0","marked_at":1789403803.674441,"reason":"detected_late","source":"npm","subject":"oxlint"}
+{"answer":"4.63.3","marked_at":1789403803.674441,"reason":"detected_late","source":"npm","subject":"rollup"}
+{"answer":"0001628280-26-061684","marked_at":1789403803.674441,"reason":"detected_late","source":"edgar","subject":"1798100:8-K"}
+{"answer":"2026-18839","marked_at":1789403803.674441,"reason":"detected_late","source":"federal_register","subject":"2026-18839"}
+{"answer":"2026-18838","marked_at":1789403803.674441,"reason":"detected_late","source":"federal_register","subject":"2026-18838"}
+{"answer":"2026-18837","marked_at":1789403803.674441,"reason":"detected_late","source":"federal_register","subject":"2026-18837"}
+{"answer":"2026-18836","marked_at":1789403803.674441,"reason":"detected_late","source":"federal_register","subject":"2026-18836"}
+{"answer":"2026-18835","marked_at":1789403803.674441,"reason":"detected_late","source":"federal_register","subject":"2026-18835"}
+{"answer":"2026-18799","marked_at":1789403803.674441,"reason":"detected_late","source":"federal_register","subject":"2026-18799"}
+{"answer":"2026-18796","marked_at":1789403803.674441,"reason":"detected_late","source":"federal_register","subject":"2026-18796"}
+{"answer":"2026-18782","marked_at":1789403803.674441,"reason":"detected_late","source":"federal_register","subject":"2026-18782"}
+{"answer":"2026-18781","marked_at":1789403803.674441,"reason":"detected_late","source":"federal_register","subject":"2026-18781"}
+{"answer":"2026-18780","marked_at":1789403803.674441,"reason":"detected_late","source":"federal_register","subject":"2026-18780"}
