@@ -578,3 +578,6 @@
 {"answer":"2609.12745","marked_at":1789418286.292665,"reason":"detected_late","source":"arxiv","subject":"2609.12745"}
 {"answer":"2609.12597","marked_at":1789418286.292665,"reason":"detected_late","source":"arxiv","subject":"2609.12597"}
 {"answer":"2609.12535","marked_at":1789418286.292665,"reason":"detected_late","source":"arxiv","subject":"2609.12535"}
+{"answer":"1.101.0","marked_at":1789428697.6900492,"reason":"detected_late","source":"pypi","subject":"litellm"}
+{"answer":"v0.161.0","marked_at":1789428697.6900492,"reason":"detected_late","source":"github_release","subject":"open-telemetry/opentelemetry-collector"}
+{"answer":"0001104659-26-107526","marked_at":1789428697.6900492,"reason":"detected_late","source":"edgar","subject":"1018724:8-K"}
