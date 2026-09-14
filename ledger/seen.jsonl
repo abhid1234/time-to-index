@@ -528,3 +528,9 @@
 {"answer":"4.63.2","marked_at":1789210573.084559,"reason":"detected_late","source":"npm","subject":"rollup"}
 {"answer":"26.5.1","marked_at":1789296148.3381176,"reason":"detected_late","source":"npm","subject":"@types/node"}
 {"answer":"5.20260914.1","marked_at":1789362703.8583083,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"6.6.4","marked_at":1789382418.1314225,"reason":"detected_late","source":"npm","subject":"antd"}
+{"answer":"5.111.0","marked_at":1789382418.1314225,"reason":"detected_late","source":"npm","subject":"webpack"}
+{"answer":"4.131.2","marked_at":1789382418.1314225,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"0.53.0","marked_at":1789382418.1314225,"reason":"detected_late","source":"pypi","subject":"uvicorn"}
+{"answer":"@cloudflare/workers-utils@0.38.1","marked_at":1789382418.1314225,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"0001193125-26-389753","marked_at":1789382418.1314225,"reason":"detected_late","source":"edgar","subject":"1341439:8-K"}
