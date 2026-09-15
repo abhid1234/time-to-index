@@ -587,3 +587,17 @@
 {"answer":"0.12.14","marked_at":1789455147.4160285,"reason":"detected_late","source":"pypi","subject":"uv"}
 {"answer":"0.12.14","marked_at":1789455147.4160285,"reason":"detected_late","source":"github_release","subject":"astral-sh/uv"}
 {"answer":"v1.101.0","marked_at":1789455147.4160285,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
+{"answer":"12.0.3","marked_at":1789474632.2702825,"reason":"detected_late","source":"npm","subject":"@nestjs/core"}
+{"answer":"4.13.8","marked_at":1789474632.2702825,"reason":"detected_late","source":"npm","subject":"hono"}
+{"answer":"12.4.2","marked_at":1789474632.2702825,"reason":"detected_late","source":"npm","subject":"pnpm"}
+{"answer":"5.0.1","marked_at":1789474632.2702825,"reason":"detected_late","source":"npm","subject":"vitest"}
+{"answer":"2026-18959","marked_at":1789474632.2702825,"reason":"detected_late","source":"federal_register","subject":"2026-18959"}
+{"answer":"2026-18944","marked_at":1789474632.2702825,"reason":"detected_late","source":"federal_register","subject":"2026-18944"}
+{"answer":"2026-18943","marked_at":1789474632.2702825,"reason":"detected_late","source":"federal_register","subject":"2026-18943"}
+{"answer":"2026-18927","marked_at":1789474632.2702825,"reason":"detected_late","source":"federal_register","subject":"2026-18927"}
+{"answer":"2026-18911","marked_at":1789474632.2702825,"reason":"detected_late","source":"federal_register","subject":"2026-18911"}
+{"answer":"2026-18909","marked_at":1789474632.2702825,"reason":"detected_late","source":"federal_register","subject":"2026-18909"}
+{"answer":"2026-18907","marked_at":1789474632.2702825,"reason":"detected_late","source":"federal_register","subject":"2026-18907"}
+{"answer":"2026-18905","marked_at":1789474632.2702825,"reason":"detected_late","source":"federal_register","subject":"2026-18905"}
+{"answer":"2026-18904","marked_at":1789474632.2702825,"reason":"detected_late","source":"federal_register","subject":"2026-18904"}
+{"answer":"2026-18903","marked_at":1789474632.2702825,"reason":"detected_late","source":"federal_register","subject":"2026-18903"}
