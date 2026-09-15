@@ -601,3 +601,6 @@
 {"answer":"2026-18905","marked_at":1789474632.2702825,"reason":"detected_late","source":"federal_register","subject":"2026-18905"}
 {"answer":"2026-18904","marked_at":1789474632.2702825,"reason":"detected_late","source":"federal_register","subject":"2026-18904"}
 {"answer":"2026-18903","marked_at":1789474632.2702825,"reason":"detected_late","source":"federal_register","subject":"2026-18903"}
+{"answer":"26.6.0","marked_at":1789492229.3085382,"reason":"detected_late","source":"npm","subject":"@types/node"}
+{"answer":"1.6.0","marked_at":1789492229.3085382,"reason":"detected_late","source":"pypi","subject":"anthropic"}
+{"answer":"v13.0.9","marked_at":1789492229.3085382,"reason":"detected_late","source":"github_release","subject":"grafana/grafana"}
