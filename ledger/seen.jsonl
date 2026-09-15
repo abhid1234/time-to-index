@@ -584,3 +584,6 @@
 {"answer":"5.20260915.1","marked_at":1789437102.3595228,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"3.14.0","marked_at":1789437102.3595228,"reason":"detected_late","source":"pypi","subject":"openai"}
 {"answer":"3.8.6","marked_at":1789437102.3595228,"reason":"detected_late","source":"pypi","subject":"prefect"}
+{"answer":"0.12.14","marked_at":1789455147.4160285,"reason":"detected_late","source":"pypi","subject":"uv"}
+{"answer":"0.12.14","marked_at":1789455147.4160285,"reason":"detected_late","source":"github_release","subject":"astral-sh/uv"}
+{"answer":"v1.101.0","marked_at":1789455147.4160285,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
