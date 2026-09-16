@@ -682,3 +682,9 @@
 {"answer":"2609.17274","marked_at":1789538920.1877558,"reason":"detected_late","source":"arxiv","subject":"2609.17274"}
 {"answer":"2609.17258","marked_at":1789538920.1877558,"reason":"detected_late","source":"arxiv","subject":"2609.17258"}
 {"answer":"2609.17236","marked_at":1789538920.1877558,"reason":"detected_late","source":"arxiv","subject":"2609.17236"}
+{"answer":"2.5.14","marked_at":1789558257.4911714,"reason":"detected_late","source":"npm","subject":"@biomejs/biome"}
+{"answer":"5.103.0","marked_at":1789558257.4911714,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
+{"answer":"5.12.5","marked_at":1789558257.4911714,"reason":"detected_late","source":"npm","subject":"fastify"}
+{"answer":"3.9.7","marked_at":1789558257.4911714,"reason":"detected_late","source":"npm","subject":"prettier"}
+{"answer":"1.138.0","marked_at":1789558257.4911714,"reason":"detected_late","source":"github_release","subject":"microsoft/vscode"}
+{"answer":"@biomejs/biome@2.5.14","marked_at":1789558257.4911714,"reason":"detected_late","source":"github_release","subject":"biomejs/biome"}
