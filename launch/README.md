@@ -45,14 +45,22 @@ sentence around it rewritten, not a digit swapped.
 
    The last one is the one that gets published by accident — it is plain text
    in the middle of the closing section and reads as prose if you skim.
-2. **Video.** Upload the walkthrough, set `thumbnail.png`, put the Substack
-   link in the description. Do this first of the three social posts: the
-   LinkedIn copy refers to the video sitting above it.
+2. **Video.** Upload `time-to-index-launch.mp4` (6:15), set `thumbnail.png`,
+   put the Substack link in the description. Do this first of the three social
+   posts: the LinkedIn copy refers to the video sitting above it.
 
-   On X the runtime matters — the full walkthrough is over the 140-second cap
-   on a free account, so attach the teaser cut to post 1 as native media. It
-   costs no characters, and autoplay on the first post is what carries a
-   thread. Assume it plays muted: posts 1 through 6d carry the words.
+   **It has captions, not a voiceover.** ElevenLabs is 403 at this sandbox's
+   egress proxy, before any key is checked, and Piper's voice models moved to
+   HuggingFace, which is blocked too. The captions are not a consolation
+   prize — X and LinkedIn autoplay muted, which is how most people will meet
+   this, and a screen recording with no words on it is one nobody can follow.
+   To add narration later see "If you want a voiceover" below; it does not
+   need a re-record.
+
+   On X, attach `time-to-index-teaser.mp4` (1:06, under the 140-second cap on
+   a free account) to post 1 as native media. It costs no characters, and
+   autoplay on the first post is what carries a thread. The cut is the uv
+   0.12.15 row — the finding itself, captioned, self-contained.
 3. **LinkedIn.** Paste `linkedin.md`. It truncates around 200 characters and
    the first line carries it: *"A search index that is wrong looks exactly like
    one that is fast."*
@@ -61,6 +69,21 @@ sentence around it rewritten, not a digit swapped.
 
 Send me the Substack URL afterwards and I'll thread it back through the
 README, the video description and both posts.
+
+## If you want a voiceover
+
+The handoff is built and needs no re-record.
+
+```
+python vo.py --script        # prints all 26 lines, each with its filename
+# render them, save as build/vo-external/<beat>-<index>.wav
+python make_video.py         # picks them up and re-times everything
+```
+
+`make_video.py` reads the real length of each wav and re-lays the whole script
+against the recording that already exists, so a take that runs long pushes the
+rest later instead of talking over it. Captions stay; they are timed from the
+same placement, so audio and text cannot drift apart.
 
 ## The claim you are now making about named products
 
