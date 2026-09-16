@@ -10,10 +10,6 @@ The API confidently returns yesterday's answer → your agent cites it. To your 
 
 One is a shrug. The other is a lie with a citation. Scored out of one they are identical, and in production they are nothing alike. So I spent a couple of weekends building the instrument that separates them.
 
-The design involves no crawling at all, which is the part people assume is hard. I watch sources that timestamp their own publications — npm, PyPI, GitHub releases, SEC EDGAR, arXiv. When a package publishes, the registry itself says exactly when. That's t=0, on the publisher's clock, never mine. You can't measure lateness without an agreed zero, and asking a crawler when something appeared is asking the defendant to time the race.
-
-Every search API then gets the same question at six fixed lags — 5 minutes to 72 hours — and at each rung I fetch the source URL directly as a control, so "the index was slow" is never confused with "the page wasn't live yet."
-
 Twelve days in, here is the clearest thing it has caught.
 
 uv 0.12.15 was released on GitHub. My collector saw it 274 seconds later. Five minutes after the release went live, four search indexes and the control were asked what the current version was.
@@ -25,6 +21,12 @@ Brave and Parallel's fast mode returned nothing at all.
 So: not one of the four had the current answer, and half of them confidently asserted the superseded one — the same wrong version, independently, at the same instant. The control proves the release was live and fetchable at that moment. This was not a publishing delay.
 
 Every conventional benchmark scores those two stale rows exactly the same as the two empty ones: zero. In production they are not the same event at all. One makes your agent retry. The other makes it cite 0.12.14 to your customer.
+
+So how is that measured, and how do I know it isn't just a publishing delay?
+
+No crawling at all, which is the part people assume is hard. I watch sources that timestamp their own publications — npm, PyPI, GitHub releases, SEC EDGAR, arXiv. When a package publishes, the registry itself says exactly when. That's t=0, on the publisher's clock, never mine. You can't measure lateness without an agreed zero, and asking a crawler when something appeared is asking the defendant to time the race.
+
+Every search API gets the same question at six fixed lags — 5 minutes to 72 hours — and at each rung I fetch the source URL directly as the control. That control is what makes the rest interpretable, and it is why the row above is a stale index rather than a slow publisher.
 
 Across the run: four STALE verdicts, on three separate packages, across three different arms.
 

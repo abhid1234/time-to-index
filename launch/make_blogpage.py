@@ -184,7 +184,7 @@ def main() -> int:
     out = HERE / "blog-preview.html"
     out.write_text(page)
     print(f"wrote {out}  ({out.stat().st_size / 1e6:.2f} MB, "
-          f"{n - len(missing)}/3 diagrams inlined)")
+          f"{n - len(missing)}/{n} diagrams inlined)")
     return 0
 
 

@@ -70,9 +70,11 @@
 
 <p><code>uv 0.12.15</code> was released on GitHub. My collector saw it 274 seconds later. At t+5m, four search indexes and the origin control were asked what the current version was:</p>
 
-<table><thead><tr><th>arm</th><th>at t+5m</th><th>latency</th><th>cost</th></tr></thead><tbody><tr><td><strong>origin control</strong> — fetches the release page directly</td><td><strong>0.12.15</strong> ✅</td><td>416 ms</td><td>$0</td></tr><tr><td>Exa (<code>auto</code>)</td><td><strong>0.12.14</strong> — superseded</td><td>1,245 ms</td><td>$0.0070</td></tr><tr><td>Parallel (<code>advanced</code>)</td><td><strong>0.12.14</strong> — superseded</td><td>3,201 ms</td><td>$0.0050</td></tr><tr><td>Brave (<code>web</code>)</td><td>nothing</td><td>373 ms</td><td>$0.0050</td></tr><tr><td>Parallel (<code>fast</code>)</td><td>nothing</td><td>766 ms</td><td>$0.0010</td></tr></tbody></table>
+<p><figure><img src="diagrams/the-catch.png" alt="The catch"></figure></p>
 
 <p>Five minutes after the release went live, <strong>not one of the four indexes had the current answer, and half of them confidently asserted the old one</strong> — the same wrong version, independently, at the same instant. The control had the right answer at that moment, so this is not a publishing delay. The release was on the web. The indexes had a stale answer and served it without a hint that it was stale.</p>
+
+<p>That table is generated from the ledger at render time, not retyped. If the event ever leaves the repo, the diagram fails loudly rather than printing a picture of something that is no longer there.</p>
 
 <p>Every conventional retrieval benchmark scores those middle two rows exactly the same as the bottom two: zero. In production they are not remotely the same event. One makes your agent retry. The other makes it cite <code>0.12.14</code> to your customer.</p>
 

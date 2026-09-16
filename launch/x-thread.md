@@ -26,15 +26,61 @@ One is a shrug. The other is a lie with a citation.
 
 **3/**
 
-The design involves no crawling, which is the part people assume is hard.
+Here's the clearest thing it has caught so far.
 
-I watch sources that timestamp their own publications — npm, PyPI, GitHub releases, SEC EDGAR, arXiv.
+uv 0.12.15 released on GitHub. Collector saw it 274s later.
 
-When a package publishes, the registry says exactly when. That's t=0, on their clock.
+At t+5m, four search indexes and the control were asked for the current version.
+
+---
+
+**3b/**
+
+Control: 0.12.15, in 416ms.
+
+Exa: 0.12.14.
+Parallel (advanced): 0.12.14.
+
+Brave: nothing.
+Parallel (fast): nothing.
+
+None of the four had it. Half confidently asserted the superseded one.
+
+---
+
+**3c/**
+
+Same wrong version. Independently. At the same instant.
+
+The control proves the release was live and fetchable right then. Not a publishing delay.
+
+The indexes had a stale answer and served it with no hint that it was stale.
+
+---
+
+**3d/**
+
+Every conventional benchmark scores those two stale rows the same as the two empty ones: zero.
+
+In production they are not the same event.
+
+One makes your agent retry. The other makes it cite 0.12.14 to your customer.
 
 ---
 
 **4/**
+
+So how is that measured, and how do I know it isn't just a publishing delay?
+
+The design involves no crawling, which is the part people assume is hard.
+
+I watch sources that timestamp their own publications — npm, PyPI, GitHub releases, SEC EDGAR, arXiv.
+
+---
+
+**4b/**
+
+When a package publishes, the registry says exactly when. That's t=0, on their clock.
 
 You cannot measure lateness without an agreed zero.
 
@@ -54,50 +100,6 @@ And at each rung I fetch the source URL directly as a control — so "the index 
 
 **6/**
 
-Here's the clearest thing it has caught.
-
-uv 0.12.15 released on GitHub. Collector saw it 274s later.
-
-At t+5m, four search indexes and the control were asked for the current version.
-
----
-
-**6b/**
-
-Control: 0.12.15, in 416ms.
-
-Exa: 0.12.14.
-Parallel (advanced): 0.12.14.
-
-Brave: nothing.
-Parallel (fast): nothing.
-
-None of the four had it. Half confidently asserted the superseded one.
-
----
-
-**6c/**
-
-Same wrong version. Independently. At the same instant.
-
-The control proves the release was live and fetchable right then. Not a publishing delay.
-
-The indexes had a stale answer and served it with no hint that it was stale.
-
----
-
-**6d/**
-
-Every conventional benchmark scores those two stale rows the same as the two empty ones: zero.
-
-In production they are not the same event.
-
-One makes your agent retry. The other makes it cite 0.12.14 to your customer.
-
----
-
-**7/**
-
 This is where a project like mine starts overselling, so let me get ahead of it.
 
 4 STALE, on 3 packages, across 3 different arms.
@@ -106,7 +108,7 @@ That's not a rate. Not a ranking. Not "Exa and Parallel are stale."
 
 ---
 
-**7b/**
+**6b/**
 
 13 events and 22 graded calls cannot support a comparison between providers. No pair of arms separates after adjustment, and the dashboard refuses to rank itself for exactly that reason.
 
@@ -114,7 +116,7 @@ Better I hand you the sample size than you find it yourself.
 
 ---
 
-**8/**
+**7/**
 
 Artificial Analysis launched a Search Index for these same APIs on 18 Aug. Serious work, and the best cost analysis published on them.
 
@@ -124,7 +126,7 @@ Nothing returned and yesterday's answer both score zero.
 
 ---
 
-**9/**
+**8/**
 
 The part I keep turning over: their harness gives the agent 25 turns.
 
@@ -136,7 +138,7 @@ Agentic harnesses absorb ABSENT, preserve STALE.
 
 ---
 
-**10/**
+**9/**
 
 To be fair to them: burn all 25 turns without finishing and you score zero, so absence can cost correctness in the tail.
 
@@ -146,7 +148,7 @@ A stale answer costs none of those.
 
 ---
 
-**11/**
+**10/**
 
 Most of the build wasn't measurement. It was machinery to stop the numbers being nicer than the truth.
 
@@ -154,7 +156,7 @@ Plan hashed + locked before collection. Probe fires late → thrown away, not re
 
 ---
 
-**12/**
+**11/**
 
 And then I told the same lie myself.
 
@@ -164,7 +166,7 @@ On the page whose entire argument is that distinction.
 
 ---
 
-**12b/**
+**11b/**
 
 Then the totals line counted squares that were never dispatched as "graded provider calls."
 
@@ -174,7 +176,7 @@ Overstating its own sample by 5x, three lines under a legend explaining what a s
 
 ---
 
-**12c/**
+**11c/**
 
 Unmeasured rungs are now the only state with no fill at all. An outline, with the reason in it: not due yet, not run yet, never scheduled.
 
@@ -182,7 +184,7 @@ Every bug was in the presentation, not the measurement — exactly where I'd bee
 
 ---
 
-**13/**
+**12/**
 
 And the part I got wrong: I ran it on GitHub Actions.
 
@@ -194,7 +196,7 @@ Dropping them is correct. The runner is the fix.
 
 ---
 
-**14/**
+**13/**
 
 Playground — run the ladder, then flip the scoring rule and watch the leaderboard invert. Real measured data underneath.
 
@@ -202,7 +204,7 @@ https://abhid1234.github.io/time-to-index/playground.html
 
 ---
 
-**15/**
+**14/**
 
 Code, MIT, full ledger — every raw payload, every verdict, every price.
 

@@ -68,15 +68,11 @@ The clearest one is a single row.
 
 `uv 0.12.15` was released on GitHub. My collector saw it 274 seconds later. At t+5m, four search indexes and the origin control were asked what the current version was:
 
-| arm | at t+5m | latency | cost |
-|---|---|---|---|
-| **origin control** — fetches the release page directly | **0.12.15** ✅ | 416 ms | $0 |
-| Exa (`auto`) | **0.12.14** — superseded | 1,245 ms | $0.0070 |
-| Parallel (`advanced`) | **0.12.14** — superseded | 3,201 ms | $0.0050 |
-| Brave (`web`) | nothing | 373 ms | $0.0050 |
-| Parallel (`fast`) | nothing | 766 ms | $0.0010 |
+![The catch](diagrams/the-catch.png)
 
 Five minutes after the release went live, **not one of the four indexes had the current answer, and half of them confidently asserted the old one** — the same wrong version, independently, at the same instant. The control had the right answer at that moment, so this is not a publishing delay. The release was on the web. The indexes had a stale answer and served it without a hint that it was stale.
+
+That table is generated from the ledger at render time, not retyped. If the event ever leaves the repo, the diagram fails loudly rather than printing a picture of something that is no longer there.
 
 Every conventional retrieval benchmark scores those middle two rows exactly the same as the bottom two: zero. In production they are not remotely the same event. One makes your agent retry. The other makes it cite `0.12.14` to your customer.
 

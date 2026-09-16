@@ -41,10 +41,16 @@ sentence around it rewritten, not a digit swapped.
    | `diagrams/absent-vs-stale.png` | upload `diagrams/absent-vs-stale.png` |
    | `diagrams/architecture.png` | upload `diagrams/architecture.png` |
    | `diagrams/interval.png` | upload `diagrams/interval.png` |
+   | `diagrams/the-catch.png` | upload `diagrams/the-catch.png` |
    | the line reading `>>> EMBED ... HERE <<<` | the video embed, then delete the line |
 
    The last one is the one that gets published by accident — it is plain text
    in the middle of the closing section and reads as prose if you skim.
+
+   `the-catch.png` is the one diagram that is not illustrative: every value in
+   it is read out of `ledger/` when it renders, so it cannot drift from what
+   the repo holds. If the uv event ever leaves the ledger, `make_diagrams.py`
+   stops rather than printing a stale picture.
 2. **Video.** Upload `time-to-index-launch.mp4` (6:15), set `thumbnail.png`,
    put the Substack link in the description. Do this first of the three social
    posts: the LinkedIn copy refers to the video sitting above it.
@@ -64,8 +70,13 @@ sentence around it rewritten, not a digit swapped.
 3. **LinkedIn.** Paste `linkedin.md`. It truncates around 200 characters and
    the first line carries it: *"A search index that is wrong looks exactly like
    one that is fast."*
-4. **X.** 21 posts, in order — 1 through 15, with 6b–6d after 6, 7b after 7,
-   and 12b–12c after 12. Posts 14 and 15 carry the links.
+4. **X.** 21 posts, in order — 1 through 14, with 3b–3d after 3, 4b after 4,
+   6b after 6, and 11b–11c after 11. Posts 13 and 14 carry the links.
+
+   The finding is at post 3, not buried behind the method. On X the concrete
+   result has to land before anyone decides whether to keep reading; posts 4
+   and 4b then answer the question it provokes, which is a better job for the
+   method than warming up for it.
 
 Send me the Substack URL afterwards and I'll thread it back through the
 README, the video description and both posts.
@@ -141,7 +152,7 @@ retry on when handed a confident stale answer.
 | `blog.md` | The source. Everything else is generated from it. |
 | `linkedin.md` | The LinkedIn post. |
 | `x-thread.md` | 21 posts. Counts measured, not estimated. |
-| `diagrams/` | Three PNGs at 2x, rendered through the same browser and palette as the playground. |
+| `diagrams/` | Four PNGs at 2x, rendered through the same browser and palette as the playground. `the-catch.png` is generated from the ledger. |
 | `thumbnail.png` | 1280×720, screenshotted from the live page at 2x rather than drawn. |
 | `check_claims.py`, `check_counts.py` | The two pre-flight checks above. |
 | `make_diagrams.py`, `make_thumb.py`, `md2substack.py`, `make_blogpage.py` | The generators. |

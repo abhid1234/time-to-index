@@ -284,6 +284,124 @@ hour — so it started answering somewhere in between, and nobody knows where.</
 """)
 
 
+# --------------------------------------------------------------------------
+# The one diagram that is not illustrative. Every value in it is read from the
+# ledger at render time, so it cannot drift from what the repo actually holds
+# -- and if the event ever disappears, this fails loudly instead of printing a
+# stale picture.
+THE_CATCH = dict(
+    w=1000, h=430, name="the-catch",
+    css="""
+.sub{font-size:13px;color:var(--ink3);margin:0 0 20px}
+.tbl{background:var(--panel);border:1px solid var(--rule);border-radius:10px;
+  overflow:hidden}
+.r{display:grid;grid-template-columns:1.35fr 1fr .62fr .58fr;align-items:center;
+  padding:13px 18px;border-top:1px solid var(--rule)}
+.r:first-child{border-top:0}
+.r.h{background:var(--inset);font-family:"IBM Plex Mono",monospace;
+  font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3)}
+.r .arm{font-size:14px;font-weight:600;color:var(--ink)}
+.r .arm span{display:block;font-size:11.5px;font-weight:400;color:var(--ink3)}
+.r .got{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600}
+.r .got em{font-style:normal;font-size:11.5px;font-weight:400;color:var(--ink3);
+  display:block;letter-spacing:.02em}
+.r .num{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink2);
+  text-align:right}
+.r.ctl{background:var(--accent-soft)}
+.r.ctl .arm{color:var(--accent)}
+.r.ctl .got{color:var(--fresh)}
+.r.stale{background:var(--stale-bg)}
+.r.stale .got{color:var(--stale)}
+.r.none .got{color:var(--absent)}
+.kick{margin-top:20px;font-size:14px;line-height:1.55;color:var(--ink2)}
+.kick b{color:var(--ink)}
+.foot{margin-top:12px;font-size:12px;color:var(--ink3);line-height:1.5}
+""",
+    body=None)   # built at render time from the ledger
+
+
+SOURCE_NAMES = {"github_release": "GitHub", "npm": "npm", "pypi": "PyPI",
+                "sec_edgar": "SEC EDGAR", "arxiv": "arXiv",
+                "federal_register": "the Federal Register"}
+
+
+def catch_body(repo):
+    """Read the uv event out of the ledger and lay it out."""
+    import json
+    led = repo / "ledger"
+    events = [json.loads(x) for x in
+              (led / "events.jsonl").read_text().splitlines() if x.strip()]
+    ev = next((e for e in events if e["subject"] == "astral-sh/uv"
+               and e["answer"] == "0.12.15"), None)
+    if ev is None:
+        raise SystemExit("the uv 0.12.15 event is not in the ledger any more "
+                         "-- the diagram and the copy both need rewriting")
+
+    seen, rows = set(), []
+    for line in (led / "results.jsonl").read_text().splitlines():
+        if not line.strip():
+            continue
+        r = json.loads(line)
+        if r["event_id"] != ev["event_id"] or r["rung"] != 300:
+            continue
+        if r["probe_id"] in seen:
+            continue
+        seen.add(r["probe_id"])
+        rows.append(r)
+
+    order = {"origin": 0}
+    rows.sort(key=lambda r: (order.get(r["provider"], 1), r["verdict"] != "STALE",
+                             r["provider"]))
+    lag = round(ev["discovered_at"] - ev["published_at"])
+
+    out = ['<p class="t">Five minutes after the release went live</p>',
+           f'<p class="sub">{ev["subject"]} {ev["answer"]}, published on '
+           f'{SOURCE_NAMES.get(ev["source"], ev["source"])} and noticed {lag} '
+           f'seconds later. '
+           f'Every arm asked the same question at t+5m. Read from the ledger, '
+           f'not retyped.</p>',
+           '<div class="tbl">',
+           '<div class="r h"><span>Arm</span><span>Returned at t + 5m</span>'
+           '<span class="num">Latency</span><span class="num">Cost</span></div>']
+
+    for r in rows:
+        control = r["provider"] == "origin"
+        if r["verdict"] == "STALE":
+            cls, got, note = "stale", r["matched_stale"][0], "superseded"
+        elif r["verdict"] == "FRESH":
+            cls, got, note = "ctl", ev["answer"], "the current answer"
+        else:
+            cls, got, note = "none", "—", "nothing relevant"
+        if control:
+            cls = "ctl"
+        name = (f'{r["provider"]} · {r["mode"]}' if not control
+                else "origin control")
+        sub = ("fetches the release page directly" if control
+               else "a real search index")
+        cost = r.get("cost_usd") or 0.0
+        out.append(
+            f'<div class="r {cls}"><div class="arm">{name}<span>{sub}</span></div>'
+            f'<div class="got">{got}<em>{note}</em></div>'
+            f'<div class="num">{r["latency_ms"]:,} ms</div>'
+            f'<div class="num">{"free" if control else f"${cost:.4f}"}</div></div>')
+
+    out.append("</div>")
+    n_stale = sum(1 for r in rows if r["verdict"] == "STALE")
+    n_prov = sum(1 for r in rows if r["provider"] != "origin")
+    out.append(
+        f'<p class="kick"><b>Not one of the {n_prov} indexes had the current '
+        f'answer, and {n_stale} of them confidently asserted the old one</b> — '
+        f'the same wrong version, independently, at the same instant. The '
+        f'control had it, so the release was live and fetchable right then. '
+        f'Every conventional benchmark scores those {n_stale} rows exactly the '
+        f'same as the empty ones: zero.</p>')
+    out.append(
+        '<p class="foot">One event. Not a rate, not a ranking — at this sample '
+        'size no pair of arms separates, and the dashboard refuses to rank '
+        'itself for that reason.</p>')
+    return "\n".join(out)
+
+
 def render(spec: dict, pg) -> None:
     html = SHELL.format(f=FONTS, css=spec["css"], body=spec["body"])
     pg.set_viewport_size({"width": spec["w"], "height": spec["h"]})
@@ -299,7 +417,8 @@ def main() -> None:
     with sync_playwright() as pw:
         b = pw.chromium.launch(executable_path=CHROME, args=["--hide-scrollbars"])
         pg = b.new_page(device_scale_factor=2)
-        for spec in (ABSENT_STALE, ARCHITECTURE, LADDER):
+        THE_CATCH["body"] = catch_body(HERE.parent)
+        for spec in (ABSENT_STALE, ARCHITECTURE, LADDER, THE_CATCH):
             render(spec, pg)
         b.close()
 
