@@ -8,3 +8,9 @@ docs/*.fragment.html
 .venv/
 venv/
 .DS_Store
+
+# Launch video build artefacts: the raw capture, caption frames and any
+# externally rendered narration. All regenerable from record.py / make_video.py
+# and far too large to version.
+launch/build/
+launch/*.mp4
