@@ -702,3 +702,9 @@
 {"answer":"2026-19013","marked_at":1789572705.5596457,"reason":"detected_late","source":"federal_register","subject":"2026-19013"}
 {"answer":"2026-19012","marked_at":1789572705.5596457,"reason":"detected_late","source":"federal_register","subject":"2026-19012"}
 {"answer":"2026-19011","marked_at":1789572705.5596457,"reason":"detected_late","source":"federal_register","subject":"2026-19011"}
+{"answer":"7.16.0","marked_at":1789585455.206252,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"1.18.1","marked_at":1789585455.206252,"reason":"detected_late","source":"pypi","subject":"hatch"}
+{"answer":"1.4.1","marked_at":1789585455.206252,"reason":"detected_late","source":"pypi","subject":"langchain"}
+{"answer":"0.16.8","marked_at":1789585455.206252,"reason":"detected_late","source":"pypi","subject":"ruff"}
+{"answer":"0.16.8","marked_at":1789585455.206252,"reason":"detected_late","source":"github_release","subject":"astral-sh/ruff"}
+{"answer":"langchain==1.4.1","marked_at":1789585455.206252,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
