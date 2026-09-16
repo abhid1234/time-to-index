@@ -51,22 +51,24 @@ sentence around it rewritten, not a digit swapped.
    it is read out of `ledger/` when it renders, so it cannot drift from what
    the repo holds. If the uv event ever leaves the ledger, `make_diagrams.py`
    stops rather than printing a stale picture.
-2. **Video.** Upload `time-to-index-launch.mp4` (6:15), set `thumbnail.png`,
+2. **Video.** Upload `time-to-index-launch.mp4` (6:27), set `thumbnail.png`,
    put the Substack link in the description. Do this first of the three social
    posts: the LinkedIn copy refers to the video sitting above it.
 
-   **It has captions, not a voiceover.** ElevenLabs is 403 at this sandbox's
-   egress proxy, before any key is checked, and Piper's voice models moved to
-   HuggingFace, which is blocked too. The captions are not a consolation
-   prize — X and LinkedIn autoplay muted, which is how most people will meet
-   this, and a screen recording with no words on it is one nobody can follow.
-   To add narration later see "If you want a voiceover" below; it does not
-   need a re-record.
+   **It is narrated and captioned.** The voice is Google's translate_tts,
+   which needs no credential and is one of the few hosts this sandbox can
+   reach — ElevenLabs is 403 at the egress proxy before any key is checked,
+   and Piper's models moved to HuggingFace, which is blocked too. If you want
+   a better voice, see "If you want a different voiceover" below; it is a
+   two-minute swap and does not need a re-record.
 
-   On X, attach `time-to-index-teaser.mp4` (1:06, under the 140-second cap on
+   The captions stay either way, and are not a consolation prize: X and
+   LinkedIn autoplay muted, which is how most people will meet this.
+
+   On X, attach `time-to-index-teaser.mp4` (1:11, under the 140-second cap on
    a free account) to post 1 as native media. It costs no characters, and
    autoplay on the first post is what carries a thread. The cut is the uv
-   0.12.15 row — the finding itself, captioned, self-contained.
+   0.12.15 row — the finding itself, self-contained.
 3. **LinkedIn.** Paste `linkedin.md`. It truncates around 200 characters and
    the first line carries it: *"A search index that is wrong looks exactly like
    one that is fast."*
@@ -81,15 +83,19 @@ sentence around it rewritten, not a digit swapped.
 Send me the Substack URL afterwards and I'll thread it back through the
 README, the video description and both posts.
 
-## If you want a voiceover
+## If you want a different voiceover
 
-The handoff is built and needs no re-record.
+`tts.py` already fills `build/vo-external/` from Google's translate_tts. Any
+wav you drop there yourself overrides it, and nothing needs re-recording.
 
 ```
-python vo.py --script        # prints all 26 lines, each with its filename
-# render them, save as build/vo-external/<beat>-<index>.wav
+python vo.py --script        # prints all 27 lines, each with its filename
+# render them anywhere, save as build/vo-external/<beat>-<index>.wav
 python make_video.py         # picks them up and re-times everything
 ```
+
+Delete `build/vo-external/` and re-run `make_video.py` for the silent
+captioned cut instead.
 
 `make_video.py` reads the real length of each wav and re-lays the whole script
 against the recording that already exists, so a take that runs long pushes the
@@ -155,6 +161,7 @@ retry on when handed a confident stale answer.
 | `diagrams/` | Four PNGs at 2x, rendered through the same browser and palette as the playground. `the-catch.png` is generated from the ledger. |
 | `thumbnail.png` | 1280×720, screenshotted from the live page at 2x rather than drawn. |
 | `check_claims.py`, `check_counts.py` | The two pre-flight checks above. |
+| `tts.py` | Renders the 27 narration lines to wavs through a reachable endpoint. |
 | `make_diagrams.py`, `make_thumb.py`, `md2substack.py`, `make_blogpage.py` | The generators. |
 
 Generators that screenshot the live page need `python -m http.server 8890`
