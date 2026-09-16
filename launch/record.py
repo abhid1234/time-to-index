@@ -94,9 +94,32 @@ class Cam:
         self.x, self.y = x, y
 
     def to(self, selector: str, ms: int = 620, dx: float = 0, dy: float = 0):
-        box = self.pg.locator(selector).first.bounding_box()
+        loc = self.pg.locator(selector).first
+        box = loc.bounding_box()
         if not box:
             return
+        # A bounding box is viewport-relative. Pointing at a row that has
+        # scrolled off sends the cursor to a clamped edge position -- it once
+        # sat in the middle of the legend while the narration named a matrix
+        # cell. Bring it into view first, gently, then point.
+        top, bot = box["y"], box["y"] + box["height"]
+        if top < 90 or bot > VH - 70:
+            want = top - (VH * 0.42)
+            self.pg.evaluate(
+                """(dy) => new Promise(res => {
+                    const y0 = window.scrollY, y1 = y0 + dy;
+                    const t0 = performance.now(), ms = 620;
+                    const ease = p => p * p * (3 - 2 * p);
+                    (function step(now) {
+                      const p = Math.min(1, (now - t0) / ms);
+                      window.scrollTo(0, y0 + (y1 - y0) * ease(p));
+                      p < 1 ? requestAnimationFrame(step) : res();
+                    })(performance.now());
+                })""", want)
+            time.sleep(0.75)
+            box = loc.bounding_box()
+            if not box:
+                return
         self.move(box["x"] + box["width"] / 2 + dx,
                   box["y"] + box["height"] / 2 + dy, ms)
 
@@ -244,16 +267,38 @@ def main() -> int:
         # illustration and the pacing.
         beat("measured_events")
         cam.click("#meas-evs button:nth-child(2)", ms=700, settle=1600)
-        cam.scroll_to("#meas-body", 800, offset=-190)
+        cam.scroll_to("#meas-head", 800, offset=-150)
         cam.hold(2400)
-        cam.to("#meas-body tr:nth-child(5) td:nth-child(2)", ms=900)
-        cam.hold(3600)
-        cam.to("#meas-body tr:nth-child(1) td:nth-child(2)", ms=900)
-        cam.hold(3200)
-        cam.to("#meas-body tr:nth-child(3) td:nth-child(2)", ms=800)
+        cam.to("#meas-body tr:nth-child(5) td:nth-child(2)", ms=900)   # origin FRESH
+        cam.hold(4200)
+        cam.to("#meas-body tr:nth-child(2) td:nth-child(2)", ms=900)   # exa STALE
+        cam.hold(4600)
+        cam.to("#meas-body tr:nth-child(3) td:nth-child(2)", ms=800)   # parallel STALE
+        cam.hold(4200)
+        cam.to("#meas-body tr:nth-child(1) td:nth-child(2)", ms=800)   # brave, nothing
+        cam.hold(2600)
+        cam.to("#meas-body tr:nth-child(4) td:nth-child(2)", ms=700)   # parallel/fast
+        cam.hold(3000)
+
+        # The uv row is one event. This beat is the claim that it is not the
+        # only one, so it walks the other two events that produced a STALE
+        # rather than holding on the first.
+        beat("measured_scope")
+        cam.scroll_to("#meas-evs", 800, offset=-170)
+        cam.hold(1000)
+        cam.click("#meas-evs button:nth-child(4)", ms=800, settle=1500)  # workers-types
+        cam.scroll_to("#meas-head", 750, offset=-150)
+        cam.hold(1400)
+        cam.to("#meas-body tr:nth-child(1) td:nth-child(2)", ms=900)     # brave STALE
+        cam.hold(3400)
+        cam.scroll_to("#meas-evs", 750, offset=-170)
+        cam.click("#meas-evs button:nth-child(5)", ms=800, settle=1400)  # sentry
+        cam.scroll_to("#meas-head", 750, offset=-150)
+        cam.hold(1400)
+        cam.to("#meas-body tr:nth-child(3) td:nth-child(2)", ms=900)     # parallel STALE
         cam.hold(3200)
         cam.scroll_to("#meas-tot", 850, offset=-260)
-        cam.hold(2600)
+        cam.hold(2800)
 
         beat("legend")
         cam.scroll_to("#meas-legend", 700)

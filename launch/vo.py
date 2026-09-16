@@ -134,12 +134,13 @@ LINES: list[tuple[str, float, str]] = [
      "confidently asserted the old one. Every conventional benchmark scores "
      "those two stale rows exactly the same as the two empty ones. Zero. In "
      "production they are not the same event at all."),
-    ("measured_events", 34.0,
-     "Across the whole run, four stale verdicts, on three separate packages, "
-     "across three different arms. And I have to say the next part in the "
-     "same breath. Thirteen events is not a rate and it is not a ranking. At "
-     "this sample size no pair of arms separates, which is why the "
-     "leaderboard refuses to rank itself."),
+    ("measured_scope", 0.8,
+     "And it is not a one off. Across the whole run, four stale verdicts, on "
+     "three separate packages, across three different arms."),
+    ("measured_scope", 9.0,
+     "And I have to say the next part in the same breath. Thirteen events is "
+     "not a rate and it is not a ranking. At this sample size no pair of arms "
+     "separates, which is why the leaderboard refuses to rank itself."),
 
     ("legend", 0.8,
      "And notice what the empty squares say. Not due yet. Not run yet. Never "

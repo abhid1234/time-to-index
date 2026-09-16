@@ -1625,7 +1625,7 @@ def cmd_observed(args) -> int:
     path = out / "observed.json"
     path.write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     t = data["totals"]
-    graded = t["fresh"] + t["stale"] + t["absent"] + t["error"]
+    graded = t["fresh"] + t["stale"] + t["absent"]
     print(f"wrote {path} ({path.stat().st_size // 1024}KB) — "
           f"{t['events']} events, {graded} graded provider cells "
           f"({t['provider_cells'] - graded} never dispatched), "
