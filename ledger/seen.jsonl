@@ -761,3 +761,5 @@
 {"answer":"langchain-typesafe==0.0.1a1","marked_at":1789671265.4777389,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
 {"answer":"wrangler@4.134.0","marked_at":1789671265.4777389,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
 {"answer":"8.10.2","marked_at":1789671265.4777389,"reason":"detected_late","source":"github_release","subject":"redis/redis"}
+{"answer":"3.9.8","marked_at":1789682189.4508271,"reason":"detected_late","source":"npm","subject":"prettier"}
+{"answer":"1.43.97","marked_at":1789682189.4508271,"reason":"detected_late","source":"pypi","subject":"boto3"}
