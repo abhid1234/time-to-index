@@ -756,3 +756,8 @@
 {"answer":"2026-19087","marked_at":1789657036.690109,"reason":"detected_late","source":"federal_register","subject":"2026-19087"}
 {"answer":"2026-19086","marked_at":1789657036.690109,"reason":"detected_late","source":"federal_register","subject":"2026-19086"}
 {"answer":"2026-19085","marked_at":1789657036.690109,"reason":"detected_late","source":"federal_register","subject":"2026-19085"}
+{"answer":"26.6.1","marked_at":1789671265.4777389,"reason":"detected_late","source":"npm","subject":"@types/node"}
+{"answer":"4.134.0","marked_at":1789671265.4777389,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"langchain-typesafe==0.0.1a1","marked_at":1789671265.4777389,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"wrangler@4.134.0","marked_at":1789671265.4777389,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"8.10.2","marked_at":1789671265.4777389,"reason":"detected_late","source":"github_release","subject":"redis/redis"}
