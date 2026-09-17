@@ -745,3 +745,14 @@
 {"answer":"3.3.2","marked_at":1789639506.7445354,"reason":"detected_late","source":"pypi","subject":"apache-airflow"}
 {"answer":"v2.9.7","marked_at":1789639506.7445354,"reason":"detected_late","source":"github_release","subject":"denoland/deno"}
 {"answer":"0001108524-26-000210","marked_at":1789639506.7445354,"reason":"detected_late","source":"edgar","subject":"1108524:8-K"}
+{"answer":"1.32.0","marked_at":1789657036.690109,"reason":"detected_late","source":"pypi","subject":"huggingface-hub"}
+{"answer":"2026-19094","marked_at":1789657036.690109,"reason":"detected_late","source":"federal_register","subject":"2026-19094"}
+{"answer":"2026-19093","marked_at":1789657036.690109,"reason":"detected_late","source":"federal_register","subject":"2026-19093"}
+{"answer":"2026-19092","marked_at":1789657036.690109,"reason":"detected_late","source":"federal_register","subject":"2026-19092"}
+{"answer":"2026-19091","marked_at":1789657036.690109,"reason":"detected_late","source":"federal_register","subject":"2026-19091"}
+{"answer":"2026-19090","marked_at":1789657036.690109,"reason":"detected_late","source":"federal_register","subject":"2026-19090"}
+{"answer":"2026-19089","marked_at":1789657036.690109,"reason":"detected_late","source":"federal_register","subject":"2026-19089"}
+{"answer":"2026-19088","marked_at":1789657036.690109,"reason":"detected_late","source":"federal_register","subject":"2026-19088"}
+{"answer":"2026-19087","marked_at":1789657036.690109,"reason":"detected_late","source":"federal_register","subject":"2026-19087"}
+{"answer":"2026-19086","marked_at":1789657036.690109,"reason":"detected_late","source":"federal_register","subject":"2026-19086"}
+{"answer":"2026-19085","marked_at":1789657036.690109,"reason":"detected_late","source":"federal_register","subject":"2026-19085"}
