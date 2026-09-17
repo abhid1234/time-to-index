@@ -763,3 +763,7 @@
 {"answer":"8.10.2","marked_at":1789671265.4777389,"reason":"detected_late","source":"github_release","subject":"redis/redis"}
 {"answer":"3.9.8","marked_at":1789682189.4508271,"reason":"detected_late","source":"npm","subject":"prettier"}
 {"answer":"1.43.97","marked_at":1789682189.4508271,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"0.11.2","marked_at":1789689590.4588444,"reason":"detected_late","source":"pypi","subject":"jax"}
+{"answer":"3.0.6","marked_at":1789689590.4588444,"reason":"detected_late","source":"pypi","subject":"pandas"}
+{"answer":"v0.34.2","marked_at":1789689590.4588444,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
+{"answer":"langchain-typesafe==0.0.1a2","marked_at":1789689590.4588444,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
