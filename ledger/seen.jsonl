@@ -825,3 +825,7 @@
 {"answer":"0.12.17","marked_at":1789760585.4429305,"reason":"detected_late","source":"pypi","subject":"uv"}
 {"answer":"0.12.17","marked_at":1789760585.4429305,"reason":"detected_late","source":"github_release","subject":"astral-sh/uv"}
 {"answer":"langchain==1.4.2","marked_at":1789760585.4429305,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"10.11.0","marked_at":1789768569.9033298,"reason":"detected_late","source":"npm","subject":"eslint"}
+{"answer":"2.11.2","marked_at":1789768569.9033298,"reason":"detected_late","source":"npm","subject":"turbo"}
+{"answer":"3.16.2","marked_at":1789768569.9033298,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"1.43.98","marked_at":1789768569.9033298,"reason":"detected_late","source":"pypi","subject":"boto3"}
