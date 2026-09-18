@@ -814,3 +814,7 @@
 {"answer":"2026-19203","marked_at":1789738588.5279021,"reason":"detected_late","source":"federal_register","subject":"2026-19203"}
 {"answer":"2026-19202","marked_at":1789738588.5279021,"reason":"detected_late","source":"federal_register","subject":"2026-19202"}
 {"answer":"2026-19201","marked_at":1789738588.5279021,"reason":"detected_late","source":"federal_register","subject":"2026-19201"}
+{"answer":"0.127.0","marked_at":1789751534.2507968,"reason":"detected_late","source":"npm","subject":"@anthropic-ai/sdk"}
+{"answer":"2.11.0","marked_at":1789751534.2507968,"reason":"detected_late","source":"npm","subject":"turbo"}
+{"answer":"1.7.0","marked_at":1789751534.2507968,"reason":"detected_late","source":"pypi","subject":"anthropic"}
+{"answer":"3.16.0","marked_at":1789751534.2507968,"reason":"detected_late","source":"pypi","subject":"openai"}
