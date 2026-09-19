@@ -829,3 +829,5 @@
 {"answer":"2.11.2","marked_at":1789768569.9033298,"reason":"detected_late","source":"npm","subject":"turbo"}
 {"answer":"3.16.2","marked_at":1789768569.9033298,"reason":"detected_late","source":"pypi","subject":"openai"}
 {"answer":"1.43.98","marked_at":1789768569.9033298,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"5.20260919.1","marked_at":1789790755.228441,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"26.6.2","marked_at":1789790755.228441,"reason":"detected_late","source":"npm","subject":"@types/node"}
