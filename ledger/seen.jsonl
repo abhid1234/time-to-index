@@ -831,3 +831,4 @@
 {"answer":"1.43.98","marked_at":1789768569.9033298,"reason":"detected_late","source":"pypi","subject":"boto3"}
 {"answer":"5.20260919.1","marked_at":1789790755.228441,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"26.6.2","marked_at":1789790755.228441,"reason":"detected_late","source":"npm","subject":"@types/node"}
+{"answer":"4.63.4","marked_at":1789807588.1612654,"reason":"detected_late","source":"npm","subject":"rollup"}
