@@ -832,3 +832,4 @@
 {"answer":"5.20260919.1","marked_at":1789790755.228441,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"26.6.2","marked_at":1789790755.228441,"reason":"detected_late","source":"npm","subject":"@types/node"}
 {"answer":"4.63.4","marked_at":1789807588.1612654,"reason":"detected_late","source":"npm","subject":"rollup"}
+{"answer":"12.5.1","marked_at":1789865057.9563441,"reason":"detected_late","source":"npm","subject":"pnpm"}
