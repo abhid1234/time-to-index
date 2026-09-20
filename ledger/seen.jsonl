@@ -835,3 +835,5 @@
 {"answer":"12.5.1","marked_at":1789865057.9563441,"reason":"detected_late","source":"npm","subject":"pnpm"}
 {"answer":"5.20260920.1","marked_at":1789882130.6417584,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"1.102.0","marked_at":1789882130.6417584,"reason":"detected_late","source":"pypi","subject":"litellm"}
+{"answer":"6.6.5","marked_at":1789898595.3796716,"reason":"detected_late","source":"npm","subject":"antd"}
+{"answer":"4.23.15","marked_at":1789898595.3796716,"reason":"detected_late","source":"npm","subject":"tsx"}
