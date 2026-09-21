@@ -866,3 +866,4 @@
 {"answer":"2609.21341","marked_at":1789962238.1819391,"reason":"detected_late","source":"arxiv","subject":"2609.21341"}
 {"answer":"2609.21133","marked_at":1789962238.1819391,"reason":"detected_late","source":"arxiv","subject":"2609.21133"}
 {"answer":"2609.20972","marked_at":1789962238.1819391,"reason":"detected_late","source":"arxiv","subject":"2609.20972"}
+{"answer":"12.0.4","marked_at":1789982375.8480906,"reason":"detected_late","source":"npm","subject":"@nestjs/core"}
