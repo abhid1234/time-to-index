@@ -884,3 +884,7 @@
 {"answer":"2026-19282","marked_at":1790006272.4905462,"reason":"detected_late","source":"federal_register","subject":"2026-19282"}
 {"answer":"2026-19281","marked_at":1790006272.4905462,"reason":"detected_late","source":"federal_register","subject":"2026-19281"}
 {"answer":"2026-19280","marked_at":1790006272.4905462,"reason":"detected_late","source":"federal_register","subject":"2026-19280"}
+{"answer":"4.136.1","marked_at":1790022134.1152236,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"1.43.99","marked_at":1790022134.1152236,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"langchain-openai==1.6.3","marked_at":1790022134.1152236,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"@cloudflare/unenv-preset@2.16.2","marked_at":1790022134.1152236,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
