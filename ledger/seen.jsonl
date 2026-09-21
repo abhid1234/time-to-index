@@ -888,3 +888,4 @@
 {"answer":"1.43.99","marked_at":1790022134.1152236,"reason":"detected_late","source":"pypi","subject":"boto3"}
 {"answer":"langchain-openai==1.6.3","marked_at":1790022134.1152236,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
 {"answer":"@cloudflare/unenv-preset@2.16.2","marked_at":1790022134.1152236,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"1.13.24","marked_at":1790033344.5201447,"reason":"detected_late","source":"pypi","subject":"dagster"}
