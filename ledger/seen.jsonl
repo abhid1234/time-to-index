@@ -946,3 +946,16 @@
 {"answer":"2609.24236","marked_at":1790059901.2927368,"reason":"detected_late","source":"arxiv","subject":"2609.24236"}
 {"answer":"2609.24137","marked_at":1790059901.2927368,"reason":"detected_late","source":"arxiv","subject":"2609.24137"}
 {"answer":"2609.23827","marked_at":1790059901.2927368,"reason":"detected_late","source":"arxiv","subject":"2609.23827"}
+{"answer":"10.75.2","marked_at":1790079872.9415696,"reason":"detected_late","source":"npm","subject":"@sentry/node"}
+{"answer":"4.136.2","marked_at":1790079872.9415696,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"wrangler@4.136.2","marked_at":1790079872.9415696,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"2026-19417","marked_at":1790079872.9415696,"reason":"detected_late","source":"federal_register","subject":"2026-19417"}
+{"answer":"2026-19416","marked_at":1790079872.9415696,"reason":"detected_late","source":"federal_register","subject":"2026-19416"}
+{"answer":"2026-19391","marked_at":1790079872.9415696,"reason":"detected_late","source":"federal_register","subject":"2026-19391"}
+{"answer":"2026-19390","marked_at":1790079872.9415696,"reason":"detected_late","source":"federal_register","subject":"2026-19390"}
+{"answer":"2026-19389","marked_at":1790079872.9415696,"reason":"detected_late","source":"federal_register","subject":"2026-19389"}
+{"answer":"2026-19388","marked_at":1790079872.9415696,"reason":"detected_late","source":"federal_register","subject":"2026-19388"}
+{"answer":"2026-19387","marked_at":1790079872.9415696,"reason":"detected_late","source":"federal_register","subject":"2026-19387"}
+{"answer":"2026-19386","marked_at":1790079872.9415696,"reason":"detected_late","source":"federal_register","subject":"2026-19386"}
+{"answer":"2026-19385","marked_at":1790079872.9415696,"reason":"detected_late","source":"federal_register","subject":"2026-19385"}
+{"answer":"2026-19384","marked_at":1790079872.9415696,"reason":"detected_late","source":"federal_register","subject":"2026-19384"}
