@@ -975,3 +975,6 @@
 {"answer":"v16.3.6","marked_at":1790107943.7004578,"reason":"detected_late","source":"github_release","subject":"vercel/next.js"}
 {"answer":"@astrojs/vercel@11.0.11","marked_at":1790107943.7004578,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
 {"answer":"0000796343-26-000156","marked_at":1790107943.7004578,"reason":"detected_late","source":"edgar","subject":"796343:10-Q"}
+{"answer":"2.11.3","marked_at":1790118103.8716178,"reason":"detected_late","source":"npm","subject":"turbo"}
+{"answer":"v0.34.3","marked_at":1790118103.8716178,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
+{"answer":"langchain-openai==1.6.4","marked_at":1790118103.8716178,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
