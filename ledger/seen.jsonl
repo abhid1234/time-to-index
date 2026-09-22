@@ -959,3 +959,10 @@
 {"answer":"2026-19386","marked_at":1790079872.9415696,"reason":"detected_late","source":"federal_register","subject":"2026-19386"}
 {"answer":"2026-19385","marked_at":1790079872.9415696,"reason":"detected_late","source":"federal_register","subject":"2026-19385"}
 {"answer":"2026-19384","marked_at":1790079872.9415696,"reason":"detected_late","source":"federal_register","subject":"2026-19384"}
+{"answer":"0.128.0","marked_at":1790097019.3505206,"reason":"detected_late","source":"npm","subject":"@anthropic-ai/sdk"}
+{"answer":"2.117.0","marked_at":1790097019.3505206,"reason":"detected_late","source":"npm","subject":"@supabase/supabase-js"}
+{"answer":"13.0.2","marked_at":1790097019.3505206,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"16.3.6","marked_at":1790097019.3505206,"reason":"detected_late","source":"npm","subject":"next"}
+{"answer":"4.136.3","marked_at":1790097019.3505206,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"1.8.0","marked_at":1790097019.3505206,"reason":"detected_late","source":"pypi","subject":"anthropic"}
+{"answer":"@cloudflare/autoconfig@0.6.2","marked_at":1790097019.3505206,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
