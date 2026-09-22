@@ -966,3 +966,12 @@
 {"answer":"4.136.3","marked_at":1790097019.3505206,"reason":"detected_late","source":"npm","subject":"wrangler"}
 {"answer":"1.8.0","marked_at":1790097019.3505206,"reason":"detected_late","source":"pypi","subject":"anthropic"}
 {"answer":"@cloudflare/autoconfig@0.6.2","marked_at":1790097019.3505206,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"7.3.4","marked_at":1790107943.7004578,"reason":"detected_late","source":"npm","subject":"astro"}
+{"answer":"44.4.4","marked_at":1790107943.7004578,"reason":"detected_late","source":"npm","subject":"electron"}
+{"answer":"7.22.0","marked_at":1790107943.7004578,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"3.18.0","marked_at":1790107943.7004578,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"1.43.100","marked_at":1790107943.7004578,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"v1.102.0","marked_at":1790107943.7004578,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
+{"answer":"v16.3.6","marked_at":1790107943.7004578,"reason":"detected_late","source":"github_release","subject":"vercel/next.js"}
+{"answer":"@astrojs/vercel@11.0.11","marked_at":1790107943.7004578,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
+{"answer":"0000796343-26-000156","marked_at":1790107943.7004578,"reason":"detected_late","source":"edgar","subject":"796343:10-Q"}
