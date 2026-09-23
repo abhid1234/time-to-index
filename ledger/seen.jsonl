@@ -1019,3 +1019,10 @@
 {"answer":"1.7.0","marked_at":1790165187.2375119,"reason":"detected_late","source":"pypi","subject":"starlette"}
 {"answer":"v1.99.3","marked_at":1790165187.2375119,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
 {"answer":"1.139.0","marked_at":1790165187.2375119,"reason":"detected_late","source":"github_release","subject":"microsoft/vscode"}
+{"answer":"11.0.0","marked_at":1790182393.5670867,"reason":"detected_late","source":"npm","subject":"@sentry/node"}
+{"answer":"12.6.0","marked_at":1790182393.5670867,"reason":"detected_late","source":"npm","subject":"pnpm"}
+{"answer":"4.137.0","marked_at":1790182393.5670867,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"langchain-openai==1.6.5","marked_at":1790182393.5670867,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"@cloudflare/runtime-types@0.1.0","marked_at":1790182393.5670867,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"v1.16.4","marked_at":1790182393.5670867,"reason":"detected_late","source":"github_release","subject":"hashicorp/terraform"}
+{"answer":"v8.19.22","marked_at":1790182393.5670867,"reason":"detected_late","source":"github_release","subject":"elastic/elasticsearch"}
