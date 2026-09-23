@@ -1011,3 +1011,11 @@
 {"answer":"2609.26711","marked_at":1790145238.7684386,"reason":"detected_late","source":"arxiv","subject":"2609.26711"}
 {"answer":"2609.26692","marked_at":1790145238.7684386,"reason":"detected_late","source":"arxiv","subject":"2609.26692"}
 {"answer":"2609.26654","marked_at":1790145238.7684386,"reason":"detected_late","source":"arxiv","subject":"2609.26654"}
+{"answer":"12.1.0","marked_at":1790165187.2375119,"reason":"detected_late","source":"npm","subject":"@nestjs/core"}
+{"answer":"2.117.1","marked_at":1790165187.2375119,"reason":"detected_late","source":"npm","subject":"@supabase/supabase-js"}
+{"answer":"44.4.5","marked_at":1790165187.2375119,"reason":"detected_late","source":"npm","subject":"electron"}
+{"answer":"6.38.0","marked_at":1790165187.2375119,"reason":"detected_late","source":"npm","subject":"knip"}
+{"answer":"7.23.0","marked_at":1790165187.2375119,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"1.7.0","marked_at":1790165187.2375119,"reason":"detected_late","source":"pypi","subject":"starlette"}
+{"answer":"v1.99.3","marked_at":1790165187.2375119,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
+{"answer":"1.139.0","marked_at":1790165187.2375119,"reason":"detected_late","source":"github_release","subject":"microsoft/vscode"}

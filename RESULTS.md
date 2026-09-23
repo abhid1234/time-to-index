@@ -1,13 +1,13 @@
 # Results
 
-_Generated 2026-09-23 06:33 UTC · 22 events · 30 provider probes graded · 14 control probes · $0.14 spent_
+_Generated 2026-09-23 12:07 UTC · 32 events · 70 provider probes graded · 24 control probes · $0.32 spent_
 
 | provider | median TTI | p90 | 24h recall | staleness | text/result | $/1k events | $/1k fresh answers | n |
 |---|---|---|---|---|---|---|---|---|
-| `brave/web` | >10m | >10m | — | 12% (2–47) | 279 chars | $5.00 | no answers | 8 |
-| `exa/auto` | >10m | >10m | — | 25% (7–59) | 1.5k chars | $7.00 | no answers | 8 |
-| `parallel/advanced` | >10m | >10m | — | 29% (8–64) | 772 chars | $5.00 | no answers | 7 |
-| `parallel/fast` | >10m | >10m | — | 0% (0–35) | 790 chars | $1.00 | no answers | 7 |
+| `parallel/advanced` | 7m–7m | >10m | 100% (70–100) | 29% (8–64) | 876 chars | $5.00 | $9.44 | 17 |
+| `brave/web` | >10m | >10m | — | 12% (2–47) | 347 chars | $5.00 | no answers | 18 |
+| `exa/auto` | >10m | >10m | 100% (21–100) | 25% (7–59) | 1.5k chars | $7.00 | $126.00 | 18 |
+| `parallel/fast` | >10m | >10m | 100% (34–100) | 0% (0–35) | 1.2k chars | $1.00 | $8.50 | 17 |
 
 ## Pipeline false-positive rate
 
