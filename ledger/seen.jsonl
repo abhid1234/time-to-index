@@ -1026,3 +1026,10 @@
 {"answer":"@cloudflare/runtime-types@0.1.0","marked_at":1790182393.5670867,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
 {"answer":"v1.16.4","marked_at":1790182393.5670867,"reason":"detected_late","source":"github_release","subject":"hashicorp/terraform"}
 {"answer":"v8.19.22","marked_at":1790182393.5670867,"reason":"detected_late","source":"github_release","subject":"elastic/elasticsearch"}
+{"answer":"22.2.0","marked_at":1790193539.5130277,"reason":"detected_late","source":"npm","subject":"@angular/core"}
+{"answer":"14.0.0","marked_at":1790193539.5130277,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"3.19.1","marked_at":1790193539.5130277,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"1.43.101","marked_at":1790193539.5130277,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"v1.35.9","marked_at":1790193539.5130277,"reason":"detected_late","source":"github_release","subject":"kubernetes/kubernetes"}
+{"answer":"cli==0.4.32","marked_at":1790193539.5130277,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langgraph"}
+{"answer":"langchain-anthropic==1.7.4","marked_at":1790193539.5130277,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
