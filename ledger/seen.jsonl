@@ -1033,3 +1033,5 @@
 {"answer":"v1.35.9","marked_at":1790193539.5130277,"reason":"detected_late","source":"github_release","subject":"kubernetes/kubernetes"}
 {"answer":"cli==0.4.32","marked_at":1790193539.5130277,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langgraph"}
 {"answer":"langchain-anthropic==1.7.4","marked_at":1790193539.5130277,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"v0.5.0","marked_at":1790204002.3223484,"reason":"detected_late","source":"github_release","subject":"ggml-org/llama.cpp"}
+{"answer":"v1.34.12","marked_at":1790204002.3223484,"reason":"detected_late","source":"github_release","subject":"kubernetes/kubernetes"}
