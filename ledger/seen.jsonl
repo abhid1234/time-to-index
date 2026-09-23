@@ -978,3 +978,17 @@
 {"answer":"2.11.3","marked_at":1790118103.8716178,"reason":"detected_late","source":"npm","subject":"turbo"}
 {"answer":"v0.34.3","marked_at":1790118103.8716178,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
 {"answer":"langchain-openai==1.6.4","marked_at":1790118103.8716178,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"5.20260923.1","marked_at":1790126896.8142579,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"3.19.0","marked_at":1790126896.8142579,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"2609.25991","marked_at":1790126896.8142579,"reason":"detected_late","source":"arxiv","subject":"2609.25991"}
+{"answer":"2609.25833","marked_at":1790126896.8142579,"reason":"detected_late","source":"arxiv","subject":"2609.25833"}
+{"answer":"2609.25825","marked_at":1790126896.8142579,"reason":"detected_late","source":"arxiv","subject":"2609.25825"}
+{"answer":"2609.25408","marked_at":1790126896.8142579,"reason":"detected_late","source":"arxiv","subject":"2609.25408"}
+{"answer":"2609.25306","marked_at":1790126896.8142579,"reason":"detected_late","source":"arxiv","subject":"2609.25306"}
+{"answer":"2609.26388","marked_at":1790126896.8142579,"reason":"detected_late","source":"arxiv","subject":"2609.26388"}
+{"answer":"2609.26316","marked_at":1790126896.8142579,"reason":"detected_late","source":"arxiv","subject":"2609.26316"}
+{"answer":"2609.26048","marked_at":1790126896.8142579,"reason":"detected_late","source":"arxiv","subject":"2609.26048"}
+{"answer":"2609.26016","marked_at":1790126896.8142579,"reason":"detected_late","source":"arxiv","subject":"2609.26016"}
+{"answer":"2609.25945","marked_at":1790126896.8142579,"reason":"detected_late","source":"arxiv","subject":"2609.25945"}
+{"answer":"2609.25563","marked_at":1790126896.8142579,"reason":"detected_late","source":"arxiv","subject":"2609.25563"}
+{"answer":"2609.25502","marked_at":1790126896.8142579,"reason":"detected_late","source":"arxiv","subject":"2609.25502"}
