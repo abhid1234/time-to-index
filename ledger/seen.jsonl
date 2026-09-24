@@ -1094,3 +1094,6 @@
 {"answer":"2026-19595","marked_at":1790268566.0481372,"reason":"detected_late","source":"federal_register","subject":"2026-19595"}
 {"answer":"2026-19594","marked_at":1790268566.0481372,"reason":"detected_late","source":"federal_register","subject":"2026-19594"}
 {"answer":"2026-19593","marked_at":1790268566.0481372,"reason":"detected_late","source":"federal_register","subject":"2026-19593"}
+{"answer":"4.139.0","marked_at":1790280711.598094,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"1.43.102","marked_at":1790280711.598094,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"langchain-core==1.6.5","marked_at":1790280711.598094,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
