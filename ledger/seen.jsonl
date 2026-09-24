@@ -1097,3 +1097,7 @@
 {"answer":"4.139.0","marked_at":1790280711.598094,"reason":"detected_late","source":"npm","subject":"wrangler"}
 {"answer":"1.43.102","marked_at":1790280711.598094,"reason":"detected_late","source":"pypi","subject":"boto3"}
 {"answer":"langchain-core==1.6.5","marked_at":1790280711.598094,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"2.11.4","marked_at":1790291721.4771647,"reason":"detected_late","source":"npm","subject":"turbo"}
+{"answer":"0.12.10","marked_at":1790291721.4771647,"reason":"detected_late","source":"pypi","subject":"flax"}
+{"answer":"0.16.9","marked_at":1790291721.4771647,"reason":"detected_late","source":"pypi","subject":"ruff"}
+{"answer":"0.16.9","marked_at":1790291721.4771647,"reason":"detected_late","source":"github_release","subject":"astral-sh/ruff"}
