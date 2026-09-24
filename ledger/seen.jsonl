@@ -1073,3 +1073,11 @@
 {"answer":"2609.28130","marked_at":1790230243.5257134,"reason":"detected_late","source":"arxiv","subject":"2609.28130"}
 {"answer":"2609.28090","marked_at":1790230243.5257134,"reason":"detected_late","source":"arxiv","subject":"2609.28090"}
 {"answer":"2609.28361","marked_at":1790230243.5257134,"reason":"detected_late","source":"arxiv","subject":"2609.28361"}
+{"answer":"7.3.5","marked_at":1790251010.0321121,"reason":"detected_late","source":"npm","subject":"astro"}
+{"answer":"4.63.5","marked_at":1790251010.0321121,"reason":"detected_late","source":"npm","subject":"rollup"}
+{"answer":"4.138.0","marked_at":1790251010.0321121,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"3.2.0","marked_at":1790251010.0321121,"reason":"detected_late","source":"pypi","subject":"haystack-ai"}
+{"answer":"1.33.0","marked_at":1790251010.0321121,"reason":"detected_late","source":"pypi","subject":"huggingface-hub"}
+{"answer":"langchain-openai==1.6.6","marked_at":1790251010.0321121,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"@cloudflare/runtime-types@0.1.1","marked_at":1790251010.0321121,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"astro@7.3.5","marked_at":1790251010.0321121,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
