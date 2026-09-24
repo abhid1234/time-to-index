@@ -1081,3 +1081,16 @@
 {"answer":"langchain-openai==1.6.6","marked_at":1790251010.0321121,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
 {"answer":"@cloudflare/runtime-types@0.1.1","marked_at":1790251010.0321121,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
 {"answer":"astro@7.3.5","marked_at":1790251010.0321121,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
+{"answer":"15.0.0","marked_at":1790268566.0481372,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"8.3.1","marked_at":1790268566.0481372,"reason":"detected_late","source":"npm","subject":"vite"}
+{"answer":"2.0.0","marked_at":1790268566.0481372,"reason":"detected_late","source":"pypi","subject":"huggingface-hub"}
+{"answer":"2026-19602","marked_at":1790268566.0481372,"reason":"detected_late","source":"federal_register","subject":"2026-19602"}
+{"answer":"2026-19601","marked_at":1790268566.0481372,"reason":"detected_late","source":"federal_register","subject":"2026-19601"}
+{"answer":"2026-19600","marked_at":1790268566.0481372,"reason":"detected_late","source":"federal_register","subject":"2026-19600"}
+{"answer":"2026-19599","marked_at":1790268566.0481372,"reason":"detected_late","source":"federal_register","subject":"2026-19599"}
+{"answer":"2026-19598","marked_at":1790268566.0481372,"reason":"detected_late","source":"federal_register","subject":"2026-19598"}
+{"answer":"2026-19597","marked_at":1790268566.0481372,"reason":"detected_late","source":"federal_register","subject":"2026-19597"}
+{"answer":"2026-19596","marked_at":1790268566.0481372,"reason":"detected_late","source":"federal_register","subject":"2026-19596"}
+{"answer":"2026-19595","marked_at":1790268566.0481372,"reason":"detected_late","source":"federal_register","subject":"2026-19595"}
+{"answer":"2026-19594","marked_at":1790268566.0481372,"reason":"detected_late","source":"federal_register","subject":"2026-19594"}
+{"answer":"2026-19593","marked_at":1790268566.0481372,"reason":"detected_late","source":"federal_register","subject":"2026-19593"}
