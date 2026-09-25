@@ -1172,3 +1172,7 @@
 {"answer":"5.20260925.2","marked_at":1790356733.9528344,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"langchain-fireworks==1.6.3","marked_at":1790356733.9528344,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
 {"answer":"0001477449-26-000046","marked_at":1790356733.9528344,"reason":"detected_late","source":"edgar","subject":"1477449:8-K"}
+{"answer":"4.141.0","marked_at":1790368455.821794,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"1.43.103","marked_at":1790368455.821794,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"@cloudflare/containers-shared@0.20.2","marked_at":1790368455.821794,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"0001193125-26-402816","marked_at":1790368455.821794,"reason":"detected_late","source":"edgar","subject":"1341439:DEF 14A"}
