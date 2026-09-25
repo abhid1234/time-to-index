@@ -1176,3 +1176,5 @@
 {"answer":"1.43.103","marked_at":1790368455.821794,"reason":"detected_late","source":"pypi","subject":"boto3"}
 {"answer":"@cloudflare/containers-shared@0.20.2","marked_at":1790368455.821794,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
 {"answer":"0001193125-26-402816","marked_at":1790368455.821794,"reason":"detected_late","source":"edgar","subject":"1341439:DEF 14A"}
+{"answer":"16.0.0","marked_at":1790379081.717294,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"26.6.3","marked_at":1790379081.717294,"reason":"detected_late","source":"npm","subject":"@types/node"}
