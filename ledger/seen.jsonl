@@ -1169,3 +1169,6 @@
 {"answer":"2026-19706","marked_at":1790338317.1941555,"reason":"detected_late","source":"federal_register","subject":"2026-19706"}
 {"answer":"2026-19704","marked_at":1790338317.1941555,"reason":"detected_late","source":"federal_register","subject":"2026-19704"}
 {"answer":"2026-19703","marked_at":1790338317.1941555,"reason":"detected_late","source":"federal_register","subject":"2026-19703"}
+{"answer":"5.20260925.2","marked_at":1790356733.9528344,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"langchain-fireworks==1.6.3","marked_at":1790356733.9528344,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"0001477449-26-000046","marked_at":1790356733.9528344,"reason":"detected_late","source":"edgar","subject":"1477449:8-K"}
