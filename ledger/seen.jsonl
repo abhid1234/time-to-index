@@ -1178,3 +1178,6 @@
 {"answer":"0001193125-26-402816","marked_at":1790368455.821794,"reason":"detected_late","source":"edgar","subject":"1341439:DEF 14A"}
 {"answer":"16.0.0","marked_at":1790379081.717294,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
 {"answer":"26.6.3","marked_at":1790379081.717294,"reason":"detected_late","source":"npm","subject":"@types/node"}
+{"answer":"5.20260926.1","marked_at":1790387844.6438859,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"5.103.3","marked_at":1790387844.6438859,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
+{"answer":"16.0.1","marked_at":1790387844.6438859,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
