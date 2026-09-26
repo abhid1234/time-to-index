@@ -1181,3 +1181,4 @@
 {"answer":"5.20260926.1","marked_at":1790387844.6438859,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"5.103.3","marked_at":1790387844.6438859,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
 {"answer":"16.0.1","marked_at":1790387844.6438859,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"5.104.0","marked_at":1790407419.211259,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
