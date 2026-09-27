@@ -1187,3 +1187,4 @@
 {"answer":"1.5.14","marked_at":1790506180.2058592,"reason":"detected_late","source":"npm","subject":"langchain"}
 {"answer":"4.142.0","marked_at":1790522616.3935852,"reason":"detected_late","source":"npm","subject":"wrangler"}
 {"answer":"@cloudflare/deploy-helpers@0.18.1","marked_at":1790522616.3935852,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"1.103.0","marked_at":1790536200.7372468,"reason":"detected_late","source":"pypi","subject":"litellm"}
