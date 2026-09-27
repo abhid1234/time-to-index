@@ -1182,3 +1182,4 @@
 {"answer":"5.103.3","marked_at":1790387844.6438859,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
 {"answer":"16.0.1","marked_at":1790387844.6438859,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
 {"answer":"5.104.0","marked_at":1790407419.211259,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
+{"answer":"3.8.7","marked_at":1790469185.9096394,"reason":"detected_late","source":"pypi","subject":"prefect"}
