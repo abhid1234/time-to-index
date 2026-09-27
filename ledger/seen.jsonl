@@ -1185,3 +1185,5 @@
 {"answer":"3.8.7","marked_at":1790469185.9096394,"reason":"detected_late","source":"pypi","subject":"prefect"}
 {"answer":"5.20260927.1","marked_at":1790487779.2053294,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"1.5.14","marked_at":1790506180.2058592,"reason":"detected_late","source":"npm","subject":"langchain"}
+{"answer":"4.142.0","marked_at":1790522616.3935852,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"@cloudflare/deploy-helpers@0.18.1","marked_at":1790522616.3935852,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
