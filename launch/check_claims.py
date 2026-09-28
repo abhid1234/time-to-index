@@ -27,7 +27,7 @@ import re
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
-ASSETS = ["blog.md", "linkedin.md", "x-thread.md", "README.md"]
+ASSETS = ["blog.md", "essay.md", "linkedin.md", "x-thread.md", "README.md", "../README.md"]
 
 
 def ledger_facts(repo: pathlib.Path) -> dict[str, float]:
@@ -237,9 +237,7 @@ CLAIMS: list[tuple[str, str, str, str]] = [
 ]
 
 WORDS = {w: i for i, w in enumerate(
-    "zero one two three four five six seven eight nine ten eleven twelve "
-    "thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty"
-    .split())}
+    ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"])}
 
 
 def to_number(raw: str, how: str) -> float | None:

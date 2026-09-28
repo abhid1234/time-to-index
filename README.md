@@ -1,11 +1,22 @@
 # Time to Index
 
-**How long does a newly published fact take to become retrievable through a
-web-search API — and until it does, what does the API return instead?**
+Time to Index measures how long a newly published fact takes to become
+retrievable through a web-search API — and, until it does, what the API
+returns instead. It separates two failures that other search benchmarks
+score the same way: returning **nothing** (ABSENT) and confidently returning
+**the answer that was just replaced** (STALE). It does not crawl, does not
+rank providers it cannot separate statistically, and does not trust anyone's
+clock but the publisher's.
 
-Retrieval benchmarks score whether a provider can find the right answer. This
-one scores *when*, and it separates two failures that every other benchmark
-collapses into one:
+![Five minutes after a uv release went live: the origin had 0.12.15, two search APIs confidently returned 0.12.14, two returned nothing](launch/diagrams/the-catch.png)
+
+## See it first
+
+- **[Short video (91s)](media/time-to-index-short.mp4)** — the problem, the clock, one real result, and what the ledger shows so far
+- **[Interactive playground](https://abhid1234.github.io/time-to-index/playground.html)** — run the ladder, flip the scoring rule (a hand-authored simulation), then read every real probe from the committed ledger; nothing to install
+- **[Live results](https://abhid1234.github.io/time-to-index/)** — the dashboard, regenerated from `ledger/` on every push
+- **[Launch post](launch/blog.md)** — why a stale answer is worse than no answer, and what 34 new facts showed
+- **[The ledger](ledger/)** — every event, probe and graded answer, plus the raw provider payloads, committed and checkable with `tti verify`
 
 | | the agent's next move |
 |---|---|
@@ -16,17 +27,54 @@ Scored as "wrong", these are identical. In production they are not remotely
 the same event, because nothing downstream of a stale citation can tell that
 it is wrong.
 
-**[Walk through it interactively →](https://abhid1234.github.io/time-to-index/playground.html)** — two
-things on one page. A simulation you can drive: run the ladder against four
-anonymous indexes, then change the scoring rule and watch the ranking invert.
-And below it, the real thing: every probe this project has actually run, named
-providers, one square per arm per rung, read straight from the committed
-ledger.
+## What the ledger shows so far
 
-Read them for different things. The simulation is hand-authored and shows how
-the instrument reasons, not how any product performs. The measured panel is
-real but still small — see [What can and cannot be
-claimed](#what-can-and-cannot-be-claimed) before drawing a conclusion from it.
+Four search APIs (Parallel advanced and fast, Exa auto, Brave web), probed
+five minutes after each new fact went live, 74 graded answers:
+
+- **Where a fact is published matters more than who you ask.** New Federal
+  Register documents came back current 12 times out of 40. New npm, PyPI and
+  GitHub releases: 0 out of 34 — and 5 of those answers were the version
+  that had just been replaced.
+- **Fast and stale are not opposites.** The arm with the most current
+  answers, `parallel/advanced`, is also tied for the most stale ones.
+- **Only a partial ordering holds.** After Holm–Bonferroni correction the
+  ledger supports 2 of 6 pairwise comparisons. The dashboard says so rather
+  than printing a leaderboard.
+
+A small, early sample over 24 days. [What can and cannot be
+claimed](#what-can-and-cannot-be-claimed) lists every limit, including the
+origin control that fails on Federal Register documents.
+
+## Five-minute look (no keys, no spend)
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e .
+python -m tti demo    # renders docs/demo.html and checks the estimator
+```
+
+(`tti` and `python -m tti` are the same program; the second also works when
+the checkout path contains a space, which the console script's `sh` wrapper
+does not. SETUP.md has the rest.)
+
+`tti demo` runs a synthetic corpus with made-up providers (`provider-a/b/c`)
+whose indexing latencies are drawn from a seeded generator, writes a payload
+for every probe in each arm's text shape (long excerpts, short snippets,
+mid-length text) and grades it with the real grader, then reports whether
+the estimator recovered the latencies it was never shown. Because the
+payloads exist, the demo page's sensitivity panel is computed, not
+placeholder: under the `snippet-window` variant the snippet arm overtakes the
+excerpt arm, which is the text-volume effect described above, made visible.
+
+```
+OK  provider-a/fast: estimated     5m–15m  true      8m  (n=106, indexed 105)
+OK  provider-b/base: estimated  1.0h–6.0h  true    1.7h  (n=106, indexed 100)
+OK  provider-c/base: estimated 24.0h–3.0d  true   34.3h  (n=106, indexed 72)
+```
+
+The demo writes `docs/demo.html` and never `docs/index.html`. It is evidence
+about the instrument, not about any product.
 
 ---
 
@@ -240,9 +288,9 @@ version, while the origin control fetched it at that same moment, so the fact
 was genuinely published and retrievable and the indexes simply had not seen it
 yet.
 
-**The first two STALE verdicts.** As of 10 September the ladder has ten
-events and twelve graded provider calls; ten came back ABSENT and two did
-not come back empty at all. At t+5m on `@sentry/node@10.74.0`, `parallel`
+**The first two STALE verdicts.** By 10 September the ladder had graded its
+first dozen provider answers; ten came back ABSENT and two did not come back
+empty at all. At t+5m on `@sentry/node@10.74.0`, `parallel`
 in `advanced` mode returned `10.73.0` — the version that had been current
 until five minutes earlier. At t+5m on
 `@cloudflare/workers-types@5.20260910.1`, `brave/web` returned
@@ -284,36 +332,6 @@ an absence caused by our own network. The interval-censored estimator brackets
 an unobserved transition to `(previous rung, this rung]` rather than pinning
 it to a point. All of this makes the numbers smaller and slower to arrive,
 which is the trade being made on purpose.
-
-## Look at it without paying for it
-
-```bash
-python3 -m venv .venv && source .venv/bin/activate
-pip install -e .
-python -m tti demo    # renders docs/demo.html and checks the estimator
-```
-
-(`tti` and `python -m tti` are the same program; the second also works when
-the checkout path contains a space, which the console script's `sh` wrapper
-does not. SETUP.md has the rest.)
-
-`tti demo` runs a synthetic corpus with made-up providers (`provider-a/b/c`)
-whose indexing latencies are drawn from a seeded generator, writes a payload
-for every probe in each arm's text shape (long excerpts, short snippets,
-mid-length text) and grades it with the real grader, then reports whether
-the estimator recovered the latencies it was never shown. Because the
-payloads exist, the demo page's sensitivity panel is computed, not
-placeholder: under the `snippet-window` variant the snippet arm overtakes the
-excerpt arm, which is the text-volume effect described above, made visible.
-
-```
-OK  provider-a/fast: estimated     5m–15m  true      8m  (n=106, indexed 105)
-OK  provider-b/base: estimated  1.0h–6.0h  true    1.7h  (n=106, indexed 100)
-OK  provider-c/base: estimated 24.0h–3.0d  true   34.3h  (n=106, indexed 72)
-```
-
-The demo writes `docs/demo.html` and never `docs/index.html`. It is evidence
-about the instrument, not about any product.
 
 ## Run it for real
 
@@ -596,7 +614,7 @@ for a table that has stopped meaning anything.
 ## Pre-commitment
 
 Results get published when the pre-registered stopping rule says so — thirty
-days, or 191 events, whichever comes first — regardless of which provider
+days, or the plan's pre-registered event target (191), whichever comes first — regardless of which provider
 wins, including if the provider I find most interesting comes last, and
 including if the answer is that all of them are fine and the metric is
 boring. The raw payloads ship with the results either way.
@@ -612,7 +630,7 @@ pip install -e ".[dev]"
 pytest -q && ruff check tti tests
 ```
 
-Over 500 tests, on Python 3.10 through 3.13, no network calls. The ones that
+Over 600 tests, on Python 3.10 through 3.13, no network calls. The ones that
 matter:
 
 - **Turnbull reduces to Kaplan–Meier** on right-censored data — a theorem, so
@@ -622,8 +640,8 @@ matter:
 - **A missing rung widens rather than shifts.** Two arms index identically;
   one had probes dropped. The bracket gets wider, the upper bound does not
   move.
-- **Schoenfeld sample sizes** against the standard tables: 66 events for a
-  hazard ratio of 2, 191 for 1.5, 945 for 1.2.
+- **Schoenfeld sample sizes** against the standard tables: for a hazard ratio
+  of 2 the tables give 66; for 1.5, 191; for 1.2, 945 (events needed).
 - **The `15.4.1`-inside-`15.4.10` substring trap**, which silently inflates
   freshness on exactly the packages that ship most often — and its twin, the
   `v15.4.2` prefix, which a strict word boundary rejects even though the
@@ -693,6 +711,29 @@ from it) or **Open** (a question a real run will answer, and has not yet).
 [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to add a provider (about twenty
 lines), add a source (one rule: it must stamp its own publication time), or
 argue with a number without writing any code at all.
+
+## Release status
+
+0.1.0 is the first public release. [CHANGELOG.md](CHANGELOG.md) lists what
+it contains, [SECURITY.md](SECURITY.md) covers keys and how to report a
+problem, and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) sets the terms for
+arguing with a number.
+
+## Citing
+
+If you use the benchmark or its method, cite it; [CITATION.cff](CITATION.cff)
+has the same record in machine-readable form.
+
+```bibtex
+@software{das_time_to_index_2026,
+  author  = {Das, Abhijit},
+  title   = {Time to Index: a freshness and staleness benchmark for web-search APIs},
+  year    = {2026},
+  version = {0.1.0},
+  url     = {https://github.com/abhid1234/time-to-index},
+  license = {MIT}
+}
+```
 
 ## License
 

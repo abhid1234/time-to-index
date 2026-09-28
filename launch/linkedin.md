@@ -34,7 +34,7 @@ How it works, briefly: no crawling. I watch sources that timestamp their own pub
 
 34 events, 74 graded calls, about 34 cents. Pre-registered, every raw payload in the repo.
 
-The video above is the page being driven, narrated.
+The 90-second video above walks through it, one real result at a time.
 
 Playground — run the ladder, flip the scoring rule, watch the ranking invert:
 https://abhid1234.github.io/time-to-index/playground.html

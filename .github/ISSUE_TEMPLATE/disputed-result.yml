@@ -1,0 +1,38 @@
+name: Disputed result
+description: A verdict, number or ranking you think is wrong.
+title: "[result] "
+labels: ["disputed-result"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for checking the numbers. The fastest route to a fix is a
+        specific probe and the rule you think mis-graded it. `tti regrade` and
+        `tti sensitivity` show how much a rule change actually moves.
+  - type: input
+    id: probe
+    attributes:
+      label: Event or probe id
+      description: From `ledger/results.jsonl`, the dashboard, or the playground's measured panel.
+      placeholder: e.g. github:astral-sh/uv@0.12.15 · exa/auto · t+5m
+    validations:
+      required: true
+  - type: textarea
+    id: claim
+    attributes:
+      label: What the ledger says, and what you think is true
+      description: Quote the stored verdict and the raw payload text it was graded from.
+    validations:
+      required: true
+  - type: textarea
+    id: rerun
+    attributes:
+      label: What happens under `tti regrade` or `tti sensitivity`
+      description: If you changed a rule in `tti/grader.py`, how many verdicts moved?
+  - type: checkboxes
+    id: keys
+    attributes:
+      label: Before you submit
+      options:
+        - label: This issue contains no API keys, tokens or private data.
+          required: true

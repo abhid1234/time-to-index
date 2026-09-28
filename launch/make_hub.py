@@ -49,7 +49,8 @@ def fonts() -> str:
 def video_facts() -> list[tuple[str, str, str]]:
     ff = __import__("imageio_ffmpeg").get_ffmpeg_exe()
     out = []
-    for name in ("time-to-index-launch.mp4", "time-to-index-teaser.mp4"):
+    for name in ("time-to-index-short.mp4", "time-to-index-launch.mp4",
+                 "time-to-index-teaser.mp4"):
         f = HERE / name
         if not f.exists():
             out.append((name, "not built", "—"))
@@ -57,7 +58,12 @@ def video_facts() -> list[tuple[str, str, str]]:
         err = subprocess.run([ff, "-i", str(f)], capture_output=True, text=True).stderr
         m = re.search(r"Duration: (\d+):(\d+):(\d+)", err)
         dur = f"{int(m[2])}:{m[3]}" if m else "?"
-        audio = "narrated + captioned" if "Audio" in err else "SILENT — check"
+        if "Audio" not in err:
+            audio = "SILENT — check"
+        elif "short" in name:
+            audio = "primary · on-screen text + music bed"
+        else:
+            audio = "narrated + captioned"
         out.append((name, f"{dur} · {f.stat().st_size / 1e6:.0f} MB", audio))
     return out
 
@@ -174,7 +180,7 @@ def main() -> int:
         f'<div class="bd">{html.escape(b)}</div></div>'
         for n, c, b in counts)
 
-    blog = md2substack.convert((HERE / "blog.md").read_text())
+    blog = md2substack.convert((HERE / "essay.md").read_text())
     blog = re.sub(r'src="(diagrams/[^"]+)"',
                   lambda m: f'src="{uri(HERE / m.group(1), "image/png")}"'
                   if (HERE / m.group(1)).exists() else m.group(0), blog)
@@ -200,8 +206,10 @@ two pre-flight checks immediately before posting, not now.</p>
 <li><b>Rotate the ElevenLabs key</b> — it is in the session transcript.</li>
 <li><b>Rule on the <code>Datadog, Inc.</code> entry</b> in <code>data/watchlist.yaml</code>
     — a T1 partner in a public repo you are about to send traffic to.</li>
-<li><b>Download the two video files</b> — they are gitignored, so they are the
-    only part of this pack the repo does not protect.</li>
+<li><b>Download the video files</b> — the 91-second cut is committed under
+    <code>media/</code>; the long cuts are gitignored and exist only here.</li>
+<li><b>Set the repo homepage, topics and social preview</b>, then tag
+    <code>v0.1.0</code> — see <code>docs/RELEASING.md</code>.</li>
 <li><b>Decide you are comfortable naming a faster provider.</b> The copy says
     Parallel (advanced) <i>separates</i> from Brave and Exa after correction —
     a statistical claim about named products under your byline. It is correctly
@@ -222,16 +230,18 @@ results is what pre-registration exists to stop. Expect someone to ask.</div>
 
 <h2>Running order</h2>
 <ol class="steps">
-<li><b>Substack.</b> Paste <code>blog.html</code>. Upload the four diagrams where
-  the image markers are, and replace the <code>&gt;&gt;&gt; EMBED &lt;&lt;&lt;</code>
-  line with the video — that line is plain prose and gets published by accident.</li>
-<li><b>Video.</b> Upload the full cut, set <code>thumbnail.png</code>, put the
-  Substack link in the description. Do this before the two social posts: the
-  LinkedIn copy refers to the video sitting above it.</li>
-<li><b>LinkedIn.</b> Paste the text below, upload the full video as native media.
-  It truncates around 200 characters and the first line carries it.</li>
-<li><b>X.</b> {len(counts)} posts in the order below. Attach the teaser to post 1
-  as native media — it costs no characters and autoplay carries the thread.</li>
+<li><b>Substack.</b> Paste <code>essay.html</code> (the ~900-word post shown
+  below). Upload the four diagrams where the image markers are and embed
+  <code>time-to-index-short.mp4</code> under the playground link.
+  <code>blog.html</code> is the long version, for a follow-up.</li>
+<li><b>Video.</b> Upload <code>time-to-index-short.mp4</code>, set
+  <code>thumbnail.png</code>, put the Substack link in the description. Do this
+  before the two social posts: the LinkedIn copy refers to the video above it.</li>
+<li><b>LinkedIn.</b> Paste the text below, upload the short video as native
+  media. It truncates around 200 characters and the first line carries it.</li>
+<li><b>X.</b> {len(counts)} posts in the order below. Attach the short video to
+  post 1 as native media — 91 seconds fits the free-account cap, costs no
+  characters, and autoplay carries the thread.</li>
 </ol>
 
 <div class="grid">{vids}</div>

@@ -1,0 +1,24 @@
+name: New provider or source
+description: Propose a search API to benchmark, or a publisher to take events from.
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options: ["Search provider", "Event source"]
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Name and docs link
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it belongs
+      description: For a source, say where it stamps its own publication time — that is the one hard rule.
+    validations:
+      required: true

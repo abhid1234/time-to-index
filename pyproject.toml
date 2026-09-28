@@ -9,11 +9,39 @@ description = "A freshness and staleness benchmark for web-search APIs"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
+authors = [{name = "Abhijit Das"}]
+keywords = [
+  "benchmark", "web-search", "search-api", "freshness", "staleness",
+  "llm-agents", "rag", "information-retrieval", "survival-analysis",
+  "interval-censoring",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Internet :: WWW/HTTP :: Indexing/Search",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+]
 # Two runtime code dependencies on purpose. A benchmark nobody can install is
 # a blog post; every extra dep is another reason a fork does not happen.
 # tzdata is data, not code: the IANA zone database, for the EDGAR and Federal
 # Register collectors on systems that ship without one (slim containers).
 dependencies = ["requests>=2.31", "PyYAML>=6.0", "tzdata>=2024.1"]
+
+[project.urls]
+Homepage = "https://abhid1234.github.io/time-to-index/"
+Playground = "https://abhid1234.github.io/time-to-index/playground.html"
+Repository = "https://github.com/abhid1234/time-to-index"
+Issues = "https://github.com/abhid1234/time-to-index/issues"
+Changelog = "https://github.com/abhid1234/time-to-index/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = ["pytest>=7.4", "ruff>=0.6"]

@@ -97,13 +97,16 @@ def convert(md: str) -> str:
 
 def main() -> int:
     here = pathlib.Path(__file__).resolve().parent
-    body = convert((here / "blog.md").read_text())
+    # `python md2substack.py essay.md` for the short post; blog.md by default.
+    src = here / (sys.argv[1] if len(sys.argv) > 1 else "blog.md")
+    dst = src.with_suffix(".html")
+    body = convert(src.read_text())
     page = (
         "<!-- Paste everything below into the Substack editor. Substack keeps\n"
         "     these tags and drops anything else, so no classes or styles. -->\n"
         + body + "\n")
-    (here / "blog.html").write_text(page)
-    print(f"wrote {here / 'blog.html'} ({len(page)} chars)")
+    dst.write_text(page)
+    print(f"wrote {dst} ({len(page)} chars)")
 
     # A check, not a claim: if a tag Substack drops slipped in, say so.
     kept = {"h1", "h2", "p", "strong", "em", "code", "pre", "ul", "li", "hr",

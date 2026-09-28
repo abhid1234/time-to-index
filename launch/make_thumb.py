@@ -55,7 +55,7 @@ h1{{font-family:Newsreader,serif;font-size:58px;font-weight:500;line-height:1.08
   <p class="tag">TIME TO INDEX</p>
   <h1>A search index that is wrong<br>looks exactly like one that is fast.</h1>
   <div class="shot"><img src="{src}"></div>
-  <p class="cap">Every benchmark scores both as zero. <b>This one doesn't.</b></p>
+  <p class="cap">Every benchmark scores both as zero. <b>This one doesn’t.</b></p>
 </div>
 """
 
@@ -77,11 +77,25 @@ def main() -> None:
 
         src = "data:image/png;base64," + base64.b64encode(shot.read_bytes()).decode()
         card = b.new_page(viewport={"width": W, "height": H}, device_scale_factor=1)
-        card.set_content(PAGE.format(f=FONTS, w=W, h=H, inner=W - 144, src=src),
-                         wait_until="load")
-        card.wait_for_timeout(900)
+        # Fonts go in as data URIs: a page set from about:blank cannot load
+        # them cross-origin from the local server, and silently falls back to
+        # Times -- which is what the first thumbnail shipped with.
+        doc = PAGE.format(f=FONTS, w=W, h=H, inner=W - 144, src=src)
+        docs_fonts = HERE.parent / "docs" / "fonts"
+        for font in docs_fonts.glob("*.woff2"):
+            uri = "data:font/woff2;base64," + base64.b64encode(font.read_bytes()).decode()
+            doc = doc.replace(f"{FONTS}/{font.name}", uri)
+        card.set_content(doc, wait_until="load")
+        card.evaluate("document.fonts.ready")
+        assert card.evaluate("document.fonts.check('58px Newsreader')"), "fonts did not load"
+        card.wait_for_timeout(300)
         out = HERE / "thumbnail.png"
         card.screenshot(path=str(out))
+        # The same card at the 1200x630 Open Graph size, for link unfurls:
+        # scaled to 1200 wide, then trimmed evenly top and bottom.
+        from PIL import Image
+        og = Image.open(out).convert("RGB").resize((1200, 675), Image.LANCZOS)
+        og.crop((0, 22, 1200, 652)).save(HERE.parent / "docs" / "og.png", optimize=True)
         b.close()
 
     print(f"wrote {out}  {W}x{H}  ({out.stat().st_size // 1024} KB)")
