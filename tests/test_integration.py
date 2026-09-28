@@ -261,7 +261,7 @@ def test_cli_report_writes_a_dashboard_after_a_run(tmp_path, monkeypatch, capsys
     assert main(["--run-dir", str(tmp_path), "report",
                  "--out-dir", str(tmp_path / "out")]) == 0
     assert main(["--run-dir", str(tmp_path), "power"]) == 0
-    # sensitivity succeeds and reports honestly that it had nothing to
+    # sensitivity succeeds and reports plainly that it had nothing to
     # re-grade, rather than failing or claiming perfect agreement.
     assert main(["--run-dir", str(tmp_path), "sensitivity"]) == 0
     out = capsys.readouterr().out

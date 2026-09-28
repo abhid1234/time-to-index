@@ -76,7 +76,7 @@ class SurvivalCurve:
 
     def quantile(self, q: float) -> float | None:
         """Smallest t with S(t) <= 1-q. None if the curve never gets there,
-        which is the honest answer for a provider that indexed under half of
+        which is the right answer for a provider that indexed under half of
         the corpus inside the observation window."""
         target = 1.0 - q
         for t, s in zip(self.times, self.survival, strict=True):

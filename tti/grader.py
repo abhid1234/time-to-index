@@ -55,7 +55,7 @@ class Rules:
     Making them a parameter is what lets `tti sensitivity` re-grade the stored
     payloads under deliberately worse rules and report how far the leaderboard
     moves. If it barely moves, the choices did not matter. If it reorders, the
-    honest thing is to publish that alongside the ranking.
+    right thing is to publish that alongside the ranking.
     """
     name: str = "strict"
     text_keys: frozenset = field(default_factory=lambda: _TEXT_KEYS)

@@ -70,7 +70,7 @@ publication, per provider, per mode.
 Geometric spacing, because indexing latency spans four orders of magnitude
 and a linear ladder spends its whole budget resolving the tail.
 
-Three rules discard data to keep the rest honest, and a fourth stops spending:
+Three rules discard data to keep the rest straight, and a fourth stops spending:
 
 **Detection lag.** An event our collector noticed 40 minutes after
 publication cannot be probed at the 5-minute rung. Rather than record it at
@@ -355,7 +355,7 @@ release occasionally. Grading against one would score true retrieval as a false
 positive, so it is dropped and counted. Where the publisher cannot be asked,
 the counterfactual is used and tallied separately — an unverified
 counterfactual is weaker evidence, and pretending otherwise would overstate the
-check that exists to keep us honest.
+check that exists to keep us straight.
 
 The reported figure at zero observed hits is not 0%. It is the Wilson upper
 bound, which at small n is large, and that is the number that goes beside the
@@ -423,7 +423,7 @@ actually locate probability mass and solves for the mass by self-consistency.
 
 A dropped probe then *widens* an interval instead of removing an event. That
 is not a rounding detail: it means a run with a flaky provider, an exhausted
-budget, or a missed cron tick still contributes its events at honest, wider
+budget, or a missed cron tick still contributes its events at truthful, wider
 precision.
 
 Kaplan–Meier is kept alongside it and the dashboard prints the gap between

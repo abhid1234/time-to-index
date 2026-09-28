@@ -139,7 +139,7 @@ was built, so the 13.1 figure is a floor.
 4. **Fill in `docs/INTEGRATION-NOTES.md`.** Every adapter was checked
    against its provider's published API document on 2026-09-02, but no
    provider API has ever been called from this code: the "Open" items are
-   the behaviours a spec cannot tell you. Filling them in honestly is worth
+   the behaviours a spec cannot tell you. Filling them in truthfully is worth
    more than any number in the results table — it is the part a vendor
    cannot get anywhere else.
 5. **Then publish**, and only then.

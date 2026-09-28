@@ -11,7 +11,7 @@ Verified 2026-09-02: `X-API-KEY` header, `q`, `num`; results under
 `organic[]` with `snippet`. One credit buys up to ten results, two credits
 for eleven to a hundred; `num` here is five. Priced at the entry pack,
 $1.00 per 1,000 queries; volume packs go to $0.30 and a benchmark is not
-going to buy twelve million queries, so the entry rate is the honest one.
+going to buy twelve million queries, so the entry rate is the truthful one.
 """
 
 from __future__ import annotations

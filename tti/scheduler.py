@@ -13,7 +13,7 @@ a hash of (event, provider, mode, rung), the ledger records which ids have
 completed, and a re-run skips them. A crashed run loses at most the probes
 in flight.
 
-Three rules keep the numbers honest, and each one costs us data:
+Three rules keep the numbers straight, and each one costs us data:
 
     Detection lag.  An event our collector noticed 40 minutes after
     publication cannot be probed at the t+5m rung, because that rung has

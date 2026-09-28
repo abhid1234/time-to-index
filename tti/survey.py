@@ -194,7 +194,7 @@ class Survey:
     def metadata_only(self) -> list[SiteResult]:
         """Pages whose body is a shell but which ship readable metadata.
 
-        Reported on their own because the honest description is neither
+        Reported on their own because the accurate description is neither
         "readable" nor "not readable": an agent learns what the page is and
         not what it says."""
         return [r for r in self.results
