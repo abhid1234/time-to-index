@@ -159,8 +159,8 @@ def main() -> int:
     diagrams = "".join(
         f'<figure><img src="{uri(HERE / "diagrams" / f, "image/png")}">'
         f'<figcaption>{f}</figcaption></figure>'
-        for f in ("the-catch.png", "absent-vs-stale.png", "architecture.png",
-                  "interval.png")
+        for f in ("by-source.png", "the-catch.png", "absent-vs-stale.png",
+                  "architecture.png", "interval.png")
         if (HERE / "diagrams" / f).exists())
 
     vids = "".join(
@@ -202,7 +202,22 @@ two pre-flight checks immediately before posting, not now.</p>
     — a T1 partner in a public repo you are about to send traffic to.</li>
 <li><b>Download the two video files</b> — they are gitignored, so they are the
     only part of this pack the repo does not protect.</li>
+<li><b>Decide you are comfortable naming a faster provider.</b> The copy says
+    Parallel (advanced) <i>separates</i> from Brave and Exa after correction —
+    a statistical claim about named products under your byline. It is correctly
+    done and bounded everywhere it appears (Federal Register only; also tied
+    for most stale). If you would rather not, lead with the source-class
+    finding, which names nobody.</li>
 </ul>
+</div>
+
+<div class="card" style="margin:0 0 22px;border-color:#E8D48A">
+<span class="k">Disclosed in the copy — know it before you post</span>
+<div class="n" style="font-size:14px;color:var(--ink2);margin-top:6px">The origin
+control fails on every Federal Register document, 10 of 10. The fresh answers
+don't depend on it, but the ABSENT verdicts there can't be checked against it.
+Deliberately not patched before launch — regrading a control after seeing the
+results is what pre-registration exists to stop. Expect someone to ask.</div>
 </div>
 
 <h2>Running order</h2>
@@ -229,7 +244,7 @@ python check_counts.py     # every X post vs the 280 limit</code></pre>
 hitting publish is exactly where drift happens — the event count has already
 moved seven → eight → ten → thirteen mid-draft.</p>
 
-<h2>The finding</h2>
+<h2>The findings</h2>
 {diagrams}
 
 <h2>LinkedIn</h2>

@@ -137,6 +137,10 @@ LINES: list[tuple[str, float, str]] = [
     ("measured_scope", 0.8,
      "And it is not a one off. Across the whole run, five stale verdicts, on "
      "four separate events, across three different arms."),
+    ("measured_scope", 10.5,
+     "Brave served a two day old Cloudflare build. On Sentry, Parallel's "
+     "advanced mode served the previous release. Different packages, "
+     "different arms, the same failure."),
 
     ("measured_source", 0.8,
      "Then the result I did not go looking for. Every fresh answer in the "

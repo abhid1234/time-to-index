@@ -178,7 +178,7 @@ Dropping those is correct — a probe I can't place on the ladder is worth less 
 | **Runtime** | Python 3.10–3.13, stdlib plus `requests` and `PyYAML`. No framework, no database |
 | **Ledger** | Append-only JSONL, committed to the repo, with every raw payload gzipped alongside |
 | **Pages** | One hand-written HTML file each. No build step, no `package.json`, fonts self-hosted |
-| **Tests** | 606, on GitHub Actions across four Python versions. One skips by design — it guards a page that only exists before the first run |
+| **Tests** | 610, on GitHub Actions across four Python versions. One skips by design — it guards a page that only exists before the first run |
 | **Built with** | Claude Code, which wrote most of it and caught all three bugs above |
 
 The ledger choice is the one I'd defend. Every number on the dashboard can be traced to a raw API response sitting in the repo, so "I don't believe that" has an answer that isn't "trust me."

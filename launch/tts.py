@@ -88,7 +88,9 @@ def main() -> int:
         chunks = split(text)
         parts = []
         for n, chunk in enumerate(chunks):
-            mp3 = TMP / f"{i:02d}-{n}.mp3"
+            import hashlib
+            key = hashlib.sha1(chunk.encode()).hexdigest()[:12]
+            mp3 = TMP / f"{key}.mp3"
             if not mp3.exists():
                 fetch(chunk, mp3)
                 time.sleep(PACE)

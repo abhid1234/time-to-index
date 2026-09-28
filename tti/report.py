@@ -679,8 +679,33 @@ def dashboard_html(scores: list[ProviderScore], events: dict[str, Event],
         computable = [r for r in powers if r.p_adjusted == r.p_adjusted]
         separable = [r for r in computable if r.p_adjusted < 0.05]
         n_events = max((s.n_events for s in scoreable), default=0)
-        if separable:
+        if separable and len(separable) == len(computable):
             empty_note = ""
+        elif separable:
+            # Some pairs separate and some do not. The table is still sorted,
+            # and a sorted table reads as a complete ranking -- which is the
+            # exact misreading the no-ordering banner exists to stop, just in
+            # the partial case. Dropping the banner the moment one pair
+            # cleared the bar left a reader free to infer the other five.
+            # Name the pairs that separate; call the rest what they are.
+            def _pair(r):
+                return f"<code>{r.a}</code> vs <code>{r.b}</code>"
+            named = ", ".join(
+                f"{_pair(r)} (adjusted p {r.p_adjusted:.3f})"
+                for r in sorted(separable, key=lambda r: r.p_adjusted))
+            rest = len(computable) - len(separable)
+            empty_note = (
+                "<div class='panel'><p style='margin-top:0'><b>This run "
+                f"supports {len(separable)} of {len(computable)} pairwise "
+                "orderings, not a full ranking.</b> "
+                f"{'This pair separates' if len(separable) == 1 else 'These pairs separate'}"
+                f" after Holm&#8211;Bonferroni adjustment: {named}. "
+                f"The other {rest} {'does' if rest == 1 else 'do'} not, so "
+                "the order of the table beyond those pairs is not a "
+                "result.</p>"
+                "<p class='note'><b>Are the differences real</b> below has "
+                "every pair, and <code>tti power</code> says how many more "
+                "events each of the rest would need.</p></div>")
         else:
             reason = ("no pair of arms could be compared yet"
                       if not computable else

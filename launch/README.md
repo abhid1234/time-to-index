@@ -5,7 +5,7 @@ a scratch directory outside it; a container reset took the whole thing —
 copy, generators and rendered video — and only what had been pushed survived.
 That is the same lesson the project is about, learned the expensive way.
 
-606 tests green on `main`, three pages live on GitHub Pages.
+610 tests green on `main`, three pages live on GitHub Pages.
 
 ## Read it first
 
@@ -53,7 +53,7 @@ sentence around it rewritten, not a digit swapped.
    render, so they cannot drift from what the repo holds. Re-run
    `make_diagrams.py` immediately before posting, for the same reason you run
    the checks then.
-2. **Video.** Upload `time-to-index-launch.mp4` (6:27), set `thumbnail.png`,
+2. **Video.** Upload `time-to-index-launch.mp4` (7:27), set `thumbnail.png`,
    put the Substack link in the description. Do this first of the three social
    posts: the LinkedIn copy refers to the video sitting above it.
 
