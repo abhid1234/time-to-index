@@ -402,6 +402,98 @@ def catch_body(repo):
     return "\n".join(out)
 
 
+# --------------------------------------------------------------------------
+# The source-class finding. Read from the ledger at render time for the same
+# reason as the-catch: this is a result, and a hand-typed picture of a result
+# is how a launch ends up asserting last week's numbers.
+BY_SOURCE = dict(
+    w=1000, h=470, name="by-source",
+    css="""
+.sub{font-size:13px;color:var(--ink3);margin:0 0 22px;max-width:76ch;line-height:1.5}
+.rows{display:flex;flex-direction:column;gap:14px}
+.row{display:grid;grid-template-columns:170px 1fr 118px;align-items:center;gap:16px}
+.lab{font-size:14px;font-weight:600;color:var(--ink)}
+.lab span{display:block;font-size:11.5px;font-weight:400;color:var(--ink3)}
+.bar{display:flex;height:34px;border-radius:6px;overflow:hidden;
+  background:var(--inset);border:1px solid var(--rule)}
+.seg{height:100%;display:flex;align-items:center;justify-content:center;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;
+  letter-spacing:.04em;white-space:nowrap;overflow:hidden}
+.seg.f{background:var(--fresh-bg);color:var(--fresh);border-right:1px solid var(--fresh-line)}
+.seg.s{background:var(--stale-bg);color:var(--stale);border-right:1px solid var(--stale-line)}
+.seg.a{background:var(--absent-bg);color:var(--absent)}
+.big{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink2);text-align:right}
+.big b{font-size:21px;font-weight:600;display:block;color:var(--ink);letter-spacing:-.01em}
+.big b.hot{color:var(--fresh)}
+.key{display:flex;gap:18px;margin-top:18px;font-size:12px;color:var(--ink3)}
+.key i{display:inline-block;width:11px;height:11px;border-radius:3px;
+  margin-right:6px;vertical-align:-1px}
+.kick{margin-top:18px;font-size:14px;line-height:1.55;color:var(--ink2)}
+.kick b{color:var(--ink)}
+""",
+    body=None)
+
+
+def source_body(repo):
+    import json, collections
+    led = repo / "ledger"
+    ev = {e["event_id"]: e for e in (json.loads(x) for x in
+          (led / "events.jsonl").read_text().splitlines() if x.strip())}
+    seen, rows = set(), []
+    for line in (led / "results.jsonl").read_text().splitlines():
+        if not line.strip():
+            continue
+        r = json.loads(line)
+        if r["probe_id"] in seen:
+            continue
+        seen.add(r["probe_id"])
+        if r.get("provider") != "origin" and r["verdict"] in ("FRESH", "STALE", "ABSENT"):
+            rows.append(r)
+    by = collections.defaultdict(collections.Counter)
+    for r in rows:
+        by[ev[r["event_id"]]["source"]][r["verdict"]] += 1
+    names = {"federal_register": ("Federal Register", "US regulations and notices"),
+             "npm": ("npm", "JavaScript packages"),
+             "github_release": ("GitHub releases", "tagged software releases"),
+             "pypi": ("PyPI", "Python packages")}
+    order = sorted(by, key=lambda s: (-by[s]["FRESH"], -sum(by[s].values())))
+    out = ['<p class="t">Where a fact was published mattered more than who you asked</p>',
+           '<p class="sub">Every graded provider answer at t+5m, grouped by the source '
+           'that published the fact. Read from the ledger when this image was '
+           'rendered.</p>', '<div class="rows">']
+    for s in order:
+        c = by[s]
+        n = sum(c.values())
+        title, note = names.get(s, (s, ""))
+        segs = ""
+        for k, cls, word in (("FRESH", "f", "FRESH"), ("STALE", "s", "STALE"),
+                             ("ABSENT", "a", "ABSENT")):
+            if c[k]:
+                pct = 100 * c[k] / n
+                txt = f"{c[k]} {word}" if pct >= 14 else str(c[k])
+                segs += f'<div class="seg {cls}" style="width:{pct:.2f}%">{txt}</div>'
+        hot = " hot" if c["FRESH"] else ""
+        out.append(f'<div class="row"><div class="lab">{title}<span>{note}</span></div>'
+                   f'<div class="bar">{segs}</div>'
+                   f'<div class="big"><b class="{hot.strip()}">{c["FRESH"]}/{n}</b>fresh</div></div>')
+    out.append("</div>")
+    out.append('<div class="key"><span><i style="background:var(--fresh-bg);'
+               'border:1px solid var(--fresh-line)"></i>FRESH — the current answer</span>'
+               '<span><i style="background:var(--stale-bg);border:1px solid '
+               'var(--stale-line)"></i>STALE — the answer it replaced</span>'
+               '<span><i style="background:var(--absent-bg)"></i>ABSENT — nothing '
+               'relevant</span></div>')
+    fr = by.get("federal_register", collections.Counter())
+    rest_n = sum(sum(c.values()) for s, c in by.items() if s != "federal_register")
+    rest_f = sum(c["FRESH"] for s, c in by.items() if s != "federal_register")
+    rest_s = sum(c["STALE"] for s, c in by.items() if s != "federal_register")
+    out.append(f'<p class="kick"><b>{fr["FRESH"]} of {sum(fr.values())} Federal Register '
+               f'answers were fresh five minutes after publication. Across npm, '
+               f'PyPI and GitHub releases, {rest_f} of {rest_n}</b> — and {rest_s} of those '
+               f'came back as the version the release had just replaced.</p>')
+    return "\n".join(out)
+
+
 def render(spec: dict, pg) -> None:
     html = SHELL.format(f=FONTS, css=spec["css"], body=spec["body"])
     pg.set_viewport_size({"width": spec["w"], "height": spec["h"]})
@@ -418,7 +510,8 @@ def main() -> None:
         b = pw.chromium.launch(executable_path=CHROME, args=["--hide-scrollbars"])
         pg = b.new_page(device_scale_factor=2)
         THE_CATCH["body"] = catch_body(HERE.parent)
-        for spec in (ABSENT_STALE, ARCHITECTURE, LADDER, THE_CATCH):
+        BY_SOURCE["body"] = source_body(HERE.parent)
+        for spec in (ABSENT_STALE, ARCHITECTURE, LADDER, THE_CATCH, BY_SOURCE):
             render(spec, pg)
         b.close()
 

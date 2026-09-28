@@ -68,7 +68,42 @@ def ledger_facts(repo: pathlib.Path) -> dict[str, float]:
                       if story and r["event_id"] == story["event_id"])
 
     stale = [r for r in graded if r["verdict"] == "STALE"]
+    by_event = {e["event_id"]: e for e in events}
+    fr = [r for r in graded if by_event[r["event_id"]]["source"] == "federal_register"]
+    rest = [r for r in graded if by_event[r["event_id"]]["source"] != "federal_register"]
+    fastest = collections.Counter(
+        (r["provider"], r["mode"]) for r in graded if r["verdict"] == "FRESH"
+    ).most_common(1)
+    fast_arm = fastest[0][0] if fastest else None
+    stale_by_arm = collections.Counter((r["provider"], r["mode"]) for r in stale)
+    seen_o: set[str] = set()
+    fr_origin = []
+    for r in results:
+        if r.get("provider") != "origin" or r["probe_id"] in seen_o:
+            continue
+        seen_o.add(r["probe_id"])
+        if r.get("rung") == 300 and \
+                by_event.get(r["event_id"], {}).get("source") == "federal_register":
+            fr_origin.append(r)
     return {
+        # The source-class finding, which now leads the launch.
+        "fr_fresh": sum(1 for r in fr if r["verdict"] == "FRESH"),
+        "fr_total": len(fr),
+        "rest_fresh": sum(1 for r in rest if r["verdict"] == "FRESH"),
+        "rest_total": len(rest),
+        "rest_stale": sum(1 for r in rest if r["verdict"] == "STALE"),
+        "fisher_p": _fisher(sum(1 for r in fr if r["verdict"] == "FRESH"), len(fr),
+                            sum(1 for r in rest if r["verdict"] == "FRESH"), len(rest)),
+        # "all nine of Parallel's fresh answers were Federal Register"
+        "fast_arm_fresh": sum(1 for r in graded if r["verdict"] == "FRESH"
+                              and (r["provider"], r["mode"]) == fast_arm),
+        "fast_arm_fresh_fr": sum(1 for r in fr if r["verdict"] == "FRESH"
+                                 and (r["provider"], r["mode"]) == fast_arm),
+        # "tied for the most stale answers -- two apiece"
+        "max_stale_per_arm": max(stale_by_arm.values(), default=0),
+        "fr_origin_failed": sum(1 for r in fr_origin if r["verdict"] != "FRESH"),
+        "fr_origin_total": len(fr_origin),
+        "fast_arm_stale": stale_by_arm.get(fast_arm, 0),
         "events": len(events),
         "graded_provider_calls": len(story_calls),
         "graded_provider_calls_total": len(graded),
@@ -95,7 +130,41 @@ def ledger_facts(repo: pathlib.Path) -> dict[str, float]:
                         and e["answer"] == "0.12.15"), 0),
         "story_answer": story["answer"] if story else "",
         "tests": _collected_tests(repo),
+        "p_adj_brave": _power_table(repo).get("brave/web vs parallel/advanced", -1),
+        "p_adj_exa": _power_table(repo).get("exa/auto vs parallel/advanced", -1),
     }
+
+
+def _fisher(a: int, n1: int, c: int, n2: int) -> float:
+    """Two-sided Fisher exact p for a/n1 against c/n2.
+
+    The launch quotes this number, so the checker computes it from the ledger
+    rather than trusting the value that was true when the sentence was written.
+    """
+    from math import comb
+    b, d = n1 - a, n2 - c
+    n, r1, c1 = a + b + c + d, a + b, a + c
+    if n == 0 or c1 == 0:
+        return 1.0
+
+    def pr(x: int) -> float:
+        return comb(r1, x) * comb(n - r1, c1 - x) / comb(n, c1)
+    p0 = pr(a)
+    return sum(pr(x) for x in range(max(0, c1 - (n - r1)), min(r1, c1) + 1)
+               if pr(x) <= p0 * (1 + 1e-9))
+
+
+def _power_table(repo: pathlib.Path) -> dict[str, float]:
+    """Adjusted p for each pair, as `tti power` reports it."""
+    import subprocess
+    out = subprocess.run([sys.executable, "-m", "tti.cli", "power"], cwd=repo,
+                         capture_output=True, text=True).stdout
+    table = {}
+    for line in out.splitlines():
+        m = re.match(r"(\S+) vs (\S+)\s+\S+\s+\d+\s+[\d.]+\s+([\d.]+)", line)
+        if m:
+            table[f"{m[1]} vs {m[2]}"] = float(m[3])
+    return table
 
 
 def _collected_tests(repo: pathlib.Path) -> int:
@@ -137,10 +206,33 @@ CLAIMS: list[tuple[str, str, str, str]] = [
     ("detection lag (uv event)",
      r"released on GitHub\. My collector saw it (\d+) seconds later",
      "uv_lag", "int"),
-    ("story spend", r"[Cc]ost:? (?:was )?\$?([\d.]+) cents", "story_spend_cents", "float"),
+    ("story spend", r"[Cc]ost:? (?:was )?\$?(\d+(?:\.\d+)?) cents", "story_spend_cents", "float"),
     ("stale count (words)", r"\b(two|three|four|five|six) came back STALE", "stale", "word"),
     ("stale arms", r"across (\w+) different arms", "stale_arms", "word"),
     ("test count", r"\*\*Tests\*\* \| (\d+),", "tests", "int"),
+    ("events (digits)", r"\b(\d+) (?:real )?events\b", "events", "int"),
+    ("graded provider calls (total)",
+     r"(?<![\"'])\b(\d+) graded provider calls\b", "graded_provider_calls_total", "int"),
+    ("Federal Register fresh", r"\b(\d+) of 40\b", "fr_fresh", "int"),
+    ("Federal Register total", r"\b\d+ of (\d+) (?:Federal Register answers|were current|current)",
+     "fr_total", "int"),
+    ("registries fresh", r"\b(\d+) of 34\b", "rest_fresh", "int"),
+    ("registries total", r"\b0 of (\d+)\b", "rest_total", "int"),
+    ("fresh total (all N)", r"all (\d+) —? ?came from Federal Register|all (\d+)\)? — came",
+     "fresh", "int"),
+    ("stale total", r"\b(\d+) STALE verdicts\b", "stale", "int"),
+    ("registry stale", r"(\d+) times?, the old version|five times it was|"
+                      r"(\d+) of those came back", "rest_stale", "int"),
+    ("fast arm fresh", r"[Aa]ll (\w+) of Parallel's fresh answers", "fast_arm_fresh", "word"),
+    ("fast arm fresh (digits)", r"All (\d+) of Parallel's fresh answers",
+     "fast_arm_fresh", "int"),
+    ("tied for most stale", r"(two|three|four) apiece with Exa", "max_stale_per_arm", "word"),
+    ("FR control failures", r"(\d+) (?:of|times out of) \d+\b(?=[^.]{0,60}?(?:control|Federal Register page))|"
+                           r"fails? (?:on every Federal Register \w+ — |10 times out of )?(\d+) (?:of|times)",
+     "fr_origin_failed", "int"),
+    ("Fisher p", r"Fisher p (?:of |= )?(\d+(?:\.\d+)?)", "fisher_p_rounded", "float"),
+    ("p adj vs Brave", r"adjusted p (?:= )?(\d+(?:\.\d+)?)(?: and| \)| against)",
+     "p_adj_brave", "float"),
     ("test count (launch pack)", r"(\d+) tests green", "tests", "int"),
 ]
 
@@ -176,6 +268,8 @@ def main() -> int:
     facts = ledger_facts(pathlib.Path(args.repo))
     facts["spend_cents"] = round(facts["spend"] * 100, 2)
     facts["story_spend_cents"] = round(facts["story_spend"] * 100, 2)
+    # Quoted to one significant figure in the copy.
+    facts["fisher_p_rounded"] = float(f"{facts['fisher_p']:.1g}")
 
     print("ledger says:")
     for k in ("events", "span_days", "graded_provider_calls",
@@ -192,14 +286,19 @@ def main() -> int:
         for label, pattern, key, how in CLAIMS:
             for m in re.finditer(pattern, text):
                 checked += 1
-                got = to_number(m.group(1), how)
+                raw = next((g for g in m.groups() if g), None)
+                if raw is None:
+                    continue
+                got = to_number(raw, how)
                 want = facts[key]
-                ok = got is not None and abs(got - want) < 0.51
+                tol = 0.51 if how != "float" or abs(want) >= 1 else \
+                    max(abs(want) * 0.35, 0.0006)
+                ok = got is not None and abs(got - want) <= tol
                 if not ok:
                     bad += 1
                     line = text[:m.start()].count("\n") + 1
                     print(f"  MISMATCH  {name}:{line}  {label}")
-                    print(f"            says {m.group(1)!r}, ledger says {want}")
+                    print(f"            says {raw!r}, ledger says {want}")
                     print(f"            > {m.group(0)}")
 
     # Cross-reference check. The ledger comparison above catches a number that

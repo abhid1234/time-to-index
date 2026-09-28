@@ -8,50 +8,38 @@ The API returns nothing → your agent retries, widens the query, or says it doe
 
 The API confidently returns yesterday's answer → your agent cites it. To your customer. With no signal anywhere downstream that the number is stale.
 
-One is a shrug. The other is a lie with a citation. Scored out of one they are identical, and in production they are nothing alike. So I spent a couple of weekends building the instrument that separates them.
+One is a shrug. The other is a lie with a citation. Scored out of one they're identical. So I spent a couple of weekends building the instrument that separates them, and let it run for three and a half weeks.
 
-Twelve days in, here is the clearest thing it has caught.
+Here is the clearest single thing it caught.
 
-uv 0.12.15 was released on GitHub. My collector saw it 274 seconds later. Five minutes after the release went live, four search indexes and the control were asked what the current version was.
+uv 0.12.15 was released on GitHub. Five minutes later, four search indexes were asked for the current version. The control — a direct fetch of the release page — got 0.12.15 in 416 ms.
 
-The control fetched 0.12.15 in 416 ms.
-Exa returned 0.12.14. Parallel's advanced mode returned 0.12.14.
-Brave and Parallel's fast mode returned nothing at all.
+Exa returned 0.12.14. Parallel's advanced mode returned 0.12.14. Brave and Parallel's fast mode returned nothing.
 
-So: not one of the four had the current answer, and half of them confidently asserted the superseded one — the same wrong version, independently, at the same instant. The control proves the release was live and fetchable at that moment. This was not a publishing delay.
+Not one of the four had the current answer, and half of them confidently asserted the superseded one. The control proves the release was live and fetchable right then. Every conventional benchmark scores those two stale rows exactly like the two empty ones: zero.
 
-Every conventional benchmark scores those two stale rows exactly the same as the two empty ones: zero. In production they are not the same event at all. One makes your agent retry. The other makes it cite 0.12.14 to your customer.
+But the result I'd lead with is one I didn't go looking for.
 
-So how is that measured, and how do I know it isn't just a publishing delay?
+Every fresh answer in the whole run — all 12 — came from Federal Register documents. 12 of 40 were current five minutes after publication. Across npm, PyPI and GitHub releases: 0 of 34. Fisher p = 0.0003.
 
-No crawling at all, which is the part people assume is hard. I watch sources that timestamp their own publications — npm, PyPI, GitHub releases, SEC EDGAR, arXiv. When a package publishes, the registry itself says exactly when. That's t=0, on the publisher's clock, never mine. You can't measure lateness without an agreed zero, and asking a crawler when something appeared is asking the defendant to time the race.
+So "how fast is this search API?" is badly underspecified. A new US regulation was findable within five minutes more often than not. A new version of a package half the internet depends on — never. And when a package answer did come back, five times it was the version the release had just replaced.
 
-Every search API gets the same question at six fixed lags — 5 minutes to 72 hours — and at each rung I fetch the source URL directly as the control. That control is what makes the rest interpretable, and it is why the row above is a stale index rather than a slow publisher.
+The leaderboard can now rank, in part. Parallel's advanced mode separates from Brave and from Exa after Holm–Bonferroni correction (adjusted p 0.018 and 0.036). The other four pairs are still underpowered and the dashboard says so.
 
-Across the run: four STALE verdicts, on three separate packages, across three different arms.
+Two caveats in the same breath. All nine of Parallel's fresh answers were Federal Register documents; on package registries it was never fresh either. And the fastest arm is also tied for the most stale answers — two apiece with Exa.
 
-And the part I have to say in the same breath: that is not a rate, not a ranking, and emphatically not "Exa and Parallel are stale." Thirteen events and twenty-two graded calls cannot support a comparison between providers — no pair of arms separates after adjustment, and the dashboard refuses to rank itself for exactly that reason.
+That last point is the whole argument. Any benchmark that collapses retrieval into one number has to decide whether that arm is good or bad. It's both. Speed and staleness are different axes, and scoring them together is how you lose the one that costs you.
 
-What four instances do establish: the failure mode is real, it happens at the front of the ladder where agents actually live, it happens to more than one provider, and about a cent finds it.
+How it works, briefly: no crawling. I watch sources that timestamp their own publications, so t=0 is the publisher's clock, never mine — you can't measure lateness without an agreed zero. Every index gets the same question at fixed lags, and at each one I fetch the source directly as a control, so "the index was slow" isn't confused with "the page wasn't live yet" — on every source except the Federal Register, where it turned out the control fails 10 times out of 10. I'm disclosing that rather than patching it post-hoc; the post has the details.
 
-One more thing, for anyone evaluating these APIs.
+34 events, 74 graded calls, about 34 cents. Pre-registered, every raw payload in the repo.
 
-Artificial Analysis launched a Search Index for exactly these providers on 18 August — serious work, published methodology, and the most useful cost analysis anyone has done on these APIs. Its three component benchmarks are all answer-correctness scores, run through a harness that gives the agent 25 turns with unlimited tool calls.
+The video above is the page being driven, narrated.
 
-Give an agent that budget and an empty result set, and it retries, rephrases and widens until it finds the answer. Give it a confidently superseded answer and it has no signal to retry on, so it submits. Their methodology is careful about the limit: burn all 25 turns without finishing and you score zero, so an absence can cost correctness in the tail. But short of that it costs turns, tokens and latency, and their cost and time columns capture all three. A stale answer costs none of them — fast, cheap, wrong, and caught by no column at all.
-
-Which means the more agentic the harness — the closer to how anyone actually runs these in production — the more absence gets priced into cost, and the more staleness survives into the graded score. The failure mode that matters most in production is the one a production-shaped benchmark is least able to see.
-
-And then I told the same lie myself — three times, as it turned out. Rungs that hadn't come round yet rendered as empty grey squares, in a grid where grey already meant ABSENT. On the page whose entire argument is that distinction. Then the totals line counted squares that were never dispatched as "graded provider calls," overstating its own sample by five times.
-
-None of them was in the measurement. All three were in the presentation, which is exactly where I'd been telling everyone else to look. The post has the details.
-
-The video above is the page being driven, with the argument narrated over it.
-
-Or drive it yourself — run the ladder, then flip the scoring rule and watch the ranking invert:
+Playground — run the ladder, flip the scoring rule, watch the ranking invert:
 https://abhid1234.github.io/time-to-index/playground.html
 
-Code, MIT, full ledger, every raw payload and every price:
+Code and full ledger, MIT:
 https://github.com/abhid1234/time-to-index
 
-If you work on one of these indexes and think the methodology is unfair to you, I want to hear it. The plan is pre-registered precisely so that argument can be about the method rather than the result.
+If you work on one of these indexes and think the methodology is unfair to you, I want to hear it. The plan was pre-registered precisely so that argument can be about the method rather than the result.

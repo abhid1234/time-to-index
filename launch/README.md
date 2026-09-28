@@ -42,15 +42,17 @@ sentence around it rewritten, not a digit swapped.
    | `diagrams/architecture.png` | upload `diagrams/architecture.png` |
    | `diagrams/interval.png` | upload `diagrams/interval.png` |
    | `diagrams/the-catch.png` | upload `diagrams/the-catch.png` |
+   | `diagrams/by-source.png` | upload `diagrams/by-source.png` |
    | the line reading `>>> EMBED ... HERE <<<` | the video embed, then delete the line |
 
    The last one is the one that gets published by accident — it is plain text
    in the middle of the closing section and reads as prose if you skim.
 
-   `the-catch.png` is the one diagram that is not illustrative: every value in
-   it is read out of `ledger/` when it renders, so it cannot drift from what
-   the repo holds. If the uv event ever leaves the ledger, `make_diagrams.py`
-   stops rather than printing a stale picture.
+   `the-catch.png` and `by-source.png` are the two diagrams that are not
+   illustrative: every value in them is read out of `ledger/` when they
+   render, so they cannot drift from what the repo holds. Re-run
+   `make_diagrams.py` immediately before posting, for the same reason you run
+   the checks then.
 2. **Video.** Upload `time-to-index-launch.mp4` (6:27), set `thumbnail.png`,
    put the Substack link in the description. Do this first of the three social
    posts: the LinkedIn copy refers to the video sitting above it.
@@ -72,13 +74,13 @@ sentence around it rewritten, not a digit swapped.
 3. **LinkedIn.** Paste `linkedin.md`. It truncates around 200 characters and
    the first line carries it: *"A search index that is wrong looks exactly like
    one that is fast."*
-4. **X.** 21 posts, in order — 1 through 14, with 3b–3d after 3, 4b after 4,
-   6b after 6, and 11b–11c after 11. Posts 13 and 14 carry the links.
+4. **X.** 21 posts, in order — 1 through 14, with 3b–3c after 3, 4b after 4,
+   5b–5c after 5, 6b after 6, and 11b after 11. Posts 13 and 14 carry the
+   links.
 
-   The finding is at post 3, not buried behind the method. On X the concrete
-   result has to land before anyone decides whether to keep reading; posts 4
-   and 4b then answer the question it provokes, which is a better job for the
-   method than warming up for it.
+   The uv row is post 3 and the source-class finding is post 4 — evidence
+   before method. On X the concrete result has to land before anyone decides
+   whether to keep reading.
 
 Send me the Substack URL afterwards and I'll thread it back through the
 README, the video description and both posts.
@@ -102,29 +104,56 @@ against the recording that already exists, so a take that runs long pushes the
 rest later instead of talking over it. Captions stay; they are timed from the
 same placement, so audio and text cannot drift apart.
 
-## The claim you are now making about named products
+## The claims you are now making about named products — read before posting
 
-Posts 6b–6d, the blog section "Then it caught the thing it was built for", and
-the LinkedIn post all name **Exa (`auto`)** and **Parallel (`advanced`)** as
-having returned `0.12.14` five minutes after `uv 0.12.15` was released, and
-name **Parallel (`advanced`)** and **Brave (`web`)** for two earlier STALE
-verdicts.
+This is stronger than anything earlier drafts said, so it is worth being
+deliberate about.
 
-Every one of those sentences is backed by a raw payload in `ledger/raw/`, and
-all of them place the caveat in the same breath as the claim: four verdicts, on
-three packages, across three arms — not a rate, not a ranking. The dashboard
-refuses to rank itself at this n and says so above its own table.
+**1. Instances.** Exa (`auto`) and Parallel (`advanced`) both returned `0.12.14`
+five minutes after `uv 0.12.15` was released. Parallel (`advanced`) and Brave
+(`web`) each produced earlier STALE verdicts on other packages. Every one of
+those is backed by a raw payload in `ledger/raw/`.
 
-If someone from either company replies, that is the ground you want to be
-standing on, and it is the ground the copy actually stands on. Don't let a
-reply pull you into defending a ranking you never made.
+**2. An ordering.** The copy now says Parallel (`advanced`) *separates* from
+Brave (`web`) and from Exa (`auto`) after Holm–Bonferroni correction —
+adjusted p 0.018 and 0.036. That is a statistical claim about the speed of
+named commercial products, made under your byline. It is correctly done:
+pre-registered plan, correction across all six pairs, `tti power` output
+quoted rather than paraphrased, and `check_claims.py` recomputes both p-values
+from the ledger rather than trusting the sentence.
 
+What keeps it defensible is the caveat that travels with it everywhere it
+appears: **all nine of Parallel's fresh answers were Federal Register
+documents** — on package registries it was never fresh either — and **the
+fastest arm is also tied for the most stale answers**. The copy does not say
+"Parallel is faster." It says Parallel reached current answers more often on
+the one source class where anything was current at all, and was also among the
+most likely to serve a stale one.
+
+If someone from any of these companies replies, that is the ground to stand
+on. Don't let a reply pull you into a broader ranking than the one the copy
+actually makes.
+
+**Disclosed limitation — the origin control fails on the Federal Register.**
+10 of 10 Federal Register origin fetches come back `not_found`: the page is
+fetched but the document number is not in what the grader sees. It works on
+every npm, PyPI and GitHub event. The copy says this plainly in all three
+assets. The fresh Federal Register answers don't depend on it — an index
+returning the correct document number is proof the page was live — but the 28
+ABSENT verdicts there can't be checked against it. Deliberately **not** fixed
+before launch: changing how a control is graded after seeing the results is the
+move pre-registration exists to stop. Fix it after, in the open.
+
+**3. The source-class finding** makes no claim about any company, and is the
+least contestable result in the pack: 12 of 40 Federal Register answers fresh
+at t+5m, 0 of 34 across npm, PyPI and GitHub releases, Fisher p = 0.0003. If
+you want to lead with the safest strong claim, lead with that one.
 ## Two things about the run itself
 
-**The Parallel credit ran out.** Two calls came back HTTP 402 and are recorded
-as ERROR, excluded from every rate — a failure I caused is not a failure of
-theirs. But it means Parallel stops contributing data until the account is
-topped up, and the post names Parallel. Worth fixing before you publish.
+**The two ERRORs are HTTP 402s** from when the Parallel credit ran out, before
+it was topped up. They are recorded as ERROR and excluded from every rate — a
+failure caused on our side is not a verdict about the provider. Parallel has
+answered normally since.
 
 **Every verdict in the run is at t+5m.** Not by design — by yield. With a
 several-hour cron against a ten-minute tolerance, every rung after the first
@@ -135,10 +164,12 @@ Actions cron — that would give you two ledgers against one pre-registration.
 
 ## The two questions you'll get
 
-**"Why only thirteen events?"** GitHub Actions asks for a ten-minute cron and
-delivers one every few hours. An event only counts if noticed within ten
-minutes of publication, so ~97% are dropped. Dropping them is correct. The fix
-is a box with real timers.
+**"Why only 34 events, and why is every verdict at t+5m?"** GitHub Actions
+asks for a ten-minute cron and delivers one every few hours. An event only
+counts if noticed within ten minutes of publication, so most are dropped, and
+later rungs almost never land inside their window. Dropping them is correct.
+The fix is a box with real timers — `deploy/systemd/`, whose README warns
+against running it alongside the Actions cron.
 
 **"How is this different from the Artificial Analysis Search Index?"** Their
 axis is answer quality; this one is time to retrievability. The README has a
@@ -158,7 +189,7 @@ retry on when handed a confident stale answer.
 | `blog.md` | The source. Everything else is generated from it. |
 | `linkedin.md` | The LinkedIn post. |
 | `x-thread.md` | 21 posts. Counts measured, not estimated. |
-| `diagrams/` | Four PNGs at 2x, rendered through the same browser and palette as the playground. `the-catch.png` is generated from the ledger. |
+| `diagrams/` | Five PNGs at 2x, rendered through the same browser and palette as the playground. `the-catch.png` and `by-source.png` are generated from the ledger. |
 | `thumbnail.png` | 1280×720, screenshotted from the live page at 2x rather than drawn. |
 | `check_claims.py`, `check_counts.py` | The two pre-flight checks above. |
 | `tts.py` | Renders the 27 narration lines to wavs through a reachable endpoint. |

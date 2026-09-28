@@ -135,12 +135,29 @@ LINES: list[tuple[str, float, str]] = [
      "those two stale rows exactly the same as the two empty ones. Zero. In "
      "production they are not the same event at all."),
     ("measured_scope", 0.8,
-     "And it is not a one off. Across the whole run, four stale verdicts, on "
-     "three separate packages, across three different arms."),
-    ("measured_scope", 9.0,
-     "And I have to say the next part in the same breath. Thirteen events is "
-     "not a rate and it is not a ranking. At this sample size no pair of arms "
-     "separates, which is why the leaderboard refuses to rank itself."),
+     "And it is not a one off. Across the whole run, five stale verdicts, on "
+     "four separate events, across three different arms."),
+
+    ("measured_source", 0.8,
+     "Then the result I did not go looking for. Every fresh answer in the "
+     "whole run, all twelve of them, came from Federal Register documents."),
+    ("measured_source", 9.0,
+     "Twelve of forty were current five minutes after publication. Across N P "
+     "M, Pie Pea Eye and Github releases, zero of thirty four. Whether a new "
+     "fact is findable in five minutes depends far more on where it was "
+     "published than on which index you ask."),
+
+    ("measured_rank", 0.8,
+     "And the leaderboard can finally rank, in part. Parallel's advanced mode "
+     "separates from Brave and from Exa, after correcting for the number of "
+     "comparisons."),
+    ("measured_rank", 10.5,
+     "But it is also tied for the most stale answers. Same arm. Current on "
+     "this fact, and confidently outdated on the uv release."),
+    ("measured_rank", 20.0,
+     "That is the whole argument. A single score has to decide whether that "
+     "arm is good or bad. It is both. Speed and staleness are different axes, "
+     "and scoring them together is how you lose the one that costs you."),
 
     ("legend", 0.8,
      "And notice what the empty squares say. Not due yet. Not run yet. Never "
@@ -170,6 +187,11 @@ def caption(text: str) -> str:
         (r"\btwo hundred and seventy four seconds\b", "274 seconds"),
         (r"\bfour hundred and sixteen milliseconds\b", "416 ms"),
         (r"\btwenty five turns\b", "25 turns"),
+        (r"\bzero of thirty four\b", "0 of 34"),
+        (r"\bGithub\b", "GitHub"),
+        (r"\bTwelve of forty\b", "12 of 40"),
+        (r"\ball twelve of them\b", "all 12 of them"),
+        (r"\bfive stale verdicts\b", "5 stale verdicts"),
         (r"\bThirteen events\b", "Thirteen events"),
     ]
     for pat, rep in fixes:

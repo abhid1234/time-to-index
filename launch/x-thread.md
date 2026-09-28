@@ -10,7 +10,7 @@ A search index that is wrong looks exactly like one that is fast.
 
 Every retrieval benchmark scores both the same: zero.
 
-In production they are nothing alike. So I built the thing that separates them.
+In production they are nothing alike. So I built the thing that separates them, and ran it for three and a half weeks.
 
 ---
 
@@ -26,17 +26,15 @@ One is a shrug. The other is a lie with a citation.
 
 **3/**
 
-Here's the clearest thing it has caught so far.
+The clearest single catch:
 
-uv 0.12.15 released on GitHub. Collector saw it 274s later.
-
-At t+5m, four search indexes and the control were asked for the current version.
+uv 0.12.15 released on GitHub. Five minutes later, four search indexes and a control were asked for the current version.
 
 ---
 
 **3b/**
 
-Control: 0.12.15, in 416ms.
+Control (direct fetch of the release page): 0.12.15, in 416ms.
 
 Exa: 0.12.14.
 Parallel (advanced): 0.12.14.
@@ -44,7 +42,7 @@ Parallel (advanced): 0.12.14.
 Brave: nothing.
 Parallel (fast): nothing.
 
-None of the four had it. Half confidently asserted the superseded one.
+None of the four had it. Half confidently asserted the old one.
 
 ---
 
@@ -52,73 +50,89 @@ None of the four had it. Half confidently asserted the superseded one.
 
 Same wrong version. Independently. At the same instant.
 
-The control proves the release was live and fetchable right then. Not a publishing delay.
-
-The indexes had a stale answer and served it with no hint that it was stale.
-
----
-
-**3d/**
+The control proves the release was live and fetchable right then.
 
 Every conventional benchmark scores those two stale rows the same as the two empty ones: zero.
-
-In production they are not the same event.
-
-One makes your agent retry. The other makes it cite 0.12.14 to your customer.
 
 ---
 
 **4/**
 
-So how is that measured, and how do I know it isn't just a publishing delay?
+But the result I'd lead with is one I didn't go looking for.
 
-The design involves no crawling, which is the part people assume is hard.
+Every fresh answer in the whole run — all 12 — came from Federal Register documents.
 
-I watch sources that timestamp their own publications — npm, PyPI, GitHub releases, SEC EDGAR, arXiv.
+12 of 40 current at t+5m.
+
+npm, PyPI and GitHub releases: 0 of 34.
+
+Fisher p = 0.0003.
 
 ---
 
 **4b/**
 
-When a package publishes, the registry says exactly when. That's t=0, on their clock.
+So "how fast is this search API?" is badly underspecified. Fast for what?
 
-You cannot measure lateness without an agreed zero.
+A new US regulation: findable in five minutes more often than not.
 
-Asking a crawler when something appeared is asking the defendant to time the race.
+A new version of a package half the internet depends on: never. And 5 times, the old version instead.
 
 ---
 
 **5/**
 
-Every search API then gets the same question at six fixed lags:
+The leaderboard can now rank, in part.
 
-5m · 15m · 1h · 6h · 24h · 72h
+Parallel (advanced) separates from Brave and from Exa after Holm–Bonferroni — adjusted p 0.018 and 0.036.
 
-And at each rung I fetch the source URL directly as a control — so "the index was slow" is never confused with "the page wasn't live yet."
+The other four pairs are still underpowered, and the dashboard says so rather than sorting them.
+
+---
+
+**5b/**
+
+Two caveats, same breath.
+
+All 9 of Parallel's fresh answers were Federal Register. On package registries it was never fresh either.
+
+And the fastest arm is also tied for the most stale answers — two apiece with Exa.
+
+---
+
+**5c/**
+
+That last point is the whole argument.
+
+A benchmark that collapses retrieval into one number has to decide whether that arm is good or bad.
+
+It's both. Speed and staleness are different axes, and scoring them together is how you lose the one that costs you.
 
 ---
 
 **6/**
 
-This is where a project like mine starts overselling, so let me get ahead of it.
+How it works: no crawling, which is the part people assume is hard.
 
-4 STALE, on 3 packages, across 3 different arms.
+I watch sources that timestamp their own publications. t=0 is the publisher's clock, never mine.
 
-That's not a rate. Not a ranking. Not "Exa and Parallel are stale."
+Asking a crawler when something appeared is asking the defendant to time the race.
 
 ---
 
 **6b/**
 
-13 events and 22 graded calls cannot support a comparison between providers. No pair of arms separates after adjustment, and the dashboard refuses to rank itself for exactly that reason.
+Every index gets the same question at fixed lags — and I fetch the source directly as a control.
 
-Better I hand you the sample size than you find it yourself.
+That's what makes the uv row a stale index, not a slow publisher.
+
+(It fails on every Federal Register page, 10 of 10. Disclosed, not patched post-hoc.)
 
 ---
 
 **7/**
 
-Artificial Analysis launched a Search Index for these same APIs on 18 Aug. Serious work, and the best cost analysis published on them.
+Artificial Analysis launched a Search Index for these same APIs in August. Serious work, and the best cost analysis published on them.
 
 Its three component benchmarks are all answer-correctness scores.
 
@@ -168,37 +182,25 @@ On the page whose entire argument is that distinction.
 
 **11b/**
 
-Then the totals line counted squares that were never dispatched as "graded provider calls."
+Then the totals line counted squares that were never dispatched as "graded provider calls." It overstated its own sample by 5x — three lines under a legend explaining what a skip is.
 
-124 graded, it said. The itemised verdicts added to 24.
-
-Overstating its own sample by 5x, three lines under a legend explaining what a skip is.
-
----
-
-**11c/**
-
-Unmeasured rungs are now the only state with no fill at all. An outline, with the reason in it: not due yet, not run yet, never scheduled.
-
-Every bug was in the presentation, not the measurement — exactly where I'd been telling everyone else to look.
+Every bug was in the presentation, not the measurement.
 
 ---
 
 **12/**
 
-And the part I got wrong: I ran it on GitHub Actions.
+What I got wrong: I ran it on GitHub Actions.
 
-Asks for a 10-min cron. Gets one every few hours.
+Asks for a 10-min cron. Gets one every few hours. So every verdict above is at t+5m — later rungs almost never land in their window.
 
-So each rung after the first has ~1-in-30 odds of ever being graded. 13 events in 12 days.
-
-Dropping them is correct. The runner is the fix.
+34 events in 25 days. Dropping the rest is correct. The runner is the fix.
 
 ---
 
 **13/**
 
-Playground — run the ladder, then flip the scoring rule and watch the leaderboard invert. Real measured data underneath.
+Playground — run the ladder, flip the scoring rule, watch the leaderboard invert. Real measured data underneath.
 
 https://abhid1234.github.io/time-to-index/playground.html
 
@@ -206,8 +208,8 @@ https://abhid1234.github.io/time-to-index/playground.html
 
 **14/**
 
-Code, MIT, full ledger — every raw payload, every verdict, every price.
+Code, MIT, full ledger — every raw payload, every verdict, every price. Pre-registered.
 
-If you work on one of these indexes and think the methodology is unfair to you, I want to hear it. The plan is pre-registered so that argument can be about the method.
+If you work on one of these indexes and think the methodology is unfair to you, I want to hear it.
 
 https://github.com/abhid1234/time-to-index

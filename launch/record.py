@@ -157,6 +157,18 @@ class Cam:
         time.sleep(ms / 1000)
 
 
+def event_button(text: str) -> str:
+    """The event button that names this fact, wherever it currently sits.
+
+    Buttons are newest-first. The recorder used to click them by position, and
+    twenty-one new events landed between two takes -- so button 2 stopped being
+    the uv release and became a GitHub event whose every cell was SKIPPED. The
+    narration would have said "Exa returned 0.12.14" over a row that said
+    nothing at all. Positions drift as the ledger grows; content does not.
+    """
+    return f'#meas-evs button:has-text("{text}")'
+
+
 def main() -> int:
     BUILD.mkdir(exist_ok=True)
     budgets = json.loads((BUILD / "budgets.json").read_text())
@@ -266,7 +278,7 @@ def main() -> int:
         # events that produced a STALE, so walking them is both the
         # illustration and the pacing.
         beat("measured_events")
-        cam.click("#meas-evs button:nth-child(2)", ms=700, settle=1600)
+        cam.click(event_button("astral-sh/uv 0.12.15"), ms=700, settle=1600)
         cam.scroll_to("#meas-head", 800, offset=-150)
         cam.hold(2400)
         cam.to("#meas-body tr:nth-child(5) td:nth-child(2)", ms=900)   # origin FRESH
@@ -286,19 +298,46 @@ def main() -> int:
         beat("measured_scope")
         cam.scroll_to("#meas-evs", 800, offset=-170)
         cam.hold(1000)
-        cam.click("#meas-evs button:nth-child(4)", ms=800, settle=1500)  # workers-types
+        cam.click(event_button("workers-types 5.20260910.1"), ms=800, settle=1500)
         cam.scroll_to("#meas-head", 750, offset=-150)
         cam.hold(1400)
         cam.to("#meas-body tr:nth-child(1) td:nth-child(2)", ms=900)     # brave STALE
         cam.hold(3400)
         cam.scroll_to("#meas-evs", 750, offset=-170)
-        cam.click("#meas-evs button:nth-child(5)", ms=800, settle=1400)  # sentry
+        cam.click(event_button("@sentry/node 10.74.0"), ms=800, settle=1400)
         cam.scroll_to("#meas-head", 750, offset=-150)
         cam.hold(1400)
         cam.to("#meas-body tr:nth-child(3) td:nth-child(2)", ms=900)     # parallel STALE
         cam.hold(3200)
+
+        # The source-class finding. 2026-19495 is the Federal Register document
+        # where two arms were FRESH at t+5m -- the clearest single picture of
+        # "this source gets indexed, the registries do not".
+        beat("measured_source")
+        cam.scroll_to("#meas-evs", 800, offset=-170)
+        cam.hold(1000)
+        cam.click(event_button("2026-19495"), ms=800, settle=1500)
+        cam.scroll_to("#meas-head", 750, offset=-150)
+        cam.hold(2400)
+        cam.to("#meas-body tr:nth-child(2) td:nth-child(2)", ms=900)     # exa FRESH
+        cam.hold(3600)
+        cam.to("#meas-body tr:nth-child(3) td:nth-child(2)", ms=800)     # parallel FRESH
+        cam.hold(4400)
+
+        # Same arm, fresh on one fact and stale on another: the thesis in two
+        # cells. Hold on Parallel's FRESH here, then flip to the uv event and
+        # land on Parallel's STALE.
+        beat("measured_rank")
+        cam.to("#meas-body tr:nth-child(3) td:nth-child(2)", ms=800)     # parallel FRESH
+        cam.hold(5200)
+        cam.scroll_to("#meas-evs", 800, offset=-170)
+        cam.click(event_button("astral-sh/uv 0.12.15"), ms=800, settle=1500)
+        cam.scroll_to("#meas-head", 750, offset=-150)
+        cam.hold(1400)
+        cam.to("#meas-body tr:nth-child(3) td:nth-child(2)", ms=900)     # parallel STALE
+        cam.hold(5000)
         cam.scroll_to("#meas-tot", 850, offset=-260)
-        cam.hold(2800)
+        cam.hold(3200)
 
         beat("legend")
         cam.scroll_to("#meas-legend", 700)

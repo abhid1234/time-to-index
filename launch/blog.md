@@ -10,7 +10,7 @@ Plenty of people measure retrieval, and some of them measure it well — there's
 
 Which quietly puts two completely different failures in the same bucket.
 
-I couldn't find anyone separating them, so I spent a couple of weekends building the thing that does. What I got was a benchmark, thirteen real events, and a much better appreciation of how easy it is to lie with a grey square.
+I couldn't find anyone separating them, so I spent a couple of weekends building the thing that does. What I got was a benchmark, 34 real events, a result I didn't expect, and a much better appreciation of how easy it is to lie with a grey square.
 
 **[Play with it →](https://abhid1234.github.io/time-to-index/playground.html)** — run the ladder, then flip the scoring rule and watch the leaderboard invert. Real measured data underneath. There's a walkthrough video below if you'd rather watch than click.
 
@@ -62,9 +62,9 @@ Now the bit where a project like this usually starts overselling, so let me get 
 
 ## Then it caught the thing it was built for
 
-Twelve days in, the ladder has thirteen events and twenty-two graded provider calls. Eighteen came back ABSENT. Four came back STALE.
+Three and a half weeks in, the ladder has 34 events and 74 graded provider calls, for about 34 cents.
 
-The clearest one is a single row.
+The clearest single catch is one row.
 
 `uv 0.12.15` was released on GitHub. My collector saw it 274 seconds later. At t+5m, four search indexes and the origin control were asked what the current version was:
 
@@ -76,11 +76,39 @@ That table is generated from the ledger at render time, not retyped. If the even
 
 Every conventional retrieval benchmark scores those middle two rows exactly the same as the bottom two: zero. In production they are not remotely the same event. One makes your agent retry. The other makes it cite `0.12.14` to your customer.
 
-Across the whole run: four STALE verdicts, on three separate packages, across three different arms. Also two ERRORs — HTTP 402, my Parallel credit running out — recorded as ERROR and excluded from every rate, because a failure I caused is not a failure of theirs.
+## Where it was published mattered more than who you asked
 
-**And here is the part I have to say in the same breath.** That is not a rate, it is not a ranking, and it is emphatically not *"Exa and Parallel are stale."* At this n no pair of arms separates after adjustment, which is why the dashboard refuses to rank itself and says so above its own table. A benchmark that produced its first interesting result and immediately started drawing conclusions from it would be doing the exact thing I built it to catch.
+I didn't go looking for this, and it's the finding I'd lead with if I were writing this from scratch.
 
-What four instances do establish is narrower, and more useful to me than a leaderboard would be: the failure mode is real, it happens at the front of the ladder where agents actually live, it happens to more than one provider, and about a cent finds it.
+![By source](diagrams/by-source.png)
+
+Every FRESH answer in the entire run — all 12 — came from **Federal Register** documents. Nine of the ten Federal Register events had at least one index returning the current fact five minutes after publication.
+
+Across **npm, PyPI and GitHub releases: zero.** Not one fresh answer in 34 graded calls. That's a two-sided Fisher p of 0.0003 on 12/40 against 0/34, and it isn't close.
+
+So the question *"how fast is this search API?"* turns out to be badly underspecified. Fast for **what**? A new US regulation was findable within five minutes more often than not. A new version of a package half the internet depends on, never — and when a package answer did come back, five times it was the version the release had just replaced.
+
+I can't tell you *why* from this data. Government documents are few, heavily linked and crawled on a schedule; registries publish thousands of versions a day. Those are guesses. What the ladder can say is that the difference is real, large, and invisible to any benchmark that averages across sources.
+
+**One thing I found while writing this up, and it matters.** The origin control fails on every Federal Register document — 10 of 10. It fetches the page and cannot find the document number in what comes back, while it works on every npm, PyPI and GitHub event it ran on. So for the Federal Register, the control that is supposed to separate *"the index was slow"* from *"the page wasn't live yet"* is not doing its job.
+
+The fresh answers don't need it: an index returning the right document number five minutes after publication is proof on its own that the page was live. But the 28 ABSENT verdicts there cannot be checked against it. And I'm not going to patch the grader the night before launch. The plan is pre-registered, and changing how a control is graded *after* seeing the results is precisely the move pre-registration exists to stop. It's the first thing I'll fix, in the open, with the diff.
+
+## And the leaderboard can finally rank — in part
+
+For most of this run the dashboard refused to rank itself, because no pair of arms separated after correcting for the number of comparisons. That changed.
+
+Two pairs now separate after Holm–Bonferroni: `parallel/advanced` against `brave/web` (adjusted p = 0.018) and against `exa/auto` (adjusted p = 0.036, 95% power). The other four pairs are still underpowered, and `tti power` says how many more events each one needs.
+
+**Two things I have to say in the same breath.**
+
+First, all nine of Parallel's fresh answers are Federal Register documents. On package registries it was never fresh either. So the accurate claim is narrow: *on the sources where anything was fresh at all, Parallel's advanced mode got there more often.* It is not "Parallel is faster," full stop.
+
+Second — and this is the part I find most satisfying — **the fastest arm is also tied for the most stale answers.** Two apiece with Exa. Parallel's advanced mode is simultaneously the index most likely to have the new fact and one of the two most likely to hand you the old one as though it were current.
+
+That single row is the whole argument of this project. Any benchmark that collapses retrieval into one number has to decide whether that arm is good or bad. It's both. Speed and staleness are different axes, and scoring them together is how you lose the one that costs you.
+
+The staleness intervals still overlap heavily — this is 18 calls an arm, not a verdict on anybody's product. But it is exactly the shape I built the instrument to be able to see.
 
 ## Then I told the same lie. Twice.
 
@@ -129,11 +157,11 @@ I'm not saying their index is wrong. It measures answer quality, carefully, and 
 
 ## What it isn't
 
-It's an instrument, not a leaderboard. Nothing here scores answer quality, relevance, or ranking — and with thirteen events it cannot support a comparison between providers, which the dashboard says out loud rather than leaving you to infer from a sorted table.
+It's an instrument, not a leaderboard. Nothing here scores answer quality, relevance, or ranking — and with 34 events it supports exactly two provider comparisons and says so — the dashboard marks the other four as underpowered rather than leaving you to infer an ordering from a sorted table.
 
 It also isn't finished. I ran the collector on GitHub Actions, which asks for a cron every ten minutes and delivers one every few hours. An event only counts if it's noticed within ten minutes of publication, so roughly 97% of the world's packages go past unrecorded.
 
-Worse, and I only worked this out watching it happen: with a five-hour cadence against a ten-minute tolerance, **every rung after the first has about a 1-in-30 chance of ever being graded.** The 5-minute rung gets measured because discovery and the first probe happen in the same run. The rest need a run to land inside a ten-minute window, and mostly it doesn't. That is why every verdict above is at t+5m, and why a hundred provider squares in this run were never dispatched at all.
+Worse, and I only worked this out watching it happen: with a five-hour cadence against a ten-minute tolerance, **every rung after the first has about a 1-in-30 chance of ever being graded.** The 5-minute rung gets measured because discovery and the first probe happen in the same run. The rest need a run to land inside a ten-minute window, and mostly it doesn't. That is why every verdict in this post is at t+5m, and why most provider squares in this run were never dispatched at all.
 
 Dropping those is correct — a probe I can't place on the ladder is worth less than no probe. But it's why the run is small, and it stays small until the collector moves to a box with real timers.
 
