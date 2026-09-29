@@ -1240,3 +1240,6 @@
 {"answer":"@cloudflare/autoconfig@0.7.1","marked_at":1790627845.7574115,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
 {"answer":"0000002488-26-000182","marked_at":1790627845.7574115,"reason":"detected_late","source":"edgar","subject":"2488:8-K"}
 {"answer":"0001094285-26-000050","marked_at":1790627845.7574115,"reason":"detected_late","source":"edgar","subject":"1094285:8-K"}
+{"answer":"0.12.20","marked_at":1790641998.6406674,"reason":"detected_late","source":"pypi","subject":"uv"}
+{"answer":"0.12.20","marked_at":1790641998.6406674,"reason":"detected_late","source":"github_release","subject":"astral-sh/uv"}
+{"answer":"langchain-fireworks==1.7.0","marked_at":1790641998.6406674,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
