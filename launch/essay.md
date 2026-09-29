@@ -74,6 +74,6 @@ python -m tti demo       # synthetic run, no keys, no spend
 - **Playground:** https://abhid1234.github.io/time-to-index/playground.html
 - **Live dashboard:** https://abhid1234.github.io/time-to-index/
 - **Code, ledger and method (MIT):** https://github.com/abhid1234/time-to-index
-- **91-second video:** in the repo under `media/`
+- **91-second video:** https://abhid1234.github.io/time-to-index/playground.html#film
 
 If you work on one of these indexes and think the method is unfair to you, open an issue. The plan is pre-registered so that argument can be about the method rather than the result.
