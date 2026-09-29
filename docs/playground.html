@@ -126,6 +126,17 @@ h1{font-family:Newsreader,Georgia,serif;font-weight:500;
 .sub{font-size:19.5px;line-height:1.55;color:var(--ink-2);max-width:56ch;margin:0}
 
 /* The argument, stated before anything moves. */
+.chips{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:22px 0 0}
+.chips li{font-size:13px;color:var(--ink-2);padding:6px 12px;border:1px solid var(--rule);
+  border-radius:999px;background:var(--panel)}
+.links{margin:16px 0 0;font-size:14.5px;color:var(--ink-3)}
+.links a{color:var(--accent);text-decoration:none;font-weight:500}
+.links a:hover{text-decoration:underline}
+.coda{margin:14px 0 0}
+.film{margin:40px 0 0;scroll-margin-top:20px}
+.film video{display:block;width:100%;aspect-ratio:16/9;border-radius:14px;
+  border:1px solid var(--rule);background:#000;box-shadow:0 18px 50px -24px rgba(0,0,0,.35)}
+.film figcaption{margin:10px 2px 0;font-size:13px;color:var(--ink-3)}
 .thesis{display:flex;flex-direction:column;gap:14px;margin:6px 0 0}
 .thesis .t{transition:transform .3s cubic-bezier(.4,0,.2,1),box-shadow .3s}
 .thesis .t:hover{transform:translateY(-2px);box-shadow:var(--shadow-2)}
@@ -406,6 +417,15 @@ footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--rule);
   outdated one the same way: zero. In production they are nothing alike. This page
   shows you the difference, then lets you change the scoring rule and watch the
   ranking turn upside down.</p>
+  <ul class="chips">
+    <li>No account, nothing to install</li>
+    <li>Real data from the committed ledger</li>
+    <li>MIT · open source</li>
+  </ul>
+  <p class="links"><a href="#film">Watch the 91-second version</a> ·
+  <a href="https://github.com/abhid1234/time-to-index">GitHub</a> ·
+  <a href="https://github.com/abhid1234/time-to-index/blob/main/launch/essay.md">Launch post</a> ·
+  <a href="./">Live results</a></p>
 
    </div>
    <div>
@@ -420,11 +440,21 @@ footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--rule);
       <p>The API confidently returns the answer that was true yesterday. Your agent
       <b>cites it</b> — with no signal anywhere downstream that it's wrong.</p>
     </div>
-  </div>Scored out of one, these are the same failure.
+  </div>
+  <p class="coda">Scored out of one, these are the same failure.
   <b>They are not the same failure.</b></p>
    </div>
   </div>
 </header>
+
+<figure class="film" id="film">
+  <video controls playsinline preload="none" poster="media/short-poster.jpg"
+    aria-label="Time to Index in 91 seconds">
+    <source src="media/time-to-index-short.mp4" type="video/mp4">
+  </video>
+  <figcaption>The whole argument in 91 seconds — one real result, read from the
+  ledger. Text on screen; the sound is optional.</figcaption>
+</figure>
 
 <nav class="rail" aria-label="Sections">
   <ol>
