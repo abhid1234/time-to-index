@@ -1296,3 +1296,13 @@
 {"answer":"1.14.1","marked_at":1790706975.402434,"reason":"detected_late","source":"pypi","subject":"trl"}
 {"answer":"langchain-anthropic==1.7.5","marked_at":1790706975.402434,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
 {"answer":"@cloudflare/workers-auth@0.9.5","marked_at":1790706975.402434,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"44.5.0","marked_at":1790721332.395496,"reason":"detected_late","source":"npm","subject":"electron"}
+{"answer":"7.25.0","marked_at":1790721332.395496,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"4.144.0","marked_at":1790721332.395496,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"1.43.105","marked_at":1790721332.395496,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"3.15.1","marked_at":1790721332.395496,"reason":"detected_late","source":"pypi","subject":"google-cloud-storage"}
+{"answer":"3.22.0","marked_at":1790721332.395496,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"0.12.21","marked_at":1790721332.395496,"reason":"detected_late","source":"pypi","subject":"uv"}
+{"answer":"0.12.21","marked_at":1790721332.395496,"reason":"detected_late","source":"github_release","subject":"astral-sh/uv"}
+{"answer":"@cloudflare/vite-plugin@1.62.2","marked_at":1790721332.395496,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"0001628280-26-063820","marked_at":1790721332.395496,"reason":"detected_late","source":"edgar","subject":"1318605:8-K"}
