@@ -1272,3 +1272,17 @@
 {"answer":"2609.34727","marked_at":1790662242.9589965,"reason":"detected_late","source":"arxiv","subject":"2609.34727"}
 {"answer":"2609.33403","marked_at":1790662242.9589965,"reason":"detected_late","source":"arxiv","subject":"2609.33403"}
 {"answer":"2609.33322","marked_at":1790662242.9589965,"reason":"detected_late","source":"arxiv","subject":"2609.33322"}
+{"answer":"4.13.11","marked_at":1790687074.6277082,"reason":"detected_late","source":"npm","subject":"hono"}
+{"answer":"16.3.7","marked_at":1790687074.6277082,"reason":"detected_late","source":"npm","subject":"next"}
+{"answer":"v13.2.3","marked_at":1790687074.6277082,"reason":"detected_late","source":"github_release","subject":"grafana/grafana"}
+{"answer":"v16.3.7","marked_at":1790687074.6277082,"reason":"detected_late","source":"github_release","subject":"vercel/next.js"}
+{"answer":"C1-2026-17108","marked_at":1790687074.6277082,"reason":"detected_late","source":"federal_register","subject":"C1-2026-17108"}
+{"answer":"2026-19956","marked_at":1790687074.6277082,"reason":"detected_late","source":"federal_register","subject":"2026-19956"}
+{"answer":"2026-19946","marked_at":1790687074.6277082,"reason":"detected_late","source":"federal_register","subject":"2026-19946"}
+{"answer":"2026-19945","marked_at":1790687074.6277082,"reason":"detected_late","source":"federal_register","subject":"2026-19945"}
+{"answer":"2026-19935","marked_at":1790687074.6277082,"reason":"detected_late","source":"federal_register","subject":"2026-19935"}
+{"answer":"2026-19933","marked_at":1790687074.6277082,"reason":"detected_late","source":"federal_register","subject":"2026-19933"}
+{"answer":"2026-19929","marked_at":1790687074.6277082,"reason":"detected_late","source":"federal_register","subject":"2026-19929"}
+{"answer":"2026-19928","marked_at":1790687074.6277082,"reason":"detected_late","source":"federal_register","subject":"2026-19928"}
+{"answer":"2026-19927","marked_at":1790687074.6277082,"reason":"detected_late","source":"federal_register","subject":"2026-19927"}
+{"answer":"2026-19926","marked_at":1790687074.6277082,"reason":"detected_late","source":"federal_register","subject":"2026-19926"}
