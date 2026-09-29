@@ -1286,3 +1286,13 @@
 {"answer":"2026-19928","marked_at":1790687074.6277082,"reason":"detected_late","source":"federal_register","subject":"2026-19928"}
 {"answer":"2026-19927","marked_at":1790687074.6277082,"reason":"detected_late","source":"federal_register","subject":"2026-19927"}
 {"answer":"2026-19926","marked_at":1790687074.6277082,"reason":"detected_late","source":"federal_register","subject":"2026-19926"}
+{"answer":"7.24.0","marked_at":1790706975.402434,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"12.8.1","marked_at":1790706975.402434,"reason":"detected_late","source":"npm","subject":"pnpm"}
+{"answer":"10.6.1","marked_at":1790706975.402434,"reason":"detected_late","source":"npm","subject":"storybook"}
+{"answer":"4.143.1","marked_at":1790706975.402434,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"0.142.0","marked_at":1790706975.402434,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"6.29.0","marked_at":1790706975.402434,"reason":"detected_late","source":"pypi","subject":"gradio"}
+{"answer":"3.21.0","marked_at":1790706975.402434,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"1.14.1","marked_at":1790706975.402434,"reason":"detected_late","source":"pypi","subject":"trl"}
+{"answer":"langchain-anthropic==1.7.5","marked_at":1790706975.402434,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"@cloudflare/workers-auth@0.9.5","marked_at":1790706975.402434,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
