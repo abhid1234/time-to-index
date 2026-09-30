@@ -21,7 +21,6 @@ Writes build/screen-raw.mp4 and build/beats.json. Needs
 from __future__ import annotations
 
 import json
-import math
 import pathlib
 import shutil
 import sys

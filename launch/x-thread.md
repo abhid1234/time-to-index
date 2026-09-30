@@ -10,7 +10,7 @@ A search index that is wrong looks exactly like one that is fast.
 
 Every retrieval benchmark scores both the same: zero.
 
-In production they are nothing alike. So I built the thing that separates them, and ran it for three and a half weeks.
+In production they are nothing alike. So I built the thing that separates them, and ran it for nearly four weeks.
 
 ---
 
@@ -194,7 +194,7 @@ What I got wrong: I ran it on GitHub Actions.
 
 Asks for a 10-min cron. Gets one every few hours. So every verdict above is at t+5m — later rungs almost never land in their window.
 
-34 events in 25 days. Dropping the rest is correct. The runner is the fix.
+35 events in 26 days. Dropping the rest is correct. The runner is the fix.
 
 ---
 

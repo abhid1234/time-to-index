@@ -33,44 +33,42 @@ sentence around it rewritten, not a digit swapped.
 
 ## Post in this order
 
-1. **Substack.** Paste `blog.html`, then fill the four placeholders below.
-   Everything else links to this post, so it goes first.
+1. **Substack.** Paste `essay.html` — the ~900-word post, the same shape as
+   the AgentRoute launch essay. Everything else links to it, so it goes
+   first. Upload the four diagrams where the draft shows their paths:
 
    | in the draft | replace with |
    |---|---|
    | `diagrams/absent-vs-stale.png` | upload `diagrams/absent-vs-stale.png` |
    | `diagrams/architecture.png` | upload `diagrams/architecture.png` |
-   | `diagrams/interval.png` | upload `diagrams/interval.png` |
    | `diagrams/the-catch.png` | upload `diagrams/the-catch.png` |
    | `diagrams/by-source.png` | upload `diagrams/by-source.png` |
-   | the line reading `>>> EMBED ... HERE <<<` | the video embed, then delete the line |
 
-   The last one is the one that gets published by accident — it is plain text
-   in the middle of the closing section and reads as prose if you skim.
+   Then embed `time-to-index-short.mp4` under the playground link near the
+   top. `blog.md` / `blog.html` is the long version (~3,000 words, with the
+   Artificial Analysis comparison); keep it as a follow-up post or link it
+   from the repo.
 
    `the-catch.png` and `by-source.png` are the two diagrams that are not
    illustrative: every value in them is read out of `ledger/` when they
    render, so they cannot drift from what the repo holds. Re-run
    `make_diagrams.py` immediately before posting, for the same reason you run
    the checks then.
-2. **Video.** Upload `time-to-index-launch.mp4` (7:27), set `thumbnail.png`,
-   put the Substack link in the description. Do this first of the three social
-   posts: the LinkedIn copy refers to the video sitting above it.
+2. **Video.** The primary clip is `time-to-index-short.mp4` (1:31, 1080p;
+   a 720p copy sits next to it). Same format as the AgentRoute demo: text on
+   screen, no voiceover, an original ambient music bed at the same loudness.
+   It reads with the sound off, which is how X and LinkedIn autoplay it.
+   Set `thumbnail.png` and put the Substack link in the description.
 
-   **It is narrated and captioned.** The voice is Google's translate_tts,
-   which needs no credential and is one of the few hosts this sandbox can
-   reach — ElevenLabs is 403 at the egress proxy before any key is checked,
-   and Piper's models moved to HuggingFace, which is blocked too. If you want
-   a better voice, see "If you want a different voiceover" below; it is a
-   two-minute swap and does not need a re-record.
+   On X, attach it to post 1 as native media — at 91 seconds it is under the
+   140-second cap on a free account, costs no characters, and autoplay on the
+   first post is what carries a thread.
 
-   The captions stay either way, and are not a consolation prize: X and
-   LinkedIn autoplay muted, which is how most people will meet this.
+   Rebuild it with `python short/make_short.py`: it reads every number from
+   the ledger and refuses to render if a claim on screen no longer holds.
 
-   On X, attach `time-to-index-teaser.mp4` (1:11, under the 140-second cap on
-   a free account) to post 1 as native media. It costs no characters, and
-   autoplay on the first post is what carries a thread. The cut is the uv
-   0.12.15 row — the finding itself, self-contained.
+   The 7:27 narrated walkthrough (`time-to-index-launch.mp4`) and the 1:11
+   teaser are still here if you want a long-form cut for YouTube.
 3. **LinkedIn.** Paste `linkedin.md`. It truncates around 200 characters and
    the first line carries it: *"A search index that is wrong looks exactly like
    one that is fast."*
@@ -164,7 +162,7 @@ Actions cron — that would give you two ledgers against one pre-registration.
 
 ## The two questions you'll get
 
-**"Why only 34 events, and why is every verdict at t+5m?"** GitHub Actions
+**"Why only 35 events, and why is every verdict at t+5m?"** GitHub Actions
 asks for a ten-minute cron and delivers one every few hours. An event only
 counts if noticed within ten minutes of publication, so most are dropped, and
 later rungs almost never land inside their window. Dropping them is correct.

@@ -25,7 +25,6 @@ import argparse
 import json
 import pathlib
 import re
-import subprocess
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent

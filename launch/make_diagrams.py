@@ -396,9 +396,9 @@ def catch_body(repo):
         f'Every conventional benchmark scores those {n_stale} rows exactly the '
         f'same as the empty ones: zero.</p>')
     out.append(
-        '<p class="foot">One event. Not a rate, not a ranking — at this sample '
-        'size no pair of arms separates, and the dashboard refuses to rank '
-        'itself for that reason.</p>')
+        '<p class="foot">One event. Not a rate and not a ranking — the full '
+        'ledger supports only a partial ordering of the arms, and the dashboard '
+        'says so.</p>')
     return "\n".join(out)
 
 
@@ -435,7 +435,8 @@ BY_SOURCE = dict(
 
 
 def source_body(repo):
-    import json, collections
+    import collections
+    import json
     led = repo / "ledger"
     ev = {e["event_id"]: e for e in (json.loads(x) for x in
           (led / "events.jsonl").read_text().splitlines() if x.strip())}

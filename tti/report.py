@@ -591,6 +591,27 @@ to sit inside the noise. The raw payloads ship either way.
 </div>""")
 
 
+SITE = "https://abhid1234.github.io/time-to-index/"
+
+
+def social_meta(title: str, description: str, path: str = "") -> str:
+    """Open Graph and Twitter tags, so a shared link unfurls with the card."""
+    from html import escape
+    t, d = escape(title, quote=True), escape(description, quote=True)
+    return (
+        f'<meta name="description" content="{d}">\n'
+        f'<meta property="og:type" content="website">\n'
+        f'<meta property="og:site_name" content="Time to Index">\n'
+        f'<meta property="og:title" content="{t}">\n'
+        f'<meta property="og:description" content="{d}">\n'
+        f'<meta property="og:url" content="{SITE}{path}">\n'
+        f'<meta property="og:image" content="{SITE}og.png">\n'
+        f'<meta property="og:image:width" content="1200">\n'
+        f'<meta property="og:image:height" content="630">\n'
+        f'<meta name="twitter:card" content="summary_large_image">\n'
+    )
+
+
 def full_page(fragment: str, title: str = "Time to Index") -> str:
     """Wrap the dashboard fragment as a standalone document.
 
@@ -603,6 +624,10 @@ def full_page(fragment: str, title: str = "Time to Index") -> str:
         "<!doctype html>\n<html lang=\"en\">\n<head>\n"
         "<meta charset=\"utf-8\">\n"
         "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n"
+        + social_meta("Time to Index — how fast does a new fact reach web search?",
+                      "A pre-registered benchmark that times how long a newly published "
+                      "fact takes to reach web-search APIs, and separates answering "
+                      "nothing from confidently answering with yesterday's fact.")
         + fragment.split("<div class=\"wrap\">", 1)[0]
         + "</head>\n<body>\n<div class=\"wrap\">"
         + fragment.split("<div class=\"wrap\">", 1)[1]

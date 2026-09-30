@@ -18,7 +18,6 @@ frame with nothing after it -- which reads as the file being truncated.
 """
 from __future__ import annotations
 
-import json
 import pathlib
 import re
 import subprocess

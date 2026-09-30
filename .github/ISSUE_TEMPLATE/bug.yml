@@ -1,0 +1,33 @@
+name: Bug
+description: The code does something it should not.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: The command you ran and its full output.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version and platform
+      description: Output of `tti --version`, plus Python version and OS.
+    validations:
+      required: true
+  - type: checkboxes
+    id: keys
+    attributes:
+      label: Before you submit
+      options:
+        - label: I ran `tti verify` and included its output if it failed.
+        - label: This issue contains no API keys, tokens or private data.
+          required: true
