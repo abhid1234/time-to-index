@@ -1378,3 +1378,7 @@
 {"answer":"2026-20040","marked_at":1790795652.7673597,"reason":"detected_late","source":"federal_register","subject":"2026-20040"}
 {"answer":"2026-20039","marked_at":1790795652.7673597,"reason":"detected_late","source":"federal_register","subject":"2026-20039"}
 {"answer":"2026-20038","marked_at":1790795652.7673597,"reason":"detected_late","source":"federal_register","subject":"2026-20038"}
+{"answer":"1.43.106","marked_at":1790809478.3445415,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"1.140.0","marked_at":1790809478.3445415,"reason":"detected_late","source":"github_release","subject":"microsoft/vscode"}
+{"answer":"@cloudflare/workers-auth@0.11.0","marked_at":1790809478.3445415,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"v2.14.1","marked_at":1790809478.3445415,"reason":"detected_late","source":"github_release","subject":"pytorch/pytorch"}
