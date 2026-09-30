@@ -1306,3 +1306,16 @@
 {"answer":"0.12.21","marked_at":1790721332.395496,"reason":"detected_late","source":"github_release","subject":"astral-sh/uv"}
 {"answer":"@cloudflare/vite-plugin@1.62.2","marked_at":1790721332.395496,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
 {"answer":"0001628280-26-063820","marked_at":1790721332.395496,"reason":"detected_late","source":"edgar","subject":"1318605:8-K"}
+{"answer":"0.142.1","marked_at":1790731968.390638,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"3.22.1","marked_at":1790731968.390638,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"1.103.1","marked_at":1790731968.390638,"reason":"detected_late","source":"pypi","subject":"litellm"}
+{"answer":"v0.35.0","marked_at":1790731968.390638,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
+{"answer":"v1.103.1","marked_at":1790731968.390638,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
+{"answer":"2609.36946","marked_at":1790731968.390638,"reason":"detected_late","source":"arxiv","subject":"2609.36946"}
+{"answer":"2609.36862","marked_at":1790731968.390638,"reason":"detected_late","source":"arxiv","subject":"2609.36862"}
+{"answer":"2609.36849","marked_at":1790731968.390638,"reason":"detected_late","source":"arxiv","subject":"2609.36849"}
+{"answer":"2609.36688","marked_at":1790731968.390638,"reason":"detected_late","source":"arxiv","subject":"2609.36688"}
+{"answer":"2609.36534","marked_at":1790731968.390638,"reason":"detected_late","source":"arxiv","subject":"2609.36534"}
+{"answer":"2609.36795","marked_at":1790731968.390638,"reason":"detected_late","source":"arxiv","subject":"2609.36795"}
+{"answer":"2609.36512","marked_at":1790731968.390638,"reason":"detected_late","source":"arxiv","subject":"2609.36512"}
+{"answer":"2609.36323","marked_at":1790731968.390638,"reason":"detected_late","source":"arxiv","subject":"2609.36323"}

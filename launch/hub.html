@@ -151,7 +151,7 @@ The API returns nothing → your agent retries, widens the query, or says it doe
 
 The API confidently returns yesterday&#x27;s answer → your agent cites it. To your customer. With no signal anywhere downstream that the number is stale.
 
-One is a shrug. The other is a lie with a citation. Scored out of one they&#x27;re identical. So I spent a couple of weekends building the instrument that separates them, and let it run for three and a half weeks.
+One is a shrug. The other is a lie with a citation. Scored out of one they&#x27;re identical. So I spent a couple of weekends building the instrument that separates them, and let it run for nearly four weeks.
 
 Here is the clearest single thing it caught.
 
@@ -175,7 +175,7 @@ That last point is the whole argument. Any benchmark that collapses retrieval in
 
 How it works, briefly: no crawling. I watch sources that timestamp their own publications, so t=0 is the publisher&#x27;s clock, never mine — you can&#x27;t measure lateness without an agreed zero. Every index gets the same question at fixed lags, and at each one I fetch the source directly as a control, so &quot;the index was slow&quot; isn&#x27;t confused with &quot;the page wasn&#x27;t live yet&quot; — on every source except the Federal Register, where it turned out the control fails 10 times out of 10. I&#x27;m disclosing that rather than patching it post-hoc; the post has the details.
 
-34 events, 74 graded calls, about 34 cents. Pre-registered, every raw payload in the repo.
+35 events, 74 graded calls, about 34 cents. Pre-registered, every raw payload in the repo.
 
 The 90-second video above walks through it, one real result at a time.
 
@@ -188,11 +188,11 @@ https://github.com/abhid1234/time-to-index
 If you work on one of these indexes and think the methodology is unfair to you, I want to hear it. The plan was pre-registered precisely so that argument can be about the method rather than the result.</div>
 
 <h2>X — 21 posts</h2>
-<div class="post"><div class="hd"><b>1/</b><span class="n">240 / 280</span></div><div class="bd">A search index that is wrong looks exactly like one that is fast.
+<div class="post"><div class="hd"><b>1/</b><span class="n">235 / 280</span></div><div class="bd">A search index that is wrong looks exactly like one that is fast.
 
 Every retrieval benchmark scores both the same: zero.
 
-In production they are nothing alike. So I built the thing that separates them, and ran it for three and a half weeks.</div></div><div class="post"><div class="hd"><b>2/</b><span class="n">258 / 280</span></div><div class="bd">Returns nothing → your agent retries, widens, or says it doesn&#x27;t know. Annoying, and visible.
+In production they are nothing alike. So I built the thing that separates them, and ran it for nearly four weeks.</div></div><div class="post"><div class="hd"><b>2/</b><span class="n">258 / 280</span></div><div class="bd">Returns nothing → your agent retries, widens, or says it doesn&#x27;t know. Annoying, and visible.
 
 Returns yesterday&#x27;s answer → your agent cites it. To your customer. With no signal downstream that it&#x27;s stale.
 
@@ -268,7 +268,7 @@ Every bug was in the presentation, not the measurement.</div></div><div class="p
 
 Asks for a 10-min cron. Gets one every few hours. So every verdict above is at t+5m — later rungs almost never land in their window.
 
-34 events in 25 days. Dropping the rest is correct. The runner is the fix.</div></div><div class="post"><div class="hd"><b>13/</b><span class="n">137 / 280</span></div><div class="bd">Playground — run the ladder, flip the scoring rule, watch the leaderboard invert. Real measured data underneath.
+35 events in 26 days. Dropping the rest is correct. The runner is the fix.</div></div><div class="post"><div class="hd"><b>13/</b><span class="n">137 / 280</span></div><div class="bd">Playground — run the ladder, flip the scoring rule, watch the leaderboard invert. Real measured data underneath.
 
 https://abhid1234.github.io/time-to-index/playground.html</div></div><div class="post"><div class="hd"><b>14/</b><span class="n">212 / 280</span></div><div class="bd">Code, MIT, full ledger — every raw payload, every verdict, every price. Pre-registered.
 
@@ -285,7 +285,7 @@ https://github.com/abhid1234/time-to-index</div></div>
 
 <p>When a fact becomes true on the web — a new package version, a new government notice — how long until a search API will hand it to an agent? And until it does, what does the API hand over instead?</p>
 
-<p>I couldn't find a benchmark that answers the second question, so I built one. It has tracked 34 new facts so far, and the answer to the second question is the interesting one.</p>
+<p>I couldn't find a benchmark that answers the second question, so I built one. It has tracked 35 new facts so far, and the answer to the second question is the interesting one.</p>
 
 <p><strong><a href="https://abhid1234.github.io/time-to-index/playground.html">Try the playground →</a></strong> — run the ladder, flip the scoring rule and watch the leaderboard change, then scroll down to every real probe from the ledger.</p>
 
@@ -333,7 +333,7 @@ https://github.com/abhid1234/time-to-index</div></div>
 
 <h2>What it can't claim yet</h2>
 
-<p>This is a small, early sample: 34 events over three and a half weeks, and every verdict is at the five-minute mark, because a GitHub Actions cron fires every few hours and later probes mostly miss their window. The origin control also fails on Federal Register pages — 10 of 10 — so the ABSENT verdicts there can't be checked against it. I haven't patched that, because changing how a control is graded after seeing results is exactly what pre-registration exists to stop. It's the first fix, in the open.</p>
+<p>This is a small, early sample: 35 events over nearly four weeks, and every verdict is at the five-minute mark, because a GitHub Actions cron fires every few hours and later probes mostly miss their window. The origin control also fails on Federal Register pages — 10 of 10 — so the ABSENT verdicts there can't be checked against it. I haven't patched that, because changing how a control is graded after seeing results is exactly what pre-registration exists to stop. It's the first fix, in the open.</p>
 
 <p>And while building a tool about not confusing "we didn't ask" with "the index didn't have it," I shipped that bug into my own dashboard three times — grey squares for probes never run, and totals that counted them. All three were in the presentation, not the measurement. The repo has the fixes and the tests that pin them.</p>
 

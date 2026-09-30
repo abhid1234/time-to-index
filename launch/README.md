@@ -162,7 +162,7 @@ Actions cron — that would give you two ledgers against one pre-registration.
 
 ## The two questions you'll get
 
-**"Why only 34 events, and why is every verdict at t+5m?"** GitHub Actions
+**"Why only 35 events, and why is every verdict at t+5m?"** GitHub Actions
 asks for a ten-minute cron and delivers one every few hours. An event only
 counts if noticed within ten minutes of publication, so most are dropped, and
 later rungs almost never land inside their window. Dropping them is correct.

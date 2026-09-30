@@ -15,7 +15,7 @@ clock but the publisher's.
 - **[Short video (91s)](media/time-to-index-short.mp4)** — the problem, the clock, one real result, and what the ledger shows so far
 - **[Interactive playground](https://abhid1234.github.io/time-to-index/playground.html)** — run the ladder, flip the scoring rule (a hand-authored simulation), then read every real probe from the committed ledger; nothing to install
 - **[Live results](https://abhid1234.github.io/time-to-index/)** — the dashboard, regenerated from `ledger/` on every push
-- **[Launch post](launch/blog.md)** — why a stale answer is worse than no answer, and what 34 new facts showed
+- **[Launch post](launch/blog.md)** — why a stale answer is worse than no answer, and what 35 new facts showed
 - **[The ledger](ledger/)** — every event, probe and graded answer, plus the raw provider payloads, committed and checkable with `tti verify`
 
 | | the agent's next move |
@@ -42,7 +42,7 @@ five minutes after each new fact went live, 74 graded answers:
   ledger supports 2 of 6 pairwise comparisons. The dashboard says so rather
   than printing a leaderboard.
 
-A small, early sample over 24 days. [What can and cannot be
+A small, early sample over 26 days. [What can and cannot be
 claimed](#what-can-and-cannot-be-claimed) lists every limit, including the
 origin control that fails on Federal Register documents.
 

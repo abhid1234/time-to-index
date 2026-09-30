@@ -8,7 +8,7 @@ The API returns nothing → your agent retries, widens the query, or says it doe
 
 The API confidently returns yesterday's answer → your agent cites it. To your customer. With no signal anywhere downstream that the number is stale.
 
-One is a shrug. The other is a lie with a citation. Scored out of one they're identical. So I spent a couple of weekends building the instrument that separates them, and let it run for three and a half weeks.
+One is a shrug. The other is a lie with a citation. Scored out of one they're identical. So I spent a couple of weekends building the instrument that separates them, and let it run for nearly four weeks.
 
 Here is the clearest single thing it caught.
 
@@ -32,7 +32,7 @@ That last point is the whole argument. Any benchmark that collapses retrieval in
 
 How it works, briefly: no crawling. I watch sources that timestamp their own publications, so t=0 is the publisher's clock, never mine — you can't measure lateness without an agreed zero. Every index gets the same question at fixed lags, and at each one I fetch the source directly as a control, so "the index was slow" isn't confused with "the page wasn't live yet" — on every source except the Federal Register, where it turned out the control fails 10 times out of 10. I'm disclosing that rather than patching it post-hoc; the post has the details.
 
-34 events, 74 graded calls, about 34 cents. Pre-registered, every raw payload in the repo.
+35 events, 74 graded calls, about 34 cents. Pre-registered, every raw payload in the repo.
 
 The 90-second video above walks through it, one real result at a time.
 
