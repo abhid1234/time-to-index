@@ -1,0 +1,4 @@
+# Pages built by the scripts in launch/ (md2substack, make_hub, make_blogpage,
+# make_pack). Marked generated so they collapse in diffs and stay out of the
+# language stats, which otherwise read this Python project as HTML.
+launch/**/*.html linguist-generated
