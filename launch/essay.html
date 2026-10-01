@@ -38,11 +38,11 @@ button:focus-visible{outline:2px solid #1c1d1f;outline-offset:2px}
 
 <ul><li><strong>Never uses its own clock.</strong> Time zero is the publisher's timestamp — npm, PyPI, GitHub releases, the Federal Register. Nothing is crawled.</li><li><strong>Never scores a stale answer as a near-miss.</strong> ABSENT and STALE are separate verdicts. A confident wrong answer is never averaged into "didn't find it."</li><li><strong>Never ranks what it can't separate.</strong> The analysis plan was hashed before the first probe, and the dashboard prints only the orderings that survive correction for multiple comparisons.</li></ul>
 
-<p><figure><img src="https://raw.githubusercontent.com/abhid1234/time-to-index/main/launch/diagrams/architecture.png" alt="How the clock starts"><figcaption>where the clock starts — the publisher's timestamp, never mine</figcaption></figure></p>
+<figure><img src="https://raw.githubusercontent.com/abhid1234/time-to-index/main/launch/diagrams/architecture.png" alt="How the clock starts"><figcaption>where the clock starts — the publisher's timestamp, never mine</figcaption></figure>
 
 <h2>Two failures, one score</h2>
 
-<p><figure><img src="https://raw.githubusercontent.com/abhid1234/time-to-index/main/launch/diagrams/absent-vs-stale.png" alt="ABSENT vs STALE"><figcaption>the same question, two different failures</figcaption></figure></p>
+<figure><img src="https://raw.githubusercontent.com/abhid1234/time-to-index/main/launch/diagrams/absent-vs-stale.png" alt="ABSENT vs STALE"><figcaption>the same question, two different failures</figcaption></figure>
 
 <p>ABSENT is visible. Your agent can see it got nothing, so it retries, widens the query, or says it doesn't know. STALE isn't. The answer is well-formed and cited, so your agent has nothing to retry on — it cites it, to your user.</p>
 
@@ -56,11 +56,11 @@ button:focus-visible{outline:2px solid #1c1d1f;outline-offset:2px}
 
 <p><strong>The clearest catch is one release.</strong> uv 0.12.15 shipped on GitHub. Five minutes later the release page had it. Exa and Parallel's advanced mode both answered 0.12.14, the version it replaced. Brave and Parallel's fast mode returned nothing.</p>
 
-<p><figure><img src="https://raw.githubusercontent.com/abhid1234/time-to-index/main/launch/diagrams/the-catch.png" alt="Five minutes after the release went live"><figcaption>five minutes after the uv release — two confident wrong answers</figcaption></figure></p>
+<figure><img src="https://raw.githubusercontent.com/abhid1234/time-to-index/main/launch/diagrams/the-catch.png" alt="Five minutes after the release went live"><figcaption>five minutes after the uv release — two confident wrong answers</figcaption></figure>
 
 <p><strong>Where a fact is published mattered more than who you asked.</strong> New Federal Register notices came back current 12 times out of 40. New npm, PyPI and GitHub releases: 0 of 38, and 5 of those answers were the version that had just been replaced. That split is not close (Fisher p = 0.0002).</p>
 
-<p><figure><img src="https://raw.githubusercontent.com/abhid1234/time-to-index/main/launch/diagrams/by-source.png" alt="By source"><figcaption>already current five minutes after publication, by source</figcaption></figure></p>
+<figure><img src="https://raw.githubusercontent.com/abhid1234/time-to-index/main/launch/diagrams/by-source.png" alt="By source"><figcaption>already current five minutes after publication, by source</figcaption></figure>
 
 <p><strong>Fast and stale are different axes.</strong> After correcting for six comparisons, two orderings hold: Parallel's advanced mode found new facts more often than Brave and than Exa. All nine of Parallel's fresh answers were Federal Register notices — and it's tied with Exa for the most stale answers. A single score has to call that arm good or bad. It's both.</p>
 
@@ -72,7 +72,7 @@ button:focus-visible{outline:2px solid #1c1d1f;outline-offset:2px}
 
 <p>Step 3 is the one to try. Run the ladder, then switch from conventional scoring to "Separate ABSENT from STALE." Provider A, slow but never wrong, goes from third place to first. Provider D, instant and wrong every time, drops to last:</p>
 
-<p><figure><img src="https://raw.githubusercontent.com/abhid1234/time-to-index/main/launch/diagrams/playground-flip.png" alt="Same responses, two scoring rules"><figcaption>same responses, two scoring rules</figcaption></figure></p>
+<figure><img src="https://raw.githubusercontent.com/abhid1234/time-to-index/main/launch/diagrams/playground-flip.png" alt="Same responses, two scoring rules"><figcaption>same responses, two scoring rules</figcaption></figure>
 
 <p>Prefer to watch? The 91-second version is at the top of the playground.</p>
 

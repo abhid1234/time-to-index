@@ -39,7 +39,14 @@ def convert(md: str) -> str:
 
     def flush() -> None:
         if para:
-            out.append("<p>" + inline(" ".join(para)) + "</p>")
+            body = inline(" ".join(para))
+            # An image on its own line is a figure, and <figure> cannot sit in
+            # <p>: a browser splits it into <p></p><figure><p></p>, which
+            # pastes into Substack as a blank line above and below the image.
+            if re.fullmatch(r"<figure>.*</figure>", body):
+                out.append(body)
+            else:
+                out.append("<p>" + body + "</p>")
             para.clear()
 
     lines = md.splitlines()

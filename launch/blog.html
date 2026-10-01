@@ -18,7 +18,7 @@
 
 <h2>The two failures every benchmark scores the same</h2>
 
-<p><figure><img src="diagrams/absent-vs-stale.png" alt="ABSENT vs STALE"></figure></p>
+<figure><img src="diagrams/absent-vs-stale.png" alt="ABSENT vs STALE"></figure>
 
 <p><strong>ABSENT</strong> is a shrug. The API returns nothing relevant, your agent can <em>see</em> that it got nothing, and it retries, widens the query, or tells the user it doesn't know. It costs you latency and tokens, and the failure surfaces.</p>
 
@@ -30,7 +30,7 @@
 
 <p>This is the part people assume is hard, and it isn't. I'm not indexing the web, and I'm not racing Parallel or Exa at their own job — I'd lose badly.</p>
 
-<p><figure><img src="diagrams/architecture.png" alt="Architecture"></figure></p>
+<figure><img src="diagrams/architecture.png" alt="Architecture"></figure>
 
 <p>I watch the places that <strong>timestamp their own publications</strong>. When <code>astro@7.3.1</code> is published, npm's registry says exactly when. That timestamp is <code>t=0</code>, on the publisher's clock, never mine.</p>
 
@@ -42,7 +42,7 @@
 
 <h2>What the ladder can and cannot say</h2>
 
-<p><figure><img src="diagrams/interval.png" alt="Interval censoring"></figure></p>
+<figure><img src="diagrams/interval.png" alt="Interval censoring"></figure>
 
 <p>Here's the part I'd defend hardest, and it's the least glamorous.</p>
 
@@ -70,7 +70,7 @@
 
 <p><code>uv 0.12.15</code> was released on GitHub. My collector saw it 274 seconds later. At t+5m, four search indexes and the origin control were asked what the current version was:</p>
 
-<p><figure><img src="diagrams/the-catch.png" alt="The catch"></figure></p>
+<figure><img src="diagrams/the-catch.png" alt="The catch"></figure>
 
 <p>Five minutes after the release went live, <strong>not one of the four indexes had the current answer, and half of them confidently asserted the old one</strong> — the same wrong version, independently, at the same instant. The control had the right answer at that moment, so this is not a publishing delay. The release was on the web. The indexes had a stale answer and served it without a hint that it was stale.</p>
 
@@ -82,7 +82,7 @@
 
 <p>I didn't go looking for this, and it's the finding I'd lead with if I were writing this from scratch.</p>
 
-<p><figure><img src="diagrams/by-source.png" alt="By source"></figure></p>
+<figure><img src="diagrams/by-source.png" alt="By source"></figure>
 
 <p>Every FRESH answer in the entire run — all 12 — came from <strong>Federal Register</strong> documents. Nine of the ten Federal Register events had at least one index returning the current fact five minutes after publication.</p>
 
