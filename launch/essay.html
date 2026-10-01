@@ -1,76 +1,112 @@
-<!-- Paste everything below into the Substack editor. Substack keeps
-     these tags and drops anything else, so no classes or styles. -->
-<h1>Your agent searched the web. Did it get today's answer?</h1>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Substack paste: Your agent searched the web. Did it get today&#x27;s answer?</title>
+<style>
+body{margin:0;background:#f6f6f4;color:#1c1d1f;font:16px/1.6 -apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:28px 18px 80px}
+.steps{background:#fff;border:1px solid #dcdcd6;border-radius:10px;padding:16px 20px;font-size:14.5px}
+.steps ol{margin:6px 0 0;padding-left:20px}
+.field{display:flex;gap:12px;align-items:flex-start;margin:18px 0 0;background:#fff;
+  border:1px solid #dcdcd6;border-radius:10px;padding:14px 16px}
+.field .k{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6b6d72;width:72px;flex:none;padding-top:3px}
+.field .v{flex:1;min-width:0;font-weight:600}
+button{font:600 14px -apple-system,"Segoe UI",sans-serif;background:#1f5fb4;color:#fff;border:0;
+  border-radius:7px;padding:8px 14px;cursor:pointer;flex:none}
+button:focus-visible{outline:2px solid #1c1d1f;outline-offset:2px}
+.done{background:#1d7a4f}
+.bodyhead{display:flex;justify-content:space-between;align-items:center;margin:28px 0 8px}
+#post{background:#fff;border:1px solid #dcdcd6;border-radius:10px;padding:8px 28px 24px}
+#post img{max-width:100%;height:auto}
+#post pre{white-space:pre-wrap;background:#f2f2ef;padding:12px;border-radius:6px;font-size:13.5px}
+#post figcaption{font-size:13.5px;color:#6b6d72;text-align:center}
+</style></head><body><div class="wrap">
+<div class="steps"><b>Post to Substack in one go</b><ol>
+<li>New post. Click <b>Copy title</b> and paste it into the title field, then <b>Copy subtitle</b> into the subtitle field.</li>
+<li>Click <b>Copy body</b>, click into the post body, and paste. Images and captions come with it.</li>
+<li>Optional: upload the 91-second video under "Try it in your browser", and add a Subscribe button after the second paragraph.</li>
+</ol></div>
+<div class="field"><span class="k">Title</span><span class="v" id="title">Your agent searched the web. Did it get today&#x27;s answer?</span><button data-copy="title">Copy title</button></div>
+<div class="field"><span class="k">Subtitle</span><span class="v" id="subtitle">A clock for every newly published fact — and a score that tells &quot;found nothing&quot; from &quot;found yesterday&#x27;s answer.&quot;</span><button data-copy="subtitle">Copy subtitle</button></div>
+<div class="bodyhead"><b>Body</b><button data-copy="post">Copy body</button></div>
+<div id="post">
+<p>Your agent asks a web-search API for the latest version of a package that shipped five minutes ago. The API answers instantly, cites a source, and gives the version that was just replaced. Nothing in the response says it's out of date, so your agent passes it along. Ask which search API would have had the new version — or how long any of them take to catch up — and there's no number to look at.</p>
 
-<p><em>Search benchmarks score an empty result and yesterday's answer the same way: zero. Only one of them makes your agent cite something false. I built a clock to tell them apart.</em></p>
+<p>I built Time to Index to measure that. It's an open, pre-registered benchmark: it starts a clock the moment a fact is published, asks web-search APIs about it at fixed lags, and scores two failures separately — <strong>ABSENT</strong>, nothing useful came back, and <strong>STALE</strong>, the answer that was just replaced came back, confidently.</p>
 
-<hr>
+<p>Three things it will never do, by design:</p>
 
-<p>When a fact becomes true on the web — a new package version, a new government notice — how long until a search API will hand it to an agent? And until it does, what does the API hand over instead?</p>
+<ul><li><strong>Never uses its own clock.</strong> Time zero is the publisher's timestamp — npm, PyPI, GitHub releases, the Federal Register. Nothing is crawled.</li><li><strong>Never scores a stale answer as a near-miss.</strong> ABSENT and STALE are separate verdicts. A confident wrong answer is never averaged into "didn't find it."</li><li><strong>Never ranks what it can't separate.</strong> The analysis plan was hashed before the first probe, and the dashboard prints only the orderings that survive correction for multiple comparisons.</li></ul>
 
-<p>I couldn't find a benchmark that answers the second question, so I built one. It has tracked 37 new facts so far, and the answer to the second question is the interesting one.</p>
-
-<p><strong><a href="https://abhid1234.github.io/time-to-index/playground.html">Try the playground →</a></strong> — run the ladder, flip the scoring rule and watch the leaderboard change, then scroll down to every real probe from the ledger.</p>
+<p><figure><img src="https://raw.githubusercontent.com/abhid1234/time-to-index/main/launch/diagrams/architecture.png" alt="How the clock starts"><figcaption>where the clock starts — the publisher's timestamp, never mine</figcaption></figure></p>
 
 <h2>Two failures, one score</h2>
 
-<p><figure><img src="diagrams/absent-vs-stale.png" alt="ABSENT vs STALE"></figure></p>
+<p><figure><img src="https://raw.githubusercontent.com/abhid1234/time-to-index/main/launch/diagrams/absent-vs-stale.png" alt="ABSENT vs STALE"><figcaption>the same question, two different failures</figcaption></figure></p>
 
-<p><strong>ABSENT</strong> is a shrug. The API returns nothing useful, the agent can see that, and it retries, widens the query or says it doesn't know. It costs time and tokens, and the failure is visible.</p>
+<p>ABSENT is visible. Your agent can see it got nothing, so it retries, widens the query, or says it doesn't know. STALE isn't. The answer is well-formed and cited, so your agent has nothing to retry on — it cites it, to your user.</p>
 
-<p><strong>STALE</strong> is a confident mistake. The API returns the answer that was true yesterday, well-formed and plausible. The agent has nothing to retry on, so it cites it.</p>
+<p>Most benchmarks can't tell these apart. Score for correctness and both are zero. Score a hit rate — did something plausible come back — and the stale answer counts as a success. Either way, the failure that reaches your users disappears from the number.</p>
 
-<p>Scored out of one, both are zero. In production, one gets noticed and the other one doesn't.</p>
+<p>Every answer is also checked against a direct fetch of the source page at the same moment. Without that control, "the index was slow" and "the page wasn't live yet" look identical.</p>
 
-<h2>A clock that starts on the publisher's time</h2>
+<h2>What 37 new facts showed</h2>
 
-<p><figure><img src="diagrams/architecture.png" alt="How the clock starts"></figure></p>
+<p>Four web-search APIs — Parallel (advanced and fast), Exa and Brave — asked five minutes after each fact went live: 78 graded answers, for about 35 cents.</p>
 
-<p>Nothing here crawls the web. It watches places that timestamp their own publications — npm, PyPI, GitHub releases, the Federal Register — and uses that timestamp as t=0. You cannot measure lateness without an agreed zero, and asking a crawler when something appeared is asking the defendant to time the race.</p>
+<p><strong>The clearest catch is one release.</strong> uv 0.12.15 shipped on GitHub. Five minutes later the release page had it. Exa and Parallel's advanced mode both answered 0.12.14, the version it replaced. Brave and Parallel's fast mode returned nothing.</p>
 
-<p>Then it asks each search API a question only the new fact answers, at fixed lags after publication. At every lag it also fetches the source page directly. That control is what makes the rest readable: without it, "the index was slow" and "the page wasn't live yet" look identical.</p>
+<p><figure><img src="https://raw.githubusercontent.com/abhid1234/time-to-index/main/launch/diagrams/the-catch.png" alt="Five minutes after the release went live"><figcaption>five minutes after the uv release — two confident wrong answers</figcaption></figure></p>
 
-<p>The plan was pre-registered and hashed before the first probe, so the analysis can't drift toward a result I'd like.</p>
+<p><strong>Where a fact is published mattered more than who you asked.</strong> New Federal Register notices came back current 12 times out of 40. New npm, PyPI and GitHub releases: 0 of 38, and 5 of those answers were the version that had just been replaced. That split is not close (Fisher p = 0.0002).</p>
 
-<h2>One row that shows the whole problem</h2>
+<p><figure><img src="https://raw.githubusercontent.com/abhid1234/time-to-index/main/launch/diagrams/by-source.png" alt="By source"><figcaption>already current five minutes after publication, by source</figcaption></figure></p>
 
-<p><code>uv 0.12.15</code> was released on GitHub. Five minutes later, four search APIs were asked for the latest version.</p>
+<p><strong>Fast and stale are different axes.</strong> After correcting for six comparisons, two orderings hold: Parallel's advanced mode found new facts more often than Brave and than Exa. All nine of Parallel's fresh answers were Federal Register notices — and it's tied with Exa for the most stale answers. A single score has to call that arm good or bad. It's both.</p>
 
-<p><figure><img src="diagrams/the-catch.png" alt="Five minutes after the release went live"></figure></p>
+<h2>Try it in your browser</h2>
 
-<p>The origin control had <code>0.12.15</code>, so the release was live and fetchable. Not one of the four indexes had it, and two of them — Exa and Parallel's advanced mode — independently answered <code>0.12.14</code>, the version it replaced. A conventional benchmark scores those two rows exactly like the empty ones.</p>
+<p>The playground walks the whole argument in four steps: watch the clock start on a real npm release, run the ladder on four simulated indexes, flip the scoring rule, then scroll into the real ledger — every probe this project has run.</p>
 
-<h2>Where a fact is published mattered more than who you asked</h2>
+<p><a href="https://abhid1234.github.io/time-to-index/playground.html">abhid1234.github.io/time-to-index/playground.html</a></p>
 
-<p><figure><img src="diagrams/by-source.png" alt="By source"></figure></p>
+<p>Step 3 is the one to try. Run the ladder, then switch from conventional scoring to "Separate ABSENT from STALE." Provider A, slow but never wrong, goes from third place to first. Provider D, instant and wrong every time, drops to last:</p>
 
-<p>Across 78 graded answers, every current answer came from the Federal Register: 12 of 40. New npm, PyPI and GitHub releases: 0 of 38, and five of those answers were the version that had just been replaced. That split is not close (Fisher exact p = 0.0002).</p>
+<p><figure><img src="https://raw.githubusercontent.com/abhid1234/time-to-index/main/launch/diagrams/playground-flip.png" alt="Same responses, two scoring rules"><figcaption>same responses, two scoring rules</figcaption></figure></p>
 
-<p>So "how fast is this search API?" is underspecified. Fast for what? A new US regulation was often findable within five minutes. A new version of a widely used package, never.</p>
+<p>Prefer to watch? The 91-second version is at the top of the playground.</p>
 
-<h2>Fast and stale are different axes</h2>
+<h2>Reproduce everything</h2>
 
-<p>After correcting for six comparisons, the ledger supports two orderings: Parallel's advanced mode found new facts more often than Brave and than Exa. That claim is narrow — all nine of its current answers were Federal Register documents, and on package registries it was never current either. The other four pairs are underpowered, and the dashboard prints a partial ordering instead of a leaderboard.</p>
+<p>No accounts, no keys, no spend. Five minutes:</p>
 
-<p>The same arm is also tied with Exa for the most stale answers. It was the most likely to have the new fact and one of the two most likely to hand you the old one as current. A single score has to call that arm good or bad. It is both, and that is the point of measuring the two separately.</p>
+<pre><code>$ git clone https://github.com/abhid1234/time-to-index &amp;&amp; cd time-to-index
+$ pip install -e .
+$ python -m tti verify
+$ python -m tti demo</code></pre>
 
-<h2>What it can't claim yet</h2>
+<p><code>tti verify</code> re-checks the config, the estimator, the grader and every committed result, offline. <code>tti demo</code> runs a synthetic ladder with known answers and shows the estimator recovering them.</p>
 
-<p>This is a small, early sample: 37 events over nearly four weeks, and every verdict is at the five-minute mark, because a GitHub Actions cron fires every few hours and later probes mostly miss their window. The origin control also fails on Federal Register pages — 10 of 10 — so the ABSENT verdicts there can't be checked against it. I haven't patched that, because changing how a control is graded after seeing results is exactly what pre-registration exists to stop. It's the first fix, in the open.</p>
-
-<p>And while building a tool about not confusing "we didn't ask" with "the index didn't have it," I shipped that bug into my own dashboard three times — grey squares for probes never run, and totals that counted them. All three were in the presentation, not the measurement. The repo has the fixes and the tests that pin them.</p>
-
-<h2>Reproduce it</h2>
-
-<p>Every number above is read from a ledger committed to the repo, with every raw API response alongside.</p>
-
-<pre><code>git clone https://github.com/abhid1234/time-to-index &amp;&amp; cd time-to-index
-pip install -e .
-python -m tti verify     # offline: config, estimator, grader, ledger
-python -m tti demo       # synthetic run, no keys, no spend</code></pre>
+<p>One thing to be clear about: this is a small, early sample. 37 events over four weeks, and every verdict is at the five-minute mark — a GitHub Actions cron fires every few hours, so later probes mostly miss their window. The origin control also can't read Federal Register pages (it failed 10 of 10), so the ABSENT verdicts there can't be checked against it. I haven't patched that, because changing how a control is graded after seeing results is exactly what pre-registration exists to stop. It's the first fix, in the open.</p>
 
 <h2>Get it</h2>
 
-<ul><li><strong>Playground:</strong> <a href="https://abhid1234.github.io/time-to-index/playground.html">https://abhid1234.github.io/time-to-index/playground.html</a></li><li><strong>Live dashboard:</strong> <a href="https://abhid1234.github.io/time-to-index/">https://abhid1234.github.io/time-to-index/</a></li><li><strong>Code, ledger and method (MIT):</strong> <a href="https://github.com/abhid1234/time-to-index">https://github.com/abhid1234/time-to-index</a></li><li><strong>91-second video:</strong> <a href="https://abhid1234.github.io/time-to-index/playground.html#film">https://abhid1234.github.io/time-to-index/playground.html#film</a></li></ul>
+<ul><li><strong>Playground</strong> — <a href="https://abhid1234.github.io/time-to-index/playground.html">abhid1234.github.io/time-to-index/playground.html</a></li><li><strong>Live results</strong> — <a href="https://abhid1234.github.io/time-to-index/">abhid1234.github.io/time-to-index</a></li><li><strong>Code (MIT)</strong> — <a href="https://github.com/abhid1234/time-to-index">github.com/abhid1234/time-to-index</a> · 610 tests · Python 3.10–3.13 · two runtime dependencies</li><li><strong>Release</strong> — <a href="https://github.com/abhid1234/time-to-index/releases/tag/v0.1.0">v0.1.0</a>, wheel and source with SHA-256 sums</li><li><strong>The ledger</strong> — every event, probe and raw answer, committed alongside the code</li></ul>
 
-<p>If you work on one of these indexes and think the method is unfair to you, open an issue. The plan is pre-registered so that argument can be about the method rather than the result.</p>
+<p>Your agent already searches the web. Now you can tell when it's reading yesterday's answer.</p>
+</div></div>
+<script>
+// A selection plus execCommand("copy") puts rich text on the clipboard in
+// every browser, including a page opened straight from disk.
+document.querySelectorAll("button[data-copy]").forEach(b => b.addEventListener("click", () => {
+  const el = document.getElementById(b.dataset.copy);
+  const range = document.createRange(); range.selectNodeContents(el);
+  const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+  let ok = false; try { ok = document.execCommand("copy"); } catch (e) {}
+  sel.removeAllRanges();
+  const label = b.textContent;
+  b.textContent = ok ? "Copied" : "Select and copy by hand";
+  b.classList.toggle("done", ok);
+  setTimeout(() => { b.textContent = label; b.classList.remove("done"); }, 1800);
+}));
+</script></body></html>
