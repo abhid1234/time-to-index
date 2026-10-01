@@ -26,6 +26,13 @@ jobs:
       - run: pytest -q
       - run: python -m tti verify
       - run: python -m build
+      # What a user actually gets: install the wheel into a clean venv and
+      # list that environment, rather than the build machine's.
+      - name: SBOM (CycloneDX) for the installed wheel
+        run: |
+          python -m venv /tmp/app && /tmp/app/bin/pip install -q dist/*.whl
+          pip install -q cyclonedx-bom
+          cyclonedx-py environment /tmp/app/bin/python --output-format JSON -o dist/sbom.cdx.json
       - name: Ledger snapshot and checksums
         run: |
           tar -czf "dist/ledger-${GITHUB_REF_NAME}.tar.gz" ledger RESULTS.md
@@ -39,7 +46,7 @@ jobs:
             echo
             echo "**Install:** \`pip install git+https://github.com/${GITHUB_REPOSITORY}@${GITHUB_REF_NAME}\`"
             echo
-            echo "**Assurance:** test suite and \`tti verify\` passed on this commit ($(git rev-parse --short HEAD)); SHA-256 for every attached file is in \`SHA256SUMS\`."
+            echo "**Assurance:** test suite and \`tti verify\` passed on this commit ($(git rev-parse --short HEAD)); SHA-256 for every attached file is in \`SHA256SUMS\`; dependencies are listed in \`sbom.cdx.json\` (CycloneDX)."
           } >> notes.md
       - uses: actions/upload-artifact@v4
         with:
@@ -75,5 +82,5 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: dist
-      - run: rm -f dist/SHA256SUMS dist/ledger-*.tar.gz
+      - run: rm -f dist/SHA256SUMS dist/ledger-*.tar.gz dist/sbom.cdx.json
       - uses: pypa/gh-action-pypi-publish@release/v1

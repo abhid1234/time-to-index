@@ -4,6 +4,12 @@ Time to Index follows Semantic Versioning. Measured results are not versioned
 here: they live in `ledger/` and `RESULTS.md`, and corrections to them are
 commits with a note, never silent re-runs.
 
+## Unreleased
+
+### Added
+
+- Releases attach a CycloneDX SBOM (`sbom.cdx.json`) of the installed wheel.
+
 ## 0.1.0 - 2026-09-30
 
 First public release.
