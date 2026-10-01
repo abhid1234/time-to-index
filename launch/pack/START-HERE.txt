@@ -7,9 +7,10 @@ Release v0.1.0 is out and the site is live. hub.html shows everything on one pag
 
 2. SUBSTACK (post first; everything else links to it)
    Title: Your agent searched the web. Did it get today's answer?
-   Open 1-substack/essay.html in a browser, select all, paste into a new post.
-   Upload the 4 PNGs from 1-substack/ where the image markers are.
-   Embed 2-video/time-to-index-short.mp4 under the playground link near the top.
+   Open 1-substack/essay.html in a browser. It has three buttons:
+   Copy title, Copy subtitle, Copy body. Paste each into the matching
+   Substack field. The images and captions come with the body.
+   Optional: upload 2-video/time-to-index-short.mp4 under "Try it in your browser".
 
 3. VIDEO: 2-video/time-to-index-short.mp4 (1:31). Thumbnail: 2-video/thumbnail.png.
    Put the Substack link in the description.

@@ -51,9 +51,10 @@ Release v0.1.0 is out and the site is live. hub.html shows everything on one pag
 
 2. SUBSTACK (post first; everything else links to it)
    Title: {title}
-   Open 1-substack/essay.html in a browser, select all, paste into a new post.
-   Upload the 4 PNGs from 1-substack/ where the image markers are.
-   Embed 2-video/time-to-index-short.mp4 under the playground link near the top.
+   Open 1-substack/essay.html in a browser. It has three buttons:
+   Copy title, Copy subtitle, Copy body. Paste each into the matching
+   Substack field. The images and captions come with the body.
+   Optional: upload 2-video/time-to-index-short.mp4 under "Try it in your browser".
 
 3. VIDEO: 2-video/time-to-index-short.mp4 (1:31). Thumbnail: 2-video/thumbnail.png.
    Put the Substack link in the description.
@@ -84,7 +85,7 @@ def main() -> None:
         "4-x/x-thread.txt": HERE / "x-thread.md",
         "6-repo-settings/social-preview.png": REPO / "docs" / "og.png",
     }
-    for name in ("absent-vs-stale", "architecture", "the-catch", "by-source"):
+    for name in ("absent-vs-stale", "architecture", "the-catch", "by-source", "playground-flip"):
         copies[f"1-substack/{name}.png"] = HERE / "diagrams" / f"{name}.png"
     for dst, src in copies.items():
         (PACK / dst).parent.mkdir(parents=True, exist_ok=True)
