@@ -48,7 +48,7 @@ jobs:
             echo
             echo "**Assurance:** test suite and \`tti verify\` passed on this commit ($(git rev-parse --short HEAD)); SHA-256 for every attached file is in \`SHA256SUMS\`; dependencies are listed in \`sbom.cdx.json\` (CycloneDX)."
           } >> notes.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: dist
           path: |
