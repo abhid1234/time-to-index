@@ -204,9 +204,6 @@ two pre-flight checks immediately before posting, not now.</p>
 <div class="todo">
 <h3>Only you can do these</h3>
 <ul>
-<li><b>Rotate the ElevenLabs key</b> — it is in the session transcript.</li>
-<li><b>Rule on the <code>Datadog, Inc.</code> entry</b> in <code>data/watchlist.yaml</code>
-    — a T1 partner in a public repo you are about to send traffic to.</li>
 <li><b>Set the repo homepage, topics and social preview</b> — the gear next
     to About on the repo page; upload <code>docs/og.png</code> as the preview.
     (v0.1.0 is already released.)</li>
