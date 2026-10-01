@@ -67,8 +67,9 @@ sentence around it rewritten, not a digit swapped.
    Rebuild it with `python short/make_short.py`: it reads every number from
    the ledger and refuses to render if a claim on screen no longer holds.
 
-   The 7:27 narrated walkthrough (`time-to-index-launch.mp4`) and the 1:11
-   teaser are still here if you want a long-form cut for YouTube.
+   The 7:27 narrated walkthrough (`time-to-index-launch.mp4`) is out of
+   date: its narration says "zero of thirty four" and the registries now
+   stand at 0 of 38. Re-render it with `make_video.py` before using it.
 3. **LinkedIn.** Paste `linkedin.md`. It truncates around 200 characters and
    the first line carries it: *"A search index that is wrong looks exactly like
    one that is fast."*
