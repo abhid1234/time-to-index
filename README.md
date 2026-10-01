@@ -8,14 +8,14 @@ score the same way: returning **nothing** (ABSENT) and confidently returning
 rank providers it cannot separate statistically, and does not trust anyone's
 clock but the publisher's.
 
-![Five minutes after a uv release went live: the origin had 0.12.15, two search APIs confidently returned 0.12.14, two returned nothing](launch/diagrams/the-catch.png)
+![Five minutes after a uv release went live: the origin had 0.12.15, two search APIs confidently returned 0.12.14, two returned nothing](media/the-catch.png)
 
 ## See it first
 
 - **[Short video (91s)](media/time-to-index-short.mp4)** — the problem, the clock, one real result, and what the ledger shows so far
 - **[Interactive playground](https://abhid1234.github.io/time-to-index/playground.html)** — run the ladder, flip the scoring rule (a hand-authored simulation), then read every real probe from the committed ledger; nothing to install
 - **[Live results](https://abhid1234.github.io/time-to-index/)** — the dashboard, regenerated from `ledger/` on every push
-- **[Launch post](launch/blog.md)** — why a stale answer is worse than no answer, and what 37 new facts showed
+- **[Launch post](https://abhid.substack.com/p/your-agent-searched-the-web-did-it)** — why a stale answer is worse than no answer, and what 37 new facts showed
 - **[The ledger](ledger/)** — every event, probe and graded answer, plus the raw provider payloads, committed and checkable with `tti verify`
 
 | | the agent's next move |
