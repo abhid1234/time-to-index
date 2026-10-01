@@ -1,0 +1,12 @@
+On the repo page, click the gear icon next to "About":
+
+Description:
+How long a new fact takes to reach web-search APIs, and whether they answer nothing or confidently answer with yesterday's fact.
+
+Website:
+https://abhid1234.github.io/time-to-index/
+
+Topics:
+web-search benchmark freshness staleness llm-agents rag information-retrieval survival-analysis
+
+Then Settings > General > Social preview > upload social-preview.png (in this folder).
