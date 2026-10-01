@@ -15,7 +15,7 @@ clock but the publisher's.
 - **[Short video (91s)](media/time-to-index-short.mp4)** — the problem, the clock, one real result, and what the ledger shows so far
 - **[Interactive playground](https://abhid1234.github.io/time-to-index/playground.html)** — run the ladder, flip the scoring rule (a hand-authored simulation), then read every real probe from the committed ledger; nothing to install
 - **[Live results](https://abhid1234.github.io/time-to-index/)** — the dashboard, regenerated from `ledger/` on every push
-- **[Launch post](launch/blog.md)** — why a stale answer is worse than no answer, and what 35 new facts showed
+- **[Launch post](launch/blog.md)** — why a stale answer is worse than no answer, and what 37 new facts showed
 - **[The ledger](ledger/)** — every event, probe and graded answer, plus the raw provider payloads, committed and checkable with `tti verify`
 
 | | the agent's next move |
@@ -30,11 +30,11 @@ it is wrong.
 ## What the ledger shows so far
 
 Four search APIs (Parallel advanced and fast, Exa auto, Brave web), probed
-five minutes after each new fact went live, 74 graded answers:
+five minutes after each new fact went live, 78 graded answers:
 
 - **Where a fact is published matters more than who you ask.** New Federal
   Register documents came back current 12 times out of 40. New npm, PyPI and
-  GitHub releases: 0 out of 34 — and 5 of those answers were the version
+  GitHub releases: 0 out of 38 — and 5 of those answers were the version
   that had just been replaced.
 - **Fast and stale are not opposites.** The arm with the most current
   answers, `parallel/advanced`, is also tied for the most stale ones.
@@ -42,7 +42,7 @@ five minutes after each new fact went live, 74 graded answers:
   ledger supports 2 of 6 pairwise comparisons. The dashboard says so rather
   than printing a leaderboard.
 
-A small, early sample over 26 days. [What can and cannot be
+A small, early sample over 27 days. [What can and cannot be
 claimed](#what-can-and-cannot-be-claimed) lists every limit, including the
 origin control that fails on Federal Register documents.
 

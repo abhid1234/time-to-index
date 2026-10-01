@@ -20,7 +20,7 @@ Not one of the four had the current answer, and half of them confidently asserte
 
 But the result I'd lead with is one I didn't go looking for.
 
-Every fresh answer in the whole run — all 12 — came from Federal Register documents. 12 of 40 were current five minutes after publication. Across npm, PyPI and GitHub releases: 0 of 34. Fisher p = 0.0003.
+Every fresh answer in the whole run — all 12 — came from Federal Register documents. 12 of 40 were current five minutes after publication. Across npm, PyPI and GitHub releases: 0 of 38. Fisher p = 0.0002.
 
 So "how fast is this search API?" is badly underspecified. A new US regulation was findable within five minutes more often than not. A new version of a package half the internet depends on — never. And when a package answer did come back, five times it was the version the release had just replaced.
 
@@ -32,7 +32,7 @@ That last point is the whole argument. Any benchmark that collapses retrieval in
 
 How it works, briefly: no crawling. I watch sources that timestamp their own publications, so t=0 is the publisher's clock, never mine — you can't measure lateness without an agreed zero. Every index gets the same question at fixed lags, and at each one I fetch the source directly as a control, so "the index was slow" isn't confused with "the page wasn't live yet" — on every source except the Federal Register, where it turned out the control fails 10 times out of 10. I'm disclosing that rather than patching it post-hoc; the post has the details.
 
-35 events, 74 graded calls, about 34 cents. Pre-registered, every raw payload in the repo.
+37 events, 78 graded calls, about 35 cents. Pre-registered, every raw payload in the repo.
 
 The 90-second video above walks through it, one real result at a time.
 

@@ -6,7 +6,7 @@
 
 When a fact becomes true on the web — a new package version, a new government notice — how long until a search API will hand it to an agent? And until it does, what does the API hand over instead?
 
-I couldn't find a benchmark that answers the second question, so I built one. It has tracked 35 new facts so far, and the answer to the second question is the interesting one.
+I couldn't find a benchmark that answers the second question, so I built one. It has tracked 37 new facts so far, and the answer to the second question is the interesting one.
 
 **[Try the playground →](https://abhid1234.github.io/time-to-index/playground.html)** — run the ladder, flip the scoring rule and watch the leaderboard change, then scroll down to every real probe from the ledger.
 
@@ -42,7 +42,7 @@ The origin control had `0.12.15`, so the release was live and fetchable. Not one
 
 ![By source](diagrams/by-source.png)
 
-Across 74 graded answers, every current answer came from the Federal Register: 12 of 40. New npm, PyPI and GitHub releases: 0 of 34, and five of those answers were the version that had just been replaced. That split is not close (Fisher exact p = 0.0003).
+Across 78 graded answers, every current answer came from the Federal Register: 12 of 40. New npm, PyPI and GitHub releases: 0 of 38, and five of those answers were the version that had just been replaced. That split is not close (Fisher exact p = 0.0002).
 
 So "how fast is this search API?" is underspecified. Fast for what? A new US regulation was often findable within five minutes. A new version of a widely used package, never.
 
@@ -54,7 +54,7 @@ The same arm is also tied with Exa for the most stale answers. It was the most l
 
 ## What it can't claim yet
 
-This is a small, early sample: 35 events over nearly four weeks, and every verdict is at the five-minute mark, because a GitHub Actions cron fires every few hours and later probes mostly miss their window. The origin control also fails on Federal Register pages — 10 of 10 — so the ABSENT verdicts there can't be checked against it. I haven't patched that, because changing how a control is graded after seeing results is exactly what pre-registration exists to stop. It's the first fix, in the open.
+This is a small, early sample: 37 events over nearly four weeks, and every verdict is at the five-minute mark, because a GitHub Actions cron fires every few hours and later probes mostly miss their window. The origin control also fails on Federal Register pages — 10 of 10 — so the ABSENT verdicts there can't be checked against it. I haven't patched that, because changing how a control is graded after seeing results is exactly what pre-registration exists to stop. It's the first fix, in the open.
 
 And while building a tool about not confusing "we didn't ask" with "the index didn't have it," I shipped that bug into my own dashboard three times — grey squares for probes never run, and totals that counted them. All three were in the presentation, not the measurement. The repo has the fixes and the tests that pin them.
 
