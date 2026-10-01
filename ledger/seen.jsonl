@@ -1442,3 +1442,10 @@
 {"answer":"2026-20177","marked_at":1790869516.2549784,"reason":"detected_late","source":"federal_register","subject":"2026-20177"}
 {"answer":"2026-20176","marked_at":1790869516.2549784,"reason":"detected_late","source":"federal_register","subject":"2026-20176"}
 {"answer":"2026-20175","marked_at":1790869516.2549784,"reason":"detected_late","source":"federal_register","subject":"2026-20175"}
+{"answer":"4.146.0","marked_at":1790886896.1142,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"1.13.25","marked_at":1790886896.1142,"reason":"detected_late","source":"pypi","subject":"dagster"}
+{"answer":"3.16.0","marked_at":1790886896.1142,"reason":"detected_late","source":"pypi","subject":"google-cloud-storage"}
+{"answer":"1.43.107","marked_at":1790886896.1142,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"0.16.10","marked_at":1790886896.1142,"reason":"detected_late","source":"pypi","subject":"ruff"}
+{"answer":"0.16.10","marked_at":1790886896.1142,"reason":"detected_late","source":"github_release","subject":"astral-sh/ruff"}
+{"answer":"@cloudflare/deploy-helpers@0.19.1","marked_at":1790886896.1142,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
