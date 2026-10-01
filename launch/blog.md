@@ -10,7 +10,7 @@ Plenty of people measure retrieval, and some of them measure it well — there's
 
 Which quietly puts two completely different failures in the same bucket.
 
-I couldn't find anyone separating them, so I spent a couple of weekends building the thing that does. What I got was a benchmark, 35 real events, a result I didn't expect, and a much better appreciation of how easy it is to lie with a grey square.
+I couldn't find anyone separating them, so I spent a couple of weekends building the thing that does. What I got was a benchmark, 37 real events, a result I didn't expect, and a much better appreciation of how easy it is to lie with a grey square.
 
 **[Play with it →](https://abhid1234.github.io/time-to-index/playground.html)** — run the ladder, then flip the scoring rule and watch the leaderboard invert. Real measured data underneath. There's a walkthrough video below if you'd rather watch than click.
 
@@ -62,7 +62,7 @@ Now the bit where a project like this usually starts overselling, so let me get 
 
 ## Then it caught the thing it was built for
 
-Nearly four weeks in, the ladder has 35 events and 74 graded provider calls, for about 34 cents.
+Nearly four weeks in, the ladder has 37 events and 78 graded provider calls, for about 35 cents.
 
 The clearest single catch is one row.
 
@@ -84,7 +84,7 @@ I didn't go looking for this, and it's the finding I'd lead with if I were writi
 
 Every FRESH answer in the entire run — all 12 — came from **Federal Register** documents. Nine of the ten Federal Register events had at least one index returning the current fact five minutes after publication.
 
-Across **npm, PyPI and GitHub releases: zero.** Not one fresh answer in 34 graded calls. That's a two-sided Fisher p of 0.0003 on 12/40 against 0/34, and it isn't close.
+Across **npm, PyPI and GitHub releases: zero.** Not one fresh answer in 38 graded calls. That's a two-sided Fisher p of 0.0002 on 12/40 against 0/38, and it isn't close.
 
 So the question *"how fast is this search API?"* turns out to be badly underspecified. Fast for **what**? A new US regulation was findable within five minutes more often than not. A new version of a package half the internet depends on, never — and when a package answer did come back, five times it was the version the release had just replaced.
 
@@ -157,7 +157,7 @@ I'm not saying their index is wrong. It measures answer quality, carefully, and 
 
 ## What it isn't
 
-It's an instrument, not a leaderboard. Nothing here scores answer quality, relevance, or ranking — and with 35 events it supports exactly two provider comparisons and says so — the dashboard marks the other four as underpowered rather than leaving you to infer an ordering from a sorted table.
+It's an instrument, not a leaderboard. Nothing here scores answer quality, relevance, or ranking — and with 37 events it supports exactly two provider comparisons and says so — the dashboard marks the other four as underpowered rather than leaving you to infer an ordering from a sorted table.
 
 It also isn't finished. I ran the collector on GitHub Actions, which asks for a cron every ten minutes and delivers one every few hours. An event only counts if it's noticed within ten minutes of publication, so roughly 97% of the world's packages go past unrecorded.
 

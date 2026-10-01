@@ -49,8 +49,9 @@ def fonts() -> str:
 def video_facts() -> list[tuple[str, str, str]]:
     ff = __import__("imageio_ffmpeg").get_ffmpeg_exe()
     out = []
-    for name in ("time-to-index-short.mp4", "time-to-index-launch.mp4",
-                 "time-to-index-teaser.mp4"):
+    # Only the 91s cut: it is re-rendered from the ledger. The 7:27 narrated
+    # walkthrough speaks its numbers and goes stale with every new event.
+    for name in ("time-to-index-short.mp4",):
         f = HERE / name
         if not f.exists():
             out.append((name, "not built", "—"))
@@ -206,10 +207,9 @@ two pre-flight checks immediately before posting, not now.</p>
 <li><b>Rotate the ElevenLabs key</b> — it is in the session transcript.</li>
 <li><b>Rule on the <code>Datadog, Inc.</code> entry</b> in <code>data/watchlist.yaml</code>
     — a T1 partner in a public repo you are about to send traffic to.</li>
-<li><b>Download the video files</b> — the 91-second cut is committed under
-    <code>media/</code>; the long cuts are gitignored and exist only here.</li>
-<li><b>Set the repo homepage, topics and social preview</b>, then tag
-    <code>v0.1.0</code> — see <code>docs/RELEASING.md</code>.</li>
+<li><b>Set the repo homepage, topics and social preview</b> — the gear next
+    to About on the repo page; upload <code>docs/og.png</code> as the preview.
+    (v0.1.0 is already released.)</li>
 <li><b>Decide you are comfortable naming a faster provider.</b> The copy says
     Parallel (advanced) <i>separates</i> from Brave and Exa after correction —
     a statistical claim about named products under your byline. It is correctly

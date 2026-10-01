@@ -64,9 +64,9 @@ Every fresh answer in the whole run — all 12 — came from Federal Register do
 
 12 of 40 current at t+5m.
 
-npm, PyPI and GitHub releases: 0 of 34.
+npm, PyPI and GitHub releases: 0 of 38.
 
-Fisher p = 0.0003.
+Fisher p = 0.0002.
 
 ---
 
@@ -194,7 +194,7 @@ What I got wrong: I ran it on GitHub Actions.
 
 Asks for a 10-min cron. Gets one every few hours. So every verdict above is at t+5m — later rungs almost never land in their window.
 
-35 events in 26 days. Dropping the rest is correct. The runner is the fix.
+37 events in 27 days. Dropping the rest is correct. The runner is the fix.
 
 ---
 

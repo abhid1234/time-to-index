@@ -413,10 +413,10 @@ footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--rule);
   <div class="herogrid">
    <div>
   <h1>A search index that is wrong looks exactly like one that is fast.</h1>
-  <p class="sub">Every retrieval benchmark scores a missing answer and a confidently
-  outdated one the same way: zero. In production they are nothing alike. This page
-  shows you the difference, then lets you change the scoring rule and watch the
-  ranking turn upside down.</p>
+  <p class="sub">Benchmarks score a confidently outdated answer either like the right
+  one or like no answer at all. In production it is neither. This page shows you the
+  difference, then lets you change the scoring rule and watch the ranking turn
+  upside down.</p>
   <ul class="chips">
     <li>No account, nothing to install</li>
     <li>Real data from the committed ledger</li>
@@ -451,6 +451,7 @@ footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--rule);
   <video controls playsinline preload="none" poster="media/short-poster.jpg"
     aria-label="Time to Index in 91 seconds">
     <source src="media/time-to-index-short.mp4" type="video/mp4">
+    <source src="media/time-to-index-short.webm" type="video/webm">
   </video>
   <figcaption>The whole argument in 91 seconds — one real result, read from the
   ledger. Text on screen; the sound is optional.</figcaption>
@@ -694,7 +695,7 @@ function board(){
     el.appendChild(d);
   });
   document.getElementById("rule-note").textContent = old
-    ? "Ranked by how fast any plausible result came back. A confidently wrong answer counts the same as a correct one — which is how most retrieval benchmarks score today."
+    ? "Ranked by how fast any plausible result came back — a hit rate. A confidently wrong answer counts the same as a correct one, so the index that is wrong fastest looks best."
     : "Ranked by wrong answers first, then speed to the correct one. Returning nothing is treated as recoverable; returning the superseded answer is not.";
 }
 
@@ -899,8 +900,8 @@ function punchline(e){
     else head="<b>At t + "+lab+", "+had+" of "+graded.length+
       " search indexes had this fact.</b>";
     const wrongTxt=wrong?" "+wrong+" returned the superseded answer instead — "+
-      "a confident wrong answer, which every conventional benchmark would have "+
-      "scored as a hit.":"";
+      "a confident wrong answer. A hit rate would count it as a hit; a "+
+      "correctness score, the same as no answer at all.":"";
     return head+wrongTxt+ctlTxt;
   }
   return "<b>Nothing graded on this event yet.</b> Its probes are queued; "+
@@ -915,19 +916,28 @@ async function loadObs(){
     const bar=document.getElementById("meas-evs");bar.innerHTML="";
     OBS.events.forEach((e,i)=>{const b=document.createElement("button");
       const cells=e.arms.filter(a=>!a.control).flatMap(a=>a.cells);
-      const done=cells.filter(c=>c.state==="graded").length;
+      // A never-dispatched square is stored as state "graded", verdict
+      // SKIPPED. Counting state alone printed "24/24" on events where four
+      // calls were made: the same overstatement the totals line once had.
+      const n=v=>cells.filter(c=>c.state==="graded"&&c.verdict===v).length;
+      const fr=n("FRESH"), st=n("STALE"), ab=n("ABSENT"), er=n("ERROR"),
+            sk=n("SKIPPED"), answered=fr+st+ab,
+            queued=cells.filter(c=>c.state!=="graded").length;
       // A Federal Register document is its own answer, so "subject answer"
       // would print the number twice; name the source instead.
       const label=e.subject===e.answer?(e.source==="federal_register"?"Fed. Register ":"")+e.answer
                                        :e.subject+" "+e.answer;
-      b.textContent=label+(cells.length?"  "+done+"/"+cells.length
-                                                          :"  origin only");
+      b.textContent=label+"  "+(!cells.length?"origin only"
+        :answered?answered+" graded"+(st?" · "+st+" stale":"")
+        :queued?"queued":"0 graded");
       // Probes are enqueued when an event is discovered, so an event that
       // predates a provider key has no arm for it and never will. Saying
       // "origin only" is the difference between a reader seeing a gap in the
       // schedule and a reader seeing four providers that failed to answer.
-      b.title=cells.length? done+" of "+cells.length+
-        " provider calls on this event have been made and graded"
+      b.title=cells.length? answered+" provider answers graded ("+fr+" fresh, "+
+        st+" stale, "+ab+" absent)"+(er?", "+er+" errored":"")+
+        (queued?", "+queued+" still scheduled":"")+"; "+sk+
+        " squares never dispatched"
         : "No provider arm was scheduled on this event -- it was discovered "+
           "before any provider key was configured, and probes are enqueued at "+
           "discovery. Only the origin control ran.";
@@ -944,6 +954,17 @@ async function loadObs(){
       ["dashed","not measured yet. A dashed square is not an ABSENT, and keeping "+
                 "those two apart is the entire point of the project"],
     ].map(([t,d])=>"<dt>"+t+"</dt><dd>"+d+"</dd>").join("");
+    // Open on the clearest instance of what this page is about: the event
+    // with the most STALE answers, newest on a tie. Every event is one click
+    // away and the totals line covers all of them; opening on the newest
+    // event greeted readers with "nothing graded yet".
+    const stale=e=>e.arms.filter(a=>!a.control).flatMap(a=>a.cells)
+      .filter(c=>c.state==="graded"&&c.verdict==="STALE").length;
+    let best=-1;
+    OBS.events.forEach((e,i)=>{if(stale(e)>(best<0?0:stale(OBS.events[best])))best=i;});
+    if(best<0) best=Math.max(0,OBS.events.findIndex(e=>e.arms.some(a=>!a.control&&
+      a.cells.some(c=>c.state==="graded"&&["FRESH","STALE","ABSENT"].includes(c.verdict)))));
+    obsIdx=best;
     drawObs();
     document.getElementById("meas").hidden=false;
   }catch(e){

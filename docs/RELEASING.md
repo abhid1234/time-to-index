@@ -11,7 +11,8 @@
 
 `.github/workflows/release.yml` then refuses to continue unless the tag
 matches `pyproject.toml`, runs the suite and `tti verify`, builds the sdist
-and wheel, attaches them with a ledger snapshot and `SHA256SUMS`, and writes
+and wheel, attaches them with a ledger snapshot, a CycloneDX SBOM and
+`SHA256SUMS`, and writes
 the release notes from that version's CHANGELOG section.
 
 ## PyPI (one-time setup, optional)

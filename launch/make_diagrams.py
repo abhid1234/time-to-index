@@ -393,7 +393,7 @@ def catch_body(repo):
         f'answer, and {n_stale} of them confidently asserted the old one</b> — '
         f'the same wrong version, independently, at the same instant. The '
         f'control had it, so the release was live and fetchable right then. '
-        f'Every conventional benchmark scores those {n_stale} rows exactly the '
+        f'Scored for correctness, those {n_stale} rows count exactly the '
         f'same as the empty ones: zero.</p>')
     out.append(
         '<p class="foot">One event. Not a rate and not a ranking — the full '

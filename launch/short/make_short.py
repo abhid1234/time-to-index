@@ -417,7 +417,31 @@ def mux(ff: str, raw: pathlib.Path) -> int:
     subprocess.run([ff, "-y", "-loglevel", "error", "-i", str(out), "-vf", "scale=1280:720",
                     "-c:v", "libx264", "-preset", "slow", "-crf", "21", "-c:a", "copy",
                     "-movflags", "+faststart", str(small)], check=True)
-    print(f"wrote {out}\nwrote {small}")
+    # VP9/Opus copy for browsers built without H.264 (open-source Chromium,
+    # some Linux distributions). The page lists it after the MP4, so anything
+    # that can play H.264 never downloads it.
+    webm = HERE.parent / "time-to-index-short.webm"
+    subprocess.run([ff, "-y", "-loglevel", "error", "-i", str(small),
+                    "-c:v", "libvpx-vp9", "-crf", "34", "-b:v", "0", "-row-mt", "1",
+                    "-deadline", "good", "-cpu-used", "2",
+                    "-c:a", "libopus", "-b:a", "128k", str(webm)], check=True)
+    print(f"wrote {out}\nwrote {small}\nwrote {webm}")
+    return publish(ff, out, small, webm)
+
+
+def publish(ff: str, full: pathlib.Path, small: pathlib.Path, webm: pathlib.Path) -> int:
+    """Copy the cut to where the repo serves it: the README links media/, the
+    playground embeds docs/media/. Re-rendering is then one command, not four."""
+    import shutil
+    repo = HERE.parent.parent
+    shutil.copy2(full, repo / "media" / "time-to-index-short.mp4")
+    site = repo / "docs" / "media"
+    site.mkdir(exist_ok=True)
+    shutil.copy2(small, site / "time-to-index-short.mp4")
+    shutil.copy2(webm, site / "time-to-index-short.webm")
+    subprocess.run([ff, "-y", "-loglevel", "error", "-ss", "3.8", "-i", str(small),
+                    "-frames:v", "1", "-q:v", "3", str(site / "short-poster.jpg")], check=True)
+    print(f"published to {repo / 'media'} and {site}")
     return 0
 
 

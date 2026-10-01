@@ -216,7 +216,10 @@ CLAIMS: list[tuple[str, str, str, str]] = [
     ("Federal Register fresh", r"\b(\d+) of 40\b", "fr_fresh", "int"),
     ("Federal Register total", r"\b\d+ of (\d+) (?:Federal Register answers|were current|current)",
      "fr_total", "int"),
-    ("registries fresh", r"\b(\d+) of 34\b", "rest_fresh", "int"),
+    # Anchored on the registry wording, not on the total: the total moves with
+    # every probe run, and a pattern that names it stops matching silently.
+    ("registries fresh", r"releases:? (\d+) (?:out )?of \d+\b|\b(\d+) of \d+ across npm",
+     "rest_fresh", "int"),
     ("registries total", r"\b0 of (\d+)\b", "rest_total", "int"),
     ("fresh total (all N)", r"all (\d+) —? ?came from Federal Register|all (\d+)\)? — came",
      "fresh", "int"),

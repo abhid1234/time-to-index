@@ -67,8 +67,9 @@ sentence around it rewritten, not a digit swapped.
    Rebuild it with `python short/make_short.py`: it reads every number from
    the ledger and refuses to render if a claim on screen no longer holds.
 
-   The 7:27 narrated walkthrough (`time-to-index-launch.mp4`) and the 1:11
-   teaser are still here if you want a long-form cut for YouTube.
+   The 7:27 narrated walkthrough (`time-to-index-launch.mp4`) is out of
+   date: its narration says "zero of thirty four" and the registries now
+   stand at 0 of 38. Re-render it with `make_video.py` before using it.
 3. **LinkedIn.** Paste `linkedin.md`. It truncates around 200 characters and
    the first line carries it: *"A search index that is wrong looks exactly like
    one that is fast."*
@@ -144,7 +145,7 @@ move pre-registration exists to stop. Fix it after, in the open.
 
 **3. The source-class finding** makes no claim about any company, and is the
 least contestable result in the pack: 12 of 40 Federal Register answers fresh
-at t+5m, 0 of 34 across npm, PyPI and GitHub releases, Fisher p = 0.0003. If
+at t+5m, 0 of 38 across npm, PyPI and GitHub releases, Fisher p = 0.0002. If
 you want to lead with the safest strong claim, lead with that one.
 ## Two things about the run itself
 
@@ -162,7 +163,7 @@ Actions cron — that would give you two ledgers against one pre-registration.
 
 ## The two questions you'll get
 
-**"Why only 35 events, and why is every verdict at t+5m?"** GitHub Actions
+**"Why only 37 events, and why is every verdict at t+5m?"** GitHub Actions
 asks for a ten-minute cron and delivers one every few hours. An event only
 counts if noticed within ten minutes of publication, so most are dropped, and
 later rungs almost never land inside their window. Dropping them is correct.
