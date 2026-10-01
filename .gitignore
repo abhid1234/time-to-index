@@ -14,6 +14,7 @@ venv/
 # and far too large to version.
 launch/build/
 launch/*.mp4
+launch/*.webm
 
 # python -m build / pip wheel output
 /build/
