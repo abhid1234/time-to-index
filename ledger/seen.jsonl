@@ -1449,3 +1449,7 @@
 {"answer":"0.16.10","marked_at":1790886896.1142,"reason":"detected_late","source":"pypi","subject":"ruff"}
 {"answer":"0.16.10","marked_at":1790886896.1142,"reason":"detected_late","source":"github_release","subject":"astral-sh/ruff"}
 {"answer":"@cloudflare/deploy-helpers@0.19.1","marked_at":1790886896.1142,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"26.6.4","marked_at":1790900092.2380624,"reason":"detected_late","source":"npm","subject":"@types/node"}
+{"answer":"7.27.0","marked_at":1790900092.2380624,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"3.23.0","marked_at":1790900092.2380624,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"2.4.0","marked_at":1790900092.2380624,"reason":"detected_late","source":"pypi","subject":"mypy"}
