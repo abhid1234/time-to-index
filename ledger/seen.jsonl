@@ -1495,3 +1495,9 @@
 {"answer":"v1.16.5","marked_at":1790963368.2780917,"reason":"detected_late","source":"github_release","subject":"hashicorp/terraform"}
 {"answer":"v3.13.4","marked_at":1790963368.2780917,"reason":"detected_late","source":"github_release","subject":"prometheus/prometheus"}
 {"answer":"0001628280-26-064366","marked_at":1790963368.2780917,"reason":"detected_late","source":"edgar","subject":"1318605:8-K"}
+{"answer":"20.0.0","marked_at":1790976466.3780422,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"10.12.0","marked_at":1790976466.3780422,"reason":"detected_late","source":"npm","subject":"eslint"}
+{"answer":"6.29.1","marked_at":1790976466.3780422,"reason":"detected_late","source":"pypi","subject":"gradio"}
+{"answer":"1.43.108","marked_at":1790976466.3780422,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"v0.35.1","marked_at":1790976466.3780422,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
+{"answer":"0001679788-26-000113","marked_at":1790976466.3780422,"reason":"detected_late","source":"edgar","subject":"1679788:8-K"}
