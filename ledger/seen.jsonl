@@ -1481,3 +1481,8 @@
 {"answer":"2610.01646","marked_at":1790920241.408565,"reason":"detected_late","source":"arxiv","subject":"2610.01646"}
 {"answer":"2610.01616","marked_at":1790920241.408565,"reason":"detected_late","source":"arxiv","subject":"2610.01616"}
 {"answer":"2610.01482","marked_at":1790920241.408565,"reason":"detected_late","source":"arxiv","subject":"2610.01482"}
+{"answer":"5.104.1","marked_at":1790942435.7266521,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
+{"answer":"4.147.0","marked_at":1790942435.7266521,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"2.59.0","marked_at":1790942435.7266521,"reason":"detected_late","source":"pypi","subject":"ray"}
+{"answer":"@cloudflare/deploy-helpers@0.19.2","marked_at":1790942435.7266521,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"0001104659-26-113030","marked_at":1790942435.7266521,"reason":"detected_late","source":"edgar","subject":"1798100:8-K"}
