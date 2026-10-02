@@ -1486,3 +1486,12 @@
 {"answer":"2.59.0","marked_at":1790942435.7266521,"reason":"detected_late","source":"pypi","subject":"ray"}
 {"answer":"@cloudflare/deploy-helpers@0.19.2","marked_at":1790942435.7266521,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
 {"answer":"0001104659-26-113030","marked_at":1790942435.7266521,"reason":"detected_late","source":"edgar","subject":"1798100:8-K"}
+{"answer":"11.4.0","marked_at":1790963368.2780917,"reason":"detected_late","source":"npm","subject":"@sentry/node"}
+{"answer":"19.0.0","marked_at":1790963368.2780917,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"4.64.0","marked_at":1790963368.2780917,"reason":"detected_late","source":"npm","subject":"rollup"}
+{"answer":"2.11.7","marked_at":1790963368.2780917,"reason":"detected_late","source":"npm","subject":"turbo"}
+{"answer":"3.24.0","marked_at":1790963368.2780917,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"langchain-text-splitters==1.1.3","marked_at":1790963368.2780917,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"v1.16.5","marked_at":1790963368.2780917,"reason":"detected_late","source":"github_release","subject":"hashicorp/terraform"}
+{"answer":"v3.13.4","marked_at":1790963368.2780917,"reason":"detected_late","source":"github_release","subject":"prometheus/prometheus"}
+{"answer":"0001628280-26-064366","marked_at":1790963368.2780917,"reason":"detected_late","source":"edgar","subject":"1318605:8-K"}
