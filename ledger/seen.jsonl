@@ -1503,3 +1503,6 @@
 {"answer":"0001679788-26-000113","marked_at":1790976466.3780422,"reason":"detected_late","source":"edgar","subject":"1679788:8-K"}
 {"answer":"1.65.0","marked_at":1790988014.873951,"reason":"detected_late","source":"pypi","subject":"streamlit"}
 {"answer":"5.20261003.1","marked_at":1791006408.975888,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"1.6.1","marked_at":1791052621.3312337,"reason":"detected_late","source":"pypi","subject":"modal"}
+{"answer":"0.12.23","marked_at":1791052621.3312337,"reason":"detected_late","source":"pypi","subject":"uv"}
+{"answer":"0.12.23","marked_at":1791052621.3312337,"reason":"detected_late","source":"github_release","subject":"astral-sh/uv"}
