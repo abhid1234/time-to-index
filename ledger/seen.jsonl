@@ -1501,3 +1501,4 @@
 {"answer":"1.43.108","marked_at":1790976466.3780422,"reason":"detected_late","source":"pypi","subject":"boto3"}
 {"answer":"v0.35.1","marked_at":1790976466.3780422,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
 {"answer":"0001679788-26-000113","marked_at":1790976466.3780422,"reason":"detected_late","source":"edgar","subject":"1679788:8-K"}
+{"answer":"1.65.0","marked_at":1790988014.873951,"reason":"detected_late","source":"pypi","subject":"streamlit"}
