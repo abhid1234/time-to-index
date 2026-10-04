@@ -1507,3 +1507,5 @@
 {"answer":"0.12.23","marked_at":1791052621.3312337,"reason":"detected_late","source":"pypi","subject":"uv"}
 {"answer":"0.12.23","marked_at":1791052621.3312337,"reason":"detected_late","source":"github_release","subject":"astral-sh/uv"}
 {"answer":"12.9.1","marked_at":1791063924.685373,"reason":"detected_late","source":"npm","subject":"pnpm"}
+{"answer":"1.104.0","marked_at":1791072619.1094043,"reason":"detected_late","source":"pypi","subject":"litellm"}
+{"answer":"v1.103.3","marked_at":1791072619.1094043,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
