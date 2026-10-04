@@ -1511,3 +1511,4 @@
 {"answer":"v1.103.3","marked_at":1791072619.1094043,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
 {"answer":"5.20261004.1","marked_at":1791092898.304418,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"4.13.13","marked_at":1791092898.304418,"reason":"detected_late","source":"npm","subject":"hono"}
+{"answer":"7.28.0","marked_at":1791141339.4077992,"reason":"detected_late","source":"npm","subject":"openai"}
