@@ -1512,3 +1512,13 @@
 {"answer":"5.20261004.1","marked_at":1791092898.304418,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"4.13.13","marked_at":1791092898.304418,"reason":"detected_late","source":"npm","subject":"hono"}
 {"answer":"7.28.0","marked_at":1791141339.4077992,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"2610.03237","marked_at":1791162601.2963674,"reason":"detected_late","source":"arxiv","subject":"2610.03237"}
+{"answer":"2610.03080","marked_at":1791162601.2963674,"reason":"detected_late","source":"arxiv","subject":"2610.03080"}
+{"answer":"2610.03010","marked_at":1791162601.2963674,"reason":"detected_late","source":"arxiv","subject":"2610.03010"}
+{"answer":"2610.02995","marked_at":1791162601.2963674,"reason":"detected_late","source":"arxiv","subject":"2610.02995"}
+{"answer":"2610.02952","marked_at":1791162601.2963674,"reason":"detected_late","source":"arxiv","subject":"2610.02952"}
+{"answer":"2610.03147","marked_at":1791162601.2963674,"reason":"detected_late","source":"arxiv","subject":"2610.03147"}
+{"answer":"2610.03140","marked_at":1791162601.2963674,"reason":"detected_late","source":"arxiv","subject":"2610.03140"}
+{"answer":"2610.03087","marked_at":1791162601.2963674,"reason":"detected_late","source":"arxiv","subject":"2610.03087"}
+{"answer":"2610.02838","marked_at":1791162601.2963674,"reason":"detected_late","source":"arxiv","subject":"2610.02838"}
+{"answer":"2610.02770","marked_at":1791162601.2963674,"reason":"detected_late","source":"arxiv","subject":"2610.02770"}
