@@ -1557,3 +1557,7 @@
 {"answer":"2026-20387","marked_at":1791215839.1077898,"reason":"detected_late","source":"federal_register","subject":"2026-20387"}
 {"answer":"2026-20386","marked_at":1791215839.1077898,"reason":"detected_late","source":"federal_register","subject":"2026-20386"}
 {"answer":"2026-20385","marked_at":1791215839.1077898,"reason":"detected_late","source":"federal_register","subject":"2026-20385"}
+{"answer":"21.0.0","marked_at":1791239181.0562499,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"1.2.13","marked_at":1791239181.0562499,"reason":"detected_late","source":"pypi","subject":"langgraph"}
+{"answer":"v0.6.0","marked_at":1791239181.0562499,"reason":"detected_late","source":"github_release","subject":"ggml-org/llama.cpp"}
+{"answer":"1.2.13","marked_at":1791239181.0562499,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langgraph"}
