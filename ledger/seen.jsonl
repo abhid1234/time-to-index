@@ -1544,3 +1544,16 @@
 {"answer":"2610.03679","marked_at":1791183686.7770362,"reason":"detected_late","source":"arxiv","subject":"2610.03679"}
 {"answer":"2610.03518","marked_at":1791183686.7770362,"reason":"detected_late","source":"arxiv","subject":"2610.03518"}
 {"answer":"2610.03524","marked_at":1791183686.7770362,"reason":"detected_late","source":"arxiv","subject":"2610.03524"}
+{"answer":"1.87.0","marked_at":1791215839.1077898,"reason":"detected_late","source":"npm","subject":"oxlint"}
+{"answer":"5.1.0","marked_at":1791215839.1077898,"reason":"detected_late","source":"pypi","subject":"datasets"}
+{"answer":"0.31.0","marked_at":1791215839.1077898,"reason":"detected_late","source":"pypi","subject":"vllm"}
+{"answer":"2026-20439","marked_at":1791215839.1077898,"reason":"detected_late","source":"federal_register","subject":"2026-20439"}
+{"answer":"2026-20411","marked_at":1791215839.1077898,"reason":"detected_late","source":"federal_register","subject":"2026-20411"}
+{"answer":"2026-20396","marked_at":1791215839.1077898,"reason":"detected_late","source":"federal_register","subject":"2026-20396"}
+{"answer":"2026-20393","marked_at":1791215839.1077898,"reason":"detected_late","source":"federal_register","subject":"2026-20393"}
+{"answer":"2026-20392","marked_at":1791215839.1077898,"reason":"detected_late","source":"federal_register","subject":"2026-20392"}
+{"answer":"2026-20391","marked_at":1791215839.1077898,"reason":"detected_late","source":"federal_register","subject":"2026-20391"}
+{"answer":"2026-20388","marked_at":1791215839.1077898,"reason":"detected_late","source":"federal_register","subject":"2026-20388"}
+{"answer":"2026-20387","marked_at":1791215839.1077898,"reason":"detected_late","source":"federal_register","subject":"2026-20387"}
+{"answer":"2026-20386","marked_at":1791215839.1077898,"reason":"detected_late","source":"federal_register","subject":"2026-20386"}
+{"answer":"2026-20385","marked_at":1791215839.1077898,"reason":"detected_late","source":"federal_register","subject":"2026-20385"}
