@@ -1633,3 +1633,15 @@
 {"answer":"2026-20485","marked_at":1791302502.3241546,"reason":"detected_late","source":"federal_register","subject":"2026-20485"}
 {"answer":"2026-20484","marked_at":1791302502.3241546,"reason":"detected_late","source":"federal_register","subject":"2026-20484"}
 {"answer":"2026-20483","marked_at":1791302502.3241546,"reason":"detected_late","source":"federal_register","subject":"2026-20483"}
+{"answer":"22.0.0","marked_at":1791320232.8455799,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"6.40.0","marked_at":1791320232.8455799,"reason":"detected_late","source":"npm","subject":"knip"}
+{"answer":"1.9.16","marked_at":1791320232.8455799,"reason":"detected_late","source":"npm","subject":"solid-js"}
+{"answer":"16.4.0","marked_at":1791320232.8455799,"reason":"detected_late","source":"npm","subject":"next"}
+{"answer":"4.148.0","marked_at":1791320232.8455799,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"3.25.0","marked_at":1791320232.8455799,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"5.19.0","marked_at":1791320232.8455799,"reason":"detected_late","source":"pypi","subject":"transformers"}
+{"answer":"0.27.3","marked_at":1791320232.8455799,"reason":"detected_late","source":"pypi","subject":"typer"}
+{"answer":"3.8.8","marked_at":1791320232.8455799,"reason":"detected_late","source":"pypi","subject":"prefect"}
+{"answer":"1.14.2","marked_at":1791320232.8455799,"reason":"detected_late","source":"pypi","subject":"trl"}
+{"answer":"v5.19.0","marked_at":1791320232.8455799,"reason":"detected_late","source":"github_release","subject":"huggingface/transformers"}
+{"answer":"create-cloudflare@2.73.3","marked_at":1791320232.8455799,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
