@@ -1645,3 +1645,6 @@
 {"answer":"1.14.2","marked_at":1791320232.8455799,"reason":"detected_late","source":"pypi","subject":"trl"}
 {"answer":"v5.19.0","marked_at":1791320232.8455799,"reason":"detected_late","source":"github_release","subject":"huggingface/transformers"}
 {"answer":"create-cloudflare@2.73.3","marked_at":1791320232.8455799,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"44.6.0","marked_at":1791333026.4358048,"reason":"detected_late","source":"npm","subject":"electron"}
+{"answer":"7.30.0","marked_at":1791333026.4358048,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"3.26.0","marked_at":1791333026.4358048,"reason":"detected_late","source":"pypi","subject":"openai"}
