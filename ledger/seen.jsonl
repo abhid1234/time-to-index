@@ -1699,3 +1699,8 @@
 {"answer":"1.12.0","marked_at":1791401723.3066216,"reason":"detected_late","source":"pypi","subject":"anthropic"}
 {"answer":"0.142.3","marked_at":1791401723.3066216,"reason":"detected_late","source":"pypi","subject":"fastapi"}
 {"answer":"1.43.109","marked_at":1791401723.3066216,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"0.142.4","marked_at":1791417114.0069664,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"1.104.1","marked_at":1791417114.0069664,"reason":"detected_late","source":"pypi","subject":"litellm"}
+{"answer":"langchain-fireworks==1.7.1","marked_at":1791417114.0069664,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"v1.104.1","marked_at":1791417114.0069664,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
+{"answer":"@astrojs/netlify@8.2.8","marked_at":1791417114.0069664,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
