@@ -1692,3 +1692,10 @@
 {"answer":"2026-20560","marked_at":1791380639.0408115,"reason":"detected_late","source":"federal_register","subject":"2026-20560"}
 {"answer":"2026-20558","marked_at":1791380639.0408115,"reason":"detected_late","source":"federal_register","subject":"2026-20558"}
 {"answer":"2026-20557","marked_at":1791380639.0408115,"reason":"detected_late","source":"federal_register","subject":"2026-20557"}
+{"answer":"0.132.0","marked_at":1791401723.3066216,"reason":"detected_late","source":"npm","subject":"@anthropic-ai/sdk"}
+{"answer":"12.10.1","marked_at":1791401723.3066216,"reason":"detected_late","source":"npm","subject":"pnpm"}
+{"answer":"1.9.17","marked_at":1791401723.3066216,"reason":"detected_late","source":"npm","subject":"solid-js"}
+{"answer":"4.64.2","marked_at":1791401723.3066216,"reason":"detected_late","source":"npm","subject":"rollup"}
+{"answer":"1.12.0","marked_at":1791401723.3066216,"reason":"detected_late","source":"pypi","subject":"anthropic"}
+{"answer":"0.142.3","marked_at":1791401723.3066216,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"1.43.109","marked_at":1791401723.3066216,"reason":"detected_late","source":"pypi","subject":"boto3"}
