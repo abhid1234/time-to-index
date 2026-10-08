@@ -1737,3 +1737,10 @@
 {"answer":"2610.09903","marked_at":1791428561.6956468,"reason":"detected_late","source":"arxiv","subject":"2610.09903"}
 {"answer":"2610.09894","marked_at":1791428561.6956468,"reason":"detected_late","source":"arxiv","subject":"2610.09894"}
 {"answer":"2610.09642","marked_at":1791428561.6956468,"reason":"detected_late","source":"arxiv","subject":"2610.09642"}
+{"answer":"0.132.1","marked_at":1791455309.458124,"reason":"detected_late","source":"npm","subject":"@anthropic-ai/sdk"}
+{"answer":"7.30.1","marked_at":1791455309.458124,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"11.0.1","marked_at":1791455309.458124,"reason":"detected_late","source":"npm","subject":"preact"}
+{"answer":"1.12.1","marked_at":1791455309.458124,"reason":"detected_late","source":"pypi","subject":"anthropic"}
+{"answer":"3.26.1","marked_at":1791455309.458124,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"1.104.2","marked_at":1791455309.458124,"reason":"detected_late","source":"pypi","subject":"litellm"}
+{"answer":"v1.104.2","marked_at":1791455309.458124,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
