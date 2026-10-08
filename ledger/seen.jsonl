@@ -1762,3 +1762,14 @@
 {"answer":"2026-20695","marked_at":1791480820.5204628,"reason":"detected_late","source":"federal_register","subject":"2026-20695"}
 {"answer":"2026-20694","marked_at":1791480820.5204628,"reason":"detected_late","source":"federal_register","subject":"2026-20694"}
 {"answer":"2026-20693","marked_at":1791480820.5204628,"reason":"detected_late","source":"federal_register","subject":"2026-20693"}
+{"answer":"22.2.2","marked_at":1791498362.364522,"reason":"detected_late","source":"npm","subject":"@angular/core"}
+{"answer":"4.64.3","marked_at":1791498362.364522,"reason":"detected_late","source":"npm","subject":"rollup"}
+{"answer":"4.149.0","marked_at":1791498362.364522,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"3.17.0","marked_at":1791498362.364522,"reason":"detected_late","source":"pypi","subject":"google-cloud-storage"}
+{"answer":"1.4.4","marked_at":1791498362.364522,"reason":"detected_late","source":"pypi","subject":"langchain"}
+{"answer":"1.43.110","marked_at":1791498362.364522,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"1.15.0","marked_at":1791498362.364522,"reason":"detected_late","source":"pypi","subject":"trl"}
+{"answer":"0.12.24","marked_at":1791498362.364522,"reason":"detected_late","source":"pypi","subject":"uv"}
+{"answer":"0.12.24","marked_at":1791498362.364522,"reason":"detected_late","source":"github_release","subject":"astral-sh/uv"}
+{"answer":"langchain==1.4.4","marked_at":1791498362.364522,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"@cloudflare/remote-bindings@0.0.45","marked_at":1791498362.364522,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
