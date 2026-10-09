@@ -1803,3 +1803,17 @@
 {"answer":"2610.11701","marked_at":1791512766.1666098,"reason":"detected_late","source":"arxiv","subject":"2610.11701"}
 {"answer":"2610.11563","marked_at":1791512766.1666098,"reason":"detected_late","source":"arxiv","subject":"2610.11563"}
 {"answer":"2610.11525","marked_at":1791512766.1666098,"reason":"detected_late","source":"arxiv","subject":"2610.11525"}
+{"answer":"9.5.0","marked_at":1791538123.0293431,"reason":"detected_late","source":"npm","subject":"@mui/material"}
+{"answer":"6.41.0","marked_at":1791538123.0293431,"reason":"detected_late","source":"npm","subject":"knip"}
+{"answer":"7.31.0","marked_at":1791538123.0293431,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"26.0.0","marked_at":1791538123.0293431,"reason":"detected_late","source":"pypi","subject":"pyarrow"}
+{"answer":"v0.40.2","marked_at":1791538123.0293431,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
+{"answer":"apache-arrow-26.0.0","marked_at":1791538123.0293431,"reason":"detected_late","source":"github_release","subject":"apache/arrow"}
+{"answer":"2610.12427","marked_at":1791538123.0293431,"reason":"detected_late","source":"arxiv","subject":"2610.12427"}
+{"answer":"2610.12417","marked_at":1791538123.0293431,"reason":"detected_late","source":"arxiv","subject":"2610.12417"}
+{"answer":"2610.12410","marked_at":1791538123.0293431,"reason":"detected_late","source":"arxiv","subject":"2610.12410"}
+{"answer":"2610.12403","marked_at":1791538123.0293431,"reason":"detected_late","source":"arxiv","subject":"2610.12403"}
+{"answer":"2610.12402","marked_at":1791538123.0293431,"reason":"detected_late","source":"arxiv","subject":"2610.12402"}
+{"answer":"2610.12467","marked_at":1791538123.0293431,"reason":"detected_late","source":"arxiv","subject":"2610.12467"}
+{"answer":"2610.12465","marked_at":1791538123.0293431,"reason":"detected_late","source":"arxiv","subject":"2610.12465"}
+{"answer":"2610.12448","marked_at":1791538123.0293431,"reason":"detected_late","source":"arxiv","subject":"2610.12448"}
