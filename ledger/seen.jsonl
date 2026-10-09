@@ -1817,3 +1817,16 @@
 {"answer":"2610.12467","marked_at":1791538123.0293431,"reason":"detected_late","source":"arxiv","subject":"2610.12467"}
 {"answer":"2610.12465","marked_at":1791538123.0293431,"reason":"detected_late","source":"arxiv","subject":"2610.12465"}
 {"answer":"2610.12448","marked_at":1791538123.0293431,"reason":"detected_late","source":"arxiv","subject":"2610.12448"}
+{"answer":"0.133.0","marked_at":1791563403.5804536,"reason":"detected_late","source":"npm","subject":"@anthropic-ai/sdk"}
+{"answer":"1.13.0","marked_at":1791563403.5804536,"reason":"detected_late","source":"pypi","subject":"anthropic"}
+{"answer":"3.27.0","marked_at":1791563403.5804536,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"C1-2026-20019","marked_at":1791563403.5804536,"reason":"detected_late","source":"federal_register","subject":"C1-2026-20019"}
+{"answer":"2026-20855","marked_at":1791563403.5804536,"reason":"detected_late","source":"federal_register","subject":"2026-20855"}
+{"answer":"2026-20815","marked_at":1791563403.5804536,"reason":"detected_late","source":"federal_register","subject":"2026-20815"}
+{"answer":"2026-20792","marked_at":1791563403.5804536,"reason":"detected_late","source":"federal_register","subject":"2026-20792"}
+{"answer":"2026-20790","marked_at":1791563403.5804536,"reason":"detected_late","source":"federal_register","subject":"2026-20790"}
+{"answer":"2026-20788","marked_at":1791563403.5804536,"reason":"detected_late","source":"federal_register","subject":"2026-20788"}
+{"answer":"2026-20784","marked_at":1791563403.5804536,"reason":"detected_late","source":"federal_register","subject":"2026-20784"}
+{"answer":"2026-20783","marked_at":1791563403.5804536,"reason":"detected_late","source":"federal_register","subject":"2026-20783"}
+{"answer":"2026-20782","marked_at":1791563403.5804536,"reason":"detected_late","source":"federal_register","subject":"2026-20782"}
+{"answer":"2026-20781","marked_at":1791563403.5804536,"reason":"detected_late","source":"federal_register","subject":"2026-20781"}
