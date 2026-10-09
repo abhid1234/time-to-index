@@ -1830,3 +1830,11 @@
 {"answer":"2026-20783","marked_at":1791563403.5804536,"reason":"detected_late","source":"federal_register","subject":"2026-20783"}
 {"answer":"2026-20782","marked_at":1791563403.5804536,"reason":"detected_late","source":"federal_register","subject":"2026-20782"}
 {"answer":"2026-20781","marked_at":1791563403.5804536,"reason":"detected_late","source":"federal_register","subject":"2026-20781"}
+{"answer":"26.6.5","marked_at":1791580268.2854824,"reason":"detected_late","source":"npm","subject":"@types/node"}
+{"answer":"23.0.1","marked_at":1791580268.2854824,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"1.43.111","marked_at":1791580268.2854824,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"3.28.0","marked_at":1791580268.2854824,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"0.13.0","marked_at":1791580268.2854824,"reason":"detected_late","source":"pypi","subject":"uv"}
+{"answer":"0.17.0","marked_at":1791580268.2854824,"reason":"detected_late","source":"pypi","subject":"ruff"}
+{"answer":"0.13.0","marked_at":1791580268.2854824,"reason":"detected_late","source":"github_release","subject":"astral-sh/uv"}
+{"answer":"0.17.0","marked_at":1791580268.2854824,"reason":"detected_late","source":"github_release","subject":"astral-sh/ruff"}
