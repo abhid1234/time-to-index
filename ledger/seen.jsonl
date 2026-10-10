@@ -1844,3 +1844,5 @@
 {"answer":"5.20261010.1","marked_at":1791615337.7047079,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"4.64.4","marked_at":1791615337.7047079,"reason":"detected_late","source":"npm","subject":"rollup"}
 {"answer":"bun-v1.4.3","marked_at":1791615337.7047079,"reason":"detected_late","source":"github_release","subject":"oven-sh/bun"}
+{"answer":"3.9.10","marked_at":1791638368.034154,"reason":"detected_late","source":"npm","subject":"prettier"}
+{"answer":"4.64.5","marked_at":1791638368.034154,"reason":"detected_late","source":"npm","subject":"rollup"}
