@@ -1841,3 +1841,6 @@
 {"answer":"4.6.1","marked_at":1791593903.9744449,"reason":"detected_late","source":"npm","subject":"nuxt"}
 {"answer":"7.32.0","marked_at":1791593903.9744449,"reason":"detected_late","source":"npm","subject":"openai"}
 {"answer":"1.13.26","marked_at":1791593903.9744449,"reason":"detected_late","source":"pypi","subject":"dagster"}
+{"answer":"5.20261010.1","marked_at":1791615337.7047079,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"4.64.4","marked_at":1791615337.7047079,"reason":"detected_late","source":"npm","subject":"rollup"}
+{"answer":"bun-v1.4.3","marked_at":1791615337.7047079,"reason":"detected_late","source":"github_release","subject":"oven-sh/bun"}
