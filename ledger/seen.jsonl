@@ -1850,3 +1850,6 @@
 {"answer":"2.5.4","marked_at":1791666944.4678235,"reason":"detected_late","source":"pypi","subject":"numpy"}
 {"answer":"5.20261011.1","marked_at":1791698420.871469,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"v1.0.0","marked_at":1791698420.871469,"reason":"detected_late","source":"github_release","subject":"modelcontextprotocol/servers"}
+{"answer":"1.105.0","marked_at":1791722312.774446,"reason":"detected_late","source":"pypi","subject":"litellm"}
+{"answer":"v0.40.3","marked_at":1791722312.774446,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
+{"answer":"v1.104.3","marked_at":1791722312.774446,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
