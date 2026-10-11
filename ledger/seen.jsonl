@@ -1848,3 +1848,5 @@
 {"answer":"4.64.5","marked_at":1791638368.034154,"reason":"detected_late","source":"npm","subject":"rollup"}
 {"answer":"12.11.2","marked_at":1791654902.0864782,"reason":"detected_late","source":"npm","subject":"pnpm"}
 {"answer":"2.5.4","marked_at":1791666944.4678235,"reason":"detected_late","source":"pypi","subject":"numpy"}
+{"answer":"5.20261011.1","marked_at":1791698420.871469,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"v1.0.0","marked_at":1791698420.871469,"reason":"detected_late","source":"github_release","subject":"modelcontextprotocol/servers"}
