@@ -1881,3 +1881,9 @@
 {"answer":"2610.13704","marked_at":1791786393.7227929,"reason":"detected_late","source":"arxiv","subject":"2610.13704"}
 {"answer":"2610.13593","marked_at":1791786393.7227929,"reason":"detected_late","source":"arxiv","subject":"2610.13593"}
 {"answer":"2610.13573","marked_at":1791786393.7227929,"reason":"detected_late","source":"arxiv","subject":"2610.13573"}
+{"answer":"12.1.3","marked_at":1791820572.4938495,"reason":"detected_late","source":"npm","subject":"@nestjs/core"}
+{"answer":"11.7.0","marked_at":1791820572.4938495,"reason":"detected_late","source":"npm","subject":"@sentry/node"}
+{"answer":"6.6.6","marked_at":1791820572.4938495,"reason":"detected_late","source":"npm","subject":"antd"}
+{"answer":"5.0.4","marked_at":1791820572.4938495,"reason":"detected_late","source":"npm","subject":"vitest"}
+{"answer":"langchain-anthropic==1.7.6","marked_at":1791820572.4938495,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"@astrojs/vercel@11.0.14","marked_at":1791820572.4938495,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
