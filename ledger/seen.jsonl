@@ -1887,3 +1887,7 @@
 {"answer":"5.0.4","marked_at":1791820572.4938495,"reason":"detected_late","source":"npm","subject":"vitest"}
 {"answer":"langchain-anthropic==1.7.6","marked_at":1791820572.4938495,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
 {"answer":"@astrojs/vercel@11.0.14","marked_at":1791820572.4938495,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
+{"answer":"10.6.2","marked_at":1791845258.5667305,"reason":"detected_late","source":"npm","subject":"storybook"}
+{"answer":"1.43.112","marked_at":1791845258.5667305,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"1.4.5","marked_at":1791845258.5667305,"reason":"detected_late","source":"pypi","subject":"langchain"}
+{"answer":"langchain==1.4.5","marked_at":1791845258.5667305,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
