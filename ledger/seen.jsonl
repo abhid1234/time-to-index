@@ -1891,3 +1891,6 @@
 {"answer":"1.43.112","marked_at":1791845258.5667305,"reason":"detected_late","source":"pypi","subject":"boto3"}
 {"answer":"1.4.5","marked_at":1791845258.5667305,"reason":"detected_late","source":"pypi","subject":"langchain"}
 {"answer":"langchain==1.4.5","marked_at":1791845258.5667305,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"5.20261013.1","marked_at":1791861235.1876125,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"3.4.1","marked_at":1791861235.1876125,"reason":"detected_late","source":"pypi","subject":"dspy-ai"}
+{"answer":"checkpointpostgres==3.1.3","marked_at":1791861235.1876125,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langgraph"}
