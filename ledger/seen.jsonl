@@ -1902,3 +1902,14 @@
 {"answer":"3.17.1","marked_at":1791888415.9721918,"reason":"detected_late","source":"pypi","subject":"mlflow"}
 {"answer":"1.8.0","marked_at":1791888415.9721918,"reason":"detected_late","source":"pypi","subject":"starlette"}
 {"answer":"@cloudflare/pages-shared@0.13.196","marked_at":1791888415.9721918,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"v12.4.13","marked_at":1791913787.4280784,"reason":"detected_late","source":"github_release","subject":"grafana/grafana"}
+{"answer":"2026-20972","marked_at":1791913787.4280784,"reason":"detected_late","source":"federal_register","subject":"2026-20972"}
+{"answer":"2026-20969","marked_at":1791913787.4280784,"reason":"detected_late","source":"federal_register","subject":"2026-20969"}
+{"answer":"2026-20902","marked_at":1791913787.4280784,"reason":"detected_late","source":"federal_register","subject":"2026-20902"}
+{"answer":"2026-20901","marked_at":1791913787.4280784,"reason":"detected_late","source":"federal_register","subject":"2026-20901"}
+{"answer":"2026-20900","marked_at":1791913787.4280784,"reason":"detected_late","source":"federal_register","subject":"2026-20900"}
+{"answer":"2026-20895","marked_at":1791913787.4280784,"reason":"detected_late","source":"federal_register","subject":"2026-20895"}
+{"answer":"2026-20892","marked_at":1791913787.4280784,"reason":"detected_late","source":"federal_register","subject":"2026-20892"}
+{"answer":"2026-20890","marked_at":1791913787.4280784,"reason":"detected_late","source":"federal_register","subject":"2026-20890"}
+{"answer":"2026-20889","marked_at":1791913787.4280784,"reason":"detected_late","source":"federal_register","subject":"2026-20889"}
+{"answer":"2026-20888","marked_at":1791913787.4280784,"reason":"detected_late","source":"federal_register","subject":"2026-20888"}
