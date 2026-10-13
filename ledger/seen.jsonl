@@ -1913,3 +1913,8 @@
 {"answer":"2026-20890","marked_at":1791913787.4280784,"reason":"detected_late","source":"federal_register","subject":"2026-20890"}
 {"answer":"2026-20889","marked_at":1791913787.4280784,"reason":"detected_late","source":"federal_register","subject":"2026-20889"}
 {"answer":"2026-20888","marked_at":1791913787.4280784,"reason":"detected_late","source":"federal_register","subject":"2026-20888"}
+{"answer":"24.0.0","marked_at":1791928796.371406,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"44.7.1","marked_at":1791928796.371406,"reason":"detected_late","source":"npm","subject":"electron"}
+{"answer":"2.11.8","marked_at":1791928796.371406,"reason":"detected_late","source":"npm","subject":"turbo"}
+{"answer":"1.43.113","marked_at":1791928796.371406,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"cli==0.4.34","marked_at":1791928796.371406,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langgraph"}
