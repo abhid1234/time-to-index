@@ -1953,3 +1953,4 @@
 {"answer":"2610.17867","marked_at":1791958070.5212088,"reason":"detected_late","source":"arxiv","subject":"2610.17867"}
 {"answer":"2610.17586","marked_at":1791958070.5212088,"reason":"detected_late","source":"arxiv","subject":"2610.17586"}
 {"answer":"2610.16919","marked_at":1791958070.5212088,"reason":"detected_late","source":"arxiv","subject":"2610.16919"}
+{"answer":"v1.16.6","marked_at":1791978382.4685352,"reason":"detected_late","source":"github_release","subject":"hashicorp/terraform"}
