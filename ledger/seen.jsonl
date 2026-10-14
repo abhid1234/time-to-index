@@ -1954,3 +1954,17 @@
 {"answer":"2610.17586","marked_at":1791958070.5212088,"reason":"detected_late","source":"arxiv","subject":"2610.17586"}
 {"answer":"2610.16919","marked_at":1791958070.5212088,"reason":"detected_late","source":"arxiv","subject":"2610.16919"}
 {"answer":"v1.16.6","marked_at":1791978382.4685352,"reason":"detected_late","source":"github_release","subject":"hashicorp/terraform"}
+{"answer":"1.64.1","marked_at":1791993554.1199007,"reason":"detected_late","source":"npm","subject":"playwright"}
+{"answer":"0.143.1","marked_at":1791993554.1199007,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"langchain-openai==1.7.2","marked_at":1791993554.1199007,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"1.141.2","marked_at":1791993554.1199007,"reason":"detected_late","source":"github_release","subject":"microsoft/vscode"}
+{"answer":"2026-21061","marked_at":1791993554.1199007,"reason":"detected_late","source":"federal_register","subject":"2026-21061"}
+{"answer":"2026-21031","marked_at":1791993554.1199007,"reason":"detected_late","source":"federal_register","subject":"2026-21031"}
+{"answer":"2026-21030","marked_at":1791993554.1199007,"reason":"detected_late","source":"federal_register","subject":"2026-21030"}
+{"answer":"2026-21024","marked_at":1791993554.1199007,"reason":"detected_late","source":"federal_register","subject":"2026-21024"}
+{"answer":"2026-21022","marked_at":1791993554.1199007,"reason":"detected_late","source":"federal_register","subject":"2026-21022"}
+{"answer":"2026-21021","marked_at":1791993554.1199007,"reason":"detected_late","source":"federal_register","subject":"2026-21021"}
+{"answer":"2026-21020","marked_at":1791993554.1199007,"reason":"detected_late","source":"federal_register","subject":"2026-21020"}
+{"answer":"2026-21019","marked_at":1791993554.1199007,"reason":"detected_late","source":"federal_register","subject":"2026-21019"}
+{"answer":"2026-21018","marked_at":1791993554.1199007,"reason":"detected_late","source":"federal_register","subject":"2026-21018"}
+{"answer":"2026-21017","marked_at":1791993554.1199007,"reason":"detected_late","source":"federal_register","subject":"2026-21017"}
