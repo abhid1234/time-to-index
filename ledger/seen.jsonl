@@ -1979,3 +1979,5 @@
 {"answer":"checkpointpostgres==3.2.0","marked_at":1792008533.353179,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langgraph"}
 {"answer":"1.142.0","marked_at":1792008533.353179,"reason":"detected_late","source":"github_release","subject":"microsoft/vscode"}
 {"answer":"v16.4.1","marked_at":1792008533.353179,"reason":"detected_late","source":"github_release","subject":"vercel/next.js"}
+{"answer":"24.0.1","marked_at":1792019582.8640351,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"7.34.0","marked_at":1792019582.8640351,"reason":"detected_late","source":"npm","subject":"openai"}
