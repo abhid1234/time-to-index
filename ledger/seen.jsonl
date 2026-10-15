@@ -2045,3 +2045,11 @@
 {"answer":"2026-21099","marked_at":1792081829.980234,"reason":"detected_late","source":"federal_register","subject":"2026-21099"}
 {"answer":"2026-21098","marked_at":1792081829.980234,"reason":"detected_late","source":"federal_register","subject":"2026-21098"}
 {"answer":"2026-21097","marked_at":1792081829.980234,"reason":"detected_late","source":"federal_register","subject":"2026-21097"}
+{"answer":"1.15.0","marked_at":1792094426.4646282,"reason":"detected_late","source":"pypi","subject":"anthropic"}
+{"answer":"3.17.1","marked_at":1792094426.4646282,"reason":"detected_late","source":"pypi","subject":"google-cloud-storage"}
+{"answer":"1.16.0","marked_at":1792094426.4646282,"reason":"detected_late","source":"pypi","subject":"trl"}
+{"answer":"5.20.0","marked_at":1792094426.4646282,"reason":"detected_late","source":"pypi","subject":"transformers"}
+{"answer":"v0.40.5","marked_at":1792094426.4646282,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
+{"answer":"v0.7.0","marked_at":1792094426.4646282,"reason":"detected_late","source":"github_release","subject":"ggml-org/llama.cpp"}
+{"answer":"langchain-core==1.6.11","marked_at":1792094426.4646282,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"v5.20.0","marked_at":1792094426.4646282,"reason":"detected_late","source":"github_release","subject":"huggingface/transformers"}
