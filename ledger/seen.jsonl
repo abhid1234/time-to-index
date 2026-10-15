@@ -2022,3 +2022,7 @@
 {"answer":"2610.20245","marked_at":1792045525.147072,"reason":"detected_late","source":"arxiv","subject":"2610.20245"}
 {"answer":"2610.20193","marked_at":1792045525.147072,"reason":"detected_late","source":"arxiv","subject":"2610.20193"}
 {"answer":"2610.20527","marked_at":1792045525.147072,"reason":"detected_late","source":"arxiv","subject":"2610.20527"}
+{"answer":"11.8.0","marked_at":1792065357.8777668,"reason":"detected_late","source":"npm","subject":"@sentry/node"}
+{"answer":"5.104.3","marked_at":1792065357.8777668,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
+{"answer":"3.4.0","marked_at":1792065357.8777668,"reason":"detected_late","source":"pypi","subject":"haystack-ai"}
+{"answer":"@cloudflare/remote-bindings@0.0.48","marked_at":1792065357.8777668,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
