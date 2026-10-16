@@ -2108,3 +2108,5 @@
 {"answer":"2026-21232","marked_at":1792163957.8147767,"reason":"detected_late","source":"federal_register","subject":"2026-21232"}
 {"answer":"2026-21231","marked_at":1792163957.8147767,"reason":"detected_late","source":"federal_register","subject":"2026-21231"}
 {"answer":"2026-21230","marked_at":1792163957.8147767,"reason":"detected_late","source":"federal_register","subject":"2026-21230"}
+{"answer":"4.6.2","marked_at":1792176945.0226843,"reason":"detected_late","source":"npm","subject":"nuxt"}
+{"answer":"cli==0.4.36","marked_at":1792176945.0226843,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langgraph"}
