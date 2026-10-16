@@ -2059,3 +2059,6 @@
 {"answer":"1.5.17","marked_at":1792105221.1462965,"reason":"detected_late","source":"npm","subject":"langchain"}
 {"answer":"5.112.0","marked_at":1792105221.1462965,"reason":"detected_late","source":"npm","subject":"webpack"}
 {"answer":"v16.4.2","marked_at":1792105221.1462965,"reason":"detected_late","source":"github_release","subject":"vercel/next.js"}
+{"answer":"1.5.18","marked_at":1792113238.2048721,"reason":"detected_late","source":"npm","subject":"langchain"}
+{"answer":"2610.21264","marked_at":1792113238.2048721,"reason":"detected_late","source":"arxiv","subject":"2610.21264"}
+{"answer":"2610.21174","marked_at":1792113238.2048721,"reason":"detected_late","source":"arxiv","subject":"2610.21174"}
