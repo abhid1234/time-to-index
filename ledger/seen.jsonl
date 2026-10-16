@@ -2091,3 +2091,5 @@
 {"answer":"2610.22061","marked_at":1792130168.2572942,"reason":"detected_late","source":"arxiv","subject":"2610.22061"}
 {"answer":"2610.21796","marked_at":1792130168.2572942,"reason":"detected_late","source":"arxiv","subject":"2610.21796"}
 {"answer":"2610.21676","marked_at":1792130168.2572942,"reason":"detected_late","source":"arxiv","subject":"2610.21676"}
+{"answer":"4.151.1","marked_at":1792148248.1512573,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"@cloudflare/remote-bindings@0.0.49","marked_at":1792148248.1512573,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
