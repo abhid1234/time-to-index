@@ -2118,3 +2118,5 @@
 {"answer":"24.0.3","marked_at":1792195990.5216715,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
 {"answer":"1.2.16","marked_at":1792195990.5216715,"reason":"detected_late","source":"pypi","subject":"langgraph"}
 {"answer":"1.2.16","marked_at":1792195990.5216715,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langgraph"}
+{"answer":"7.36.0","marked_at":1792212060.5373964,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"3.33.0","marked_at":1792212060.5373964,"reason":"detected_late","source":"pypi","subject":"openai"}
