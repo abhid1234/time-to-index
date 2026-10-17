@@ -2122,3 +2122,4 @@
 {"answer":"3.33.0","marked_at":1792212060.5373964,"reason":"detected_late","source":"pypi","subject":"openai"}
 {"answer":"44.9.0","marked_at":1792226952.1420205,"reason":"detected_late","source":"npm","subject":"electron"}
 {"answer":"4.64.8","marked_at":1792240197.0357313,"reason":"detected_late","source":"npm","subject":"rollup"}
+{"answer":"v0.40.6","marked_at":1792252401.7636173,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
