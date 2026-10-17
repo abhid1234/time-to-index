@@ -2126,3 +2126,4 @@
 {"answer":"5.104.4","marked_at":1792260830.9737766,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
 {"answer":"v1.103.5","marked_at":1792260830.9737766,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
 {"answer":"4.64.9","marked_at":1792269826.524341,"reason":"detected_late","source":"npm","subject":"rollup"}
+{"answer":"7.37.0","marked_at":1792276941.6935236,"reason":"detected_late","source":"npm","subject":"openai"}
