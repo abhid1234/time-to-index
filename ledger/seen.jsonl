@@ -2137,3 +2137,7 @@
 {"answer":"v1.106.0","marked_at":1792315725.8530195,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
 {"answer":"0.144.0","marked_at":1792330182.5846205,"reason":"detected_late","source":"pypi","subject":"fastapi"}
 {"answer":"0.32.0","marked_at":1792330182.5846205,"reason":"detected_late","source":"pypi","subject":"vllm"}
+{"answer":"6.42.0","marked_at":1792342079.1226444,"reason":"detected_late","source":"npm","subject":"knip"}
+{"answer":"4.64.10","marked_at":1792342079.1226444,"reason":"detected_late","source":"npm","subject":"rollup"}
+{"answer":"0.146.0","marked_at":1792342079.1226444,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"1.9.0","marked_at":1792342079.1226444,"reason":"detected_late","source":"pypi","subject":"starlette"}
