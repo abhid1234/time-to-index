@@ -2129,3 +2129,5 @@
 {"answer":"7.37.0","marked_at":1792276941.6935236,"reason":"detected_late","source":"npm","subject":"openai"}
 {"answer":"7.38.0","marked_at":1792283223.585714,"reason":"detected_late","source":"npm","subject":"openai"}
 {"answer":"3.35.0","marked_at":1792283223.585714,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"5.20261018.1","marked_at":1792299603.3327131,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"3.35.1","marked_at":1792299603.3327131,"reason":"detected_late","source":"pypi","subject":"openai"}
