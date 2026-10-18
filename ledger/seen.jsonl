@@ -2127,3 +2127,5 @@
 {"answer":"v1.103.5","marked_at":1792260830.9737766,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
 {"answer":"4.64.9","marked_at":1792269826.524341,"reason":"detected_late","source":"npm","subject":"rollup"}
 {"answer":"7.37.0","marked_at":1792276941.6935236,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"7.38.0","marked_at":1792283223.585714,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"3.35.0","marked_at":1792283223.585714,"reason":"detected_late","source":"pypi","subject":"openai"}
