@@ -2131,3 +2131,7 @@
 {"answer":"3.35.0","marked_at":1792283223.585714,"reason":"detected_late","source":"pypi","subject":"openai"}
 {"answer":"5.20261018.1","marked_at":1792299603.3327131,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"3.35.1","marked_at":1792299603.3327131,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"0.143.5","marked_at":1792315725.8530195,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"1.106.0","marked_at":1792315725.8530195,"reason":"detected_late","source":"pypi","subject":"litellm"}
+{"answer":"v0.32.0","marked_at":1792315725.8530195,"reason":"detected_late","source":"github_release","subject":"vllm-project/vllm"}
+{"answer":"v1.106.0","marked_at":1792315725.8530195,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
