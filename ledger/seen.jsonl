@@ -2205,3 +2205,10 @@
 {"answer":"2026-21383","marked_at":1792419877.217957,"reason":"detected_late","source":"federal_register","subject":"2026-21383"}
 {"answer":"2026-21381","marked_at":1792419877.217957,"reason":"detected_late","source":"federal_register","subject":"2026-21381"}
 {"answer":"2026-21380","marked_at":1792419877.217957,"reason":"detected_late","source":"federal_register","subject":"2026-21380"}
+{"answer":"5.104.5","marked_at":1792440391.9213831,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
+{"answer":"6.42.1","marked_at":1792440391.9213831,"reason":"detected_late","source":"npm","subject":"knip"}
+{"answer":"1.89.0","marked_at":1792440391.9213831,"reason":"detected_late","source":"npm","subject":"oxlint"}
+{"answer":"1.43.115","marked_at":1792440391.9213831,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"0.149.0","marked_at":1792440391.9213831,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"5.20.2","marked_at":1792440391.9213831,"reason":"detected_late","source":"pypi","subject":"transformers"}
+{"answer":"v5.20.2","marked_at":1792440391.9213831,"reason":"detected_late","source":"github_release","subject":"huggingface/transformers"}
