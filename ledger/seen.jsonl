@@ -2186,3 +2186,22 @@
 {"answer":"2610.23546","marked_at":1792392655.0347738,"reason":"detected_late","source":"arxiv","subject":"2610.23546"}
 {"answer":"2610.23506","marked_at":1792392655.0347738,"reason":"detected_late","source":"arxiv","subject":"2610.23506"}
 {"answer":"2610.23652","marked_at":1792392655.0347738,"reason":"detected_late","source":"arxiv","subject":"2610.23652"}
+{"answer":"12.2.0","marked_at":1792419877.217957,"reason":"detected_late","source":"npm","subject":"@nestjs/core"}
+{"answer":"7.4.1","marked_at":1792419877.217957,"reason":"detected_late","source":"npm","subject":"astro"}
+{"answer":"4.151.2","marked_at":1792419877.217957,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"0.148.0","marked_at":1792419877.217957,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"0.12.0","marked_at":1792419877.217957,"reason":"detected_late","source":"pypi","subject":"jax"}
+{"answer":"cli==0.4.37","marked_at":1792419877.217957,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langgraph"}
+{"answer":"@cloudflare/pages-shared@0.13.199","marked_at":1792419877.217957,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"@astrojs/vue@7.1.1","marked_at":1792419877.217957,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
+{"answer":"0001104659-26-116700","marked_at":1792419877.217957,"reason":"detected_late","source":"edgar","subject":"1318605:DEF 14A"}
+{"answer":"C1-2026-12067","marked_at":1792419877.217957,"reason":"detected_late","source":"federal_register","subject":"C1-2026-12067"}
+{"answer":"2026-21432","marked_at":1792419877.217957,"reason":"detected_late","source":"federal_register","subject":"2026-21432"}
+{"answer":"2026-21431","marked_at":1792419877.217957,"reason":"detected_late","source":"federal_register","subject":"2026-21431"}
+{"answer":"2026-21430","marked_at":1792419877.217957,"reason":"detected_late","source":"federal_register","subject":"2026-21430"}
+{"answer":"2026-21399","marked_at":1792419877.217957,"reason":"detected_late","source":"federal_register","subject":"2026-21399"}
+{"answer":"2026-21387","marked_at":1792419877.217957,"reason":"detected_late","source":"federal_register","subject":"2026-21387"}
+{"answer":"2026-21384","marked_at":1792419877.217957,"reason":"detected_late","source":"federal_register","subject":"2026-21384"}
+{"answer":"2026-21383","marked_at":1792419877.217957,"reason":"detected_late","source":"federal_register","subject":"2026-21383"}
+{"answer":"2026-21381","marked_at":1792419877.217957,"reason":"detected_late","source":"federal_register","subject":"2026-21381"}
+{"answer":"2026-21380","marked_at":1792419877.217957,"reason":"detected_late","source":"federal_register","subject":"2026-21380"}
