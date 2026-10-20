@@ -2288,3 +2288,12 @@
 {"answer":"0.13.4","marked_at":1792518527.0605035,"reason":"detected_late","source":"github_release","subject":"astral-sh/uv"}
 {"answer":"v1.103.6","marked_at":1792518527.0605035,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
 {"answer":"0001193125-26-425881","marked_at":1792518527.0605035,"reason":"detected_late","source":"edgar","subject":"1108524:8-K"}
+{"answer":"0.136.0","marked_at":1792529741.5555634,"reason":"detected_late","source":"npm","subject":"@anthropic-ai/sdk"}
+{"answer":"44.9.2","marked_at":1792529741.5555634,"reason":"detected_late","source":"npm","subject":"electron"}
+{"answer":"2.11.10","marked_at":1792529741.5555634,"reason":"detected_late","source":"npm","subject":"turbo"}
+{"answer":"1.16.0","marked_at":1792529741.5555634,"reason":"detected_late","source":"pypi","subject":"anthropic"}
+{"answer":"0.156.2","marked_at":1792529741.5555634,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"1.43.116","marked_at":1792529741.5555634,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"1.106.1","marked_at":1792529741.5555634,"reason":"detected_late","source":"pypi","subject":"litellm"}
+{"answer":"84.2.1","marked_at":1792529741.5555634,"reason":"detected_late","source":"pypi","subject":"setuptools"}
+{"answer":"v1.106.1","marked_at":1792529741.5555634,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
