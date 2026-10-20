@@ -2297,3 +2297,7 @@
 {"answer":"1.106.1","marked_at":1792529741.5555634,"reason":"detected_late","source":"pypi","subject":"litellm"}
 {"answer":"84.2.1","marked_at":1792529741.5555634,"reason":"detected_late","source":"pypi","subject":"setuptools"}
 {"answer":"v1.106.1","marked_at":1792529741.5555634,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
+{"answer":"0.137.0","marked_at":1792539580.6915183,"reason":"detected_late","source":"npm","subject":"@anthropic-ai/sdk"}
+{"answer":"26.0.0","marked_at":1792539580.6915183,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"1.17.0","marked_at":1792539580.6915183,"reason":"detected_late","source":"pypi","subject":"anthropic"}
+{"answer":"0.156.4","marked_at":1792539580.6915183,"reason":"detected_late","source":"pypi","subject":"fastapi"}
