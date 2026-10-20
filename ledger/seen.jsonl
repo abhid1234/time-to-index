@@ -2283,3 +2283,8 @@
 {"answer":"2026-21464","marked_at":1792500899.24125,"reason":"detected_late","source":"federal_register","subject":"2026-21464"}
 {"answer":"2026-21463","marked_at":1792500899.24125,"reason":"detected_late","source":"federal_register","subject":"2026-21463"}
 {"answer":"2026-21462","marked_at":1792500899.24125,"reason":"detected_late","source":"federal_register","subject":"2026-21462"}
+{"answer":"0.156.0","marked_at":1792518527.0605035,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"0.13.4","marked_at":1792518527.0605035,"reason":"detected_late","source":"pypi","subject":"uv"}
+{"answer":"0.13.4","marked_at":1792518527.0605035,"reason":"detected_late","source":"github_release","subject":"astral-sh/uv"}
+{"answer":"v1.103.6","marked_at":1792518527.0605035,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
+{"answer":"0001193125-26-425881","marked_at":1792518527.0605035,"reason":"detected_late","source":"edgar","subject":"1108524:8-K"}
