@@ -2369,3 +2369,17 @@
 {"answer":"2026-21527","marked_at":1792588393.204945,"reason":"detected_late","source":"federal_register","subject":"2026-21527"}
 {"answer":"2026-21526","marked_at":1792588393.204945,"reason":"detected_late","source":"federal_register","subject":"2026-21526"}
 {"answer":"2026-21525","marked_at":1792588393.204945,"reason":"detected_late","source":"federal_register","subject":"2026-21525"}
+{"answer":"1.0.0","marked_at":1792606073.9035757,"reason":"detected_late","source":"npm","subject":"@anthropic-ai/sdk"}
+{"answer":"7.4.2","marked_at":1792606073.9035757,"reason":"detected_late","source":"npm","subject":"astro"}
+{"answer":"13.1.0","marked_at":1792606073.9035757,"reason":"detected_late","source":"npm","subject":"firebase"}
+{"answer":"7.41.0","marked_at":1792606073.9035757,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"2.0.0","marked_at":1792606073.9035757,"reason":"detected_late","source":"pypi","subject":"anthropic"}
+{"answer":"0.158.1","marked_at":1792606073.9035757,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"3.36.0","marked_at":1792606073.9035757,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"1.66.1","marked_at":1792606073.9035757,"reason":"detected_late","source":"pypi","subject":"streamlit"}
+{"answer":"v2.9.8","marked_at":1792606073.9035757,"reason":"detected_late","source":"github_release","subject":"denoland/deno"}
+{"answer":"v1.106.2","marked_at":1792606073.9035757,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
+{"answer":"langchain-perplexity==1.4.2","marked_at":1792606073.9035757,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"@astrojs/vue@7.1.2","marked_at":1792606073.9035757,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
+{"answer":"v1.17.0","marked_at":1792606073.9035757,"reason":"detected_late","source":"github_release","subject":"hashicorp/terraform"}
+{"answer":"v3.15.1","marked_at":1792606073.9035757,"reason":"detected_late","source":"github_release","subject":"prometheus/prometheus"}
