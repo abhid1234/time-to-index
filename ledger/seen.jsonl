@@ -2383,3 +2383,11 @@
 {"answer":"@astrojs/vue@7.1.2","marked_at":1792606073.9035757,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
 {"answer":"v1.17.0","marked_at":1792606073.9035757,"reason":"detected_late","source":"github_release","subject":"hashicorp/terraform"}
 {"answer":"v3.15.1","marked_at":1792606073.9035757,"reason":"detected_late","source":"github_release","subject":"prometheus/prometheus"}
+{"answer":"0.159.1","marked_at":1792618789.0925443,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"0.12.0.1","marked_at":1792618789.0925443,"reason":"detected_late","source":"pypi","subject":"jax"}
+{"answer":"3.4.1","marked_at":1792618789.0925443,"reason":"detected_late","source":"pypi","subject":"haystack-ai"}
+{"answer":"1.43.117","marked_at":1792618789.0925443,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"0001193125-26-427849","marked_at":1792618789.0925443,"reason":"detected_late","source":"edgar","subject":"789019:DEF 14A"}
+{"answer":"0001628280-26-066700","marked_at":1792618789.0925443,"reason":"detected_late","source":"edgar","subject":"1326801:8-K"}
+{"answer":"0001628280-26-066738","marked_at":1792618789.0925443,"reason":"detected_late","source":"edgar","subject":"1318605:8-K"}
+{"answer":"0001628280-26-066735","marked_at":1792618789.0925443,"reason":"detected_late","source":"edgar","subject":"1798100:8-K"}
