@@ -2421,3 +2421,8 @@
 {"answer":"2610.30100","marked_at":1792645298.2041354,"reason":"detected_late","source":"arxiv","subject":"2610.30100"}
 {"answer":"2610.29689","marked_at":1792645298.2041354,"reason":"detected_late","source":"arxiv","subject":"2610.29689"}
 {"answer":"2610.29669","marked_at":1792645298.2041354,"reason":"detected_late","source":"arxiv","subject":"2610.29669"}
+{"answer":"27.0.0","marked_at":1792663610.654341,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"4.65.0","marked_at":1792663610.654341,"reason":"detected_late","source":"npm","subject":"rollup"}
+{"answer":"v1.16.7","marked_at":1792663610.654341,"reason":"detected_late","source":"github_release","subject":"hashicorp/terraform"}
+{"answer":"0001628280-26-066775","marked_at":1792663610.654341,"reason":"detected_late","source":"edgar","subject":"1318605:10-Q"}
+{"answer":"0001628280-26-066773","marked_at":1792663610.654341,"reason":"detected_late","source":"edgar","subject":"1326801:10-Q"}
