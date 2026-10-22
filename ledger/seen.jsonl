@@ -2447,3 +2447,6 @@
 {"answer":"0.17.2","marked_at":1792696601.9361076,"reason":"detected_late","source":"github_release","subject":"astral-sh/ruff"}
 {"answer":"bun-v1.4.4","marked_at":1792696601.9361076,"reason":"detected_late","source":"github_release","subject":"oven-sh/bun"}
 {"answer":"langchain-core==1.7.0","marked_at":1792696601.9361076,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"7.43.0","marked_at":1792708104.7353163,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"3.37.0","marked_at":1792708104.7353163,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"1.43.118","marked_at":1792708104.7353163,"reason":"detected_late","source":"pypi","subject":"boto3"}
