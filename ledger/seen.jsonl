@@ -2441,3 +2441,9 @@
 {"answer":"2026-21625","marked_at":1792682038.386768,"reason":"detected_late","source":"federal_register","subject":"2026-21625"}
 {"answer":"2026-21624","marked_at":1792682038.386768,"reason":"detected_late","source":"federal_register","subject":"2026-21624"}
 {"answer":"2026-21623","marked_at":1792682038.386768,"reason":"detected_late","source":"federal_register","subject":"2026-21623"}
+{"answer":"23.0.1","marked_at":1792696601.9361076,"reason":"detected_late","source":"npm","subject":"stripe"}
+{"answer":"0.161.0","marked_at":1792696601.9361076,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"0.17.2","marked_at":1792696601.9361076,"reason":"detected_late","source":"pypi","subject":"ruff"}
+{"answer":"0.17.2","marked_at":1792696601.9361076,"reason":"detected_late","source":"github_release","subject":"astral-sh/ruff"}
+{"answer":"bun-v1.4.4","marked_at":1792696601.9361076,"reason":"detected_late","source":"github_release","subject":"oven-sh/bun"}
+{"answer":"langchain-core==1.7.0","marked_at":1792696601.9361076,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
