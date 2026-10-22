@@ -2391,3 +2391,6 @@
 {"answer":"0001628280-26-066700","marked_at":1792618789.0925443,"reason":"detected_late","source":"edgar","subject":"1326801:8-K"}
 {"answer":"0001628280-26-066738","marked_at":1792618789.0925443,"reason":"detected_late","source":"edgar","subject":"1318605:8-K"}
 {"answer":"0001628280-26-066735","marked_at":1792618789.0925443,"reason":"detected_late","source":"edgar","subject":"1798100:8-K"}
+{"answer":"1.1.0","marked_at":1792628214.4951596,"reason":"detected_late","source":"npm","subject":"@anthropic-ai/sdk"}
+{"answer":"2.1.0","marked_at":1792628214.4951596,"reason":"detected_late","source":"pypi","subject":"anthropic"}
+{"answer":"v0.40.8","marked_at":1792628214.4951596,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
