@@ -2481,3 +2481,5 @@
 {"answer":"2610.30710","marked_at":1792734473.696235,"reason":"detected_late","source":"arxiv","subject":"2610.30710"}
 {"answer":"2610.30593","marked_at":1792734473.696235,"reason":"detected_late","source":"arxiv","subject":"2610.30593"}
 {"answer":"2610.30425","marked_at":1792734473.696235,"reason":"detected_late","source":"arxiv","subject":"2610.30425"}
+{"answer":"2.3.0","marked_at":1792751654.1352255,"reason":"detected_late","source":"pypi","subject":"huggingface-hub"}
+{"answer":"@cloudflare/vite-plugin@1.65.0","marked_at":1792751654.1352255,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
