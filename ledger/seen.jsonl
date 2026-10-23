@@ -2500,3 +2500,7 @@
 {"answer":"2026-21710","marked_at":1792769239.240601,"reason":"detected_late","source":"federal_register","subject":"2026-21710"}
 {"answer":"2026-21708","marked_at":1792769239.240601,"reason":"detected_late","source":"federal_register","subject":"2026-21708"}
 {"answer":"2026-21707","marked_at":1792769239.240601,"reason":"detected_late","source":"federal_register","subject":"2026-21707"}
+{"answer":"11.0.2","marked_at":1792783776.8741019,"reason":"detected_late","source":"npm","subject":"preact"}
+{"answer":"0.42.0","marked_at":1792783776.8741019,"reason":"detected_late","source":"pypi","subject":"diffusers"}
+{"answer":"0.162.0","marked_at":1792783776.8741019,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"v0.40.10","marked_at":1792783776.8741019,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
