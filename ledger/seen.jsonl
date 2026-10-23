@@ -2504,3 +2504,4 @@
 {"answer":"0.42.0","marked_at":1792783776.8741019,"reason":"detected_late","source":"pypi","subject":"diffusers"}
 {"answer":"0.162.0","marked_at":1792783776.8741019,"reason":"detected_late","source":"pypi","subject":"fastapi"}
 {"answer":"v0.40.10","marked_at":1792783776.8741019,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
+{"answer":"0001094285-26-000059","marked_at":1792794860.9444926,"reason":"detected_late","source":"edgar","subject":"1094285:10-Q"}
