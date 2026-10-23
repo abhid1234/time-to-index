@@ -2450,3 +2450,7 @@
 {"answer":"7.43.0","marked_at":1792708104.7353163,"reason":"detected_late","source":"npm","subject":"openai"}
 {"answer":"3.37.0","marked_at":1792708104.7353163,"reason":"detected_late","source":"pypi","subject":"openai"}
 {"answer":"1.43.118","marked_at":1792708104.7353163,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"27.0.1","marked_at":1792716735.9388874,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"1.48.0","marked_at":1792716735.9388874,"reason":"detected_late","source":"npm","subject":"convex"}
+{"answer":"5.112.1","marked_at":1792716735.9388874,"reason":"detected_late","source":"npm","subject":"webpack"}
+{"answer":"1.143.1","marked_at":1792716735.9388874,"reason":"detected_late","source":"github_release","subject":"microsoft/vscode"}
