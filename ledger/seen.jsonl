@@ -2511,3 +2511,6 @@
 {"answer":"5.20261024.1","marked_at":1792820812.4677749,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"1.2.17","marked_at":1792820812.4677749,"reason":"detected_late","source":"pypi","subject":"langgraph"}
 {"answer":"1.2.17","marked_at":1792820812.4677749,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langgraph"}
+{"answer":"6.43.0","marked_at":1792835490.6287105,"reason":"detected_late","source":"npm","subject":"knip"}
+{"answer":"1.106.3","marked_at":1792835490.6287105,"reason":"detected_late","source":"pypi","subject":"litellm"}
+{"answer":"v1.106.3","marked_at":1792835490.6287105,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
