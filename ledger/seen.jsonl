@@ -2516,3 +2516,4 @@
 {"answer":"v1.106.3","marked_at":1792835490.6287105,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
 {"answer":"2.6.3","marked_at":1792849932.7092361,"reason":"detected_late","source":"npm","subject":"@biomejs/biome"}
 {"answer":"@biomejs/biome@2.6.3","marked_at":1792849932.7092361,"reason":"detected_late","source":"github_release","subject":"biomejs/biome"}
+{"answer":"1.10.0","marked_at":1792862124.1947503,"reason":"detected_late","source":"pypi","subject":"starlette"}
