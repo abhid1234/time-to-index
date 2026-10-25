@@ -2524,3 +2524,5 @@
 {"answer":"v1.105.5","marked_at":1792920232.0738363,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
 {"answer":"1.106.4","marked_at":1792936282.9905083,"reason":"detected_late","source":"pypi","subject":"litellm"}
 {"answer":"v1.106.4","marked_at":1792936282.9905083,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
+{"answer":"2.1.0","marked_at":1792958029.9736545,"reason":"detected_late","source":"pypi","subject":"polars"}
+{"answer":"py-2.1.0","marked_at":1792958029.9736545,"reason":"detected_late","source":"github_release","subject":"pola-rs/polars"}
