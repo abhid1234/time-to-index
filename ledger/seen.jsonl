@@ -2520,3 +2520,5 @@
 {"answer":"v0.40.11","marked_at":1792870425.2191072,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
 {"answer":"5.20261025.1","marked_at":1792902850.7972403,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"v2.1.0","marked_at":1792902850.7972403,"reason":"detected_late","source":"github_release","subject":"modelcontextprotocol/servers"}
+{"answer":"4.13.14","marked_at":1792920232.0738363,"reason":"detected_late","source":"npm","subject":"hono"}
+{"answer":"v1.105.5","marked_at":1792920232.0738363,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
