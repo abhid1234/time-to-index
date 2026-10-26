@@ -2554,3 +2554,6 @@
 {"answer":"2610.32586","marked_at":1792991738.355644,"reason":"detected_late","source":"arxiv","subject":"2610.32586"}
 {"answer":"2610.32247","marked_at":1792991738.355644,"reason":"detected_late","source":"arxiv","subject":"2610.32247"}
 {"answer":"2610.32015","marked_at":1792991738.355644,"reason":"detected_late","source":"arxiv","subject":"2610.32015"}
+{"answer":"5.105.0","marked_at":1793013297.09561,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
+{"answer":"4.65.1","marked_at":1793013297.09561,"reason":"detected_late","source":"npm","subject":"rollup"}
+{"answer":"10.6.4","marked_at":1793013297.09561,"reason":"detected_late","source":"npm","subject":"storybook"}
