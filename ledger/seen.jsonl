@@ -2575,3 +2575,11 @@
 {"answer":"2026-21819","marked_at":1793035614.2551148,"reason":"detected_late","source":"federal_register","subject":"2026-21819"}
 {"answer":"2026-21818","marked_at":1793035614.2551148,"reason":"detected_late","source":"federal_register","subject":"2026-21818"}
 {"answer":"2026-21817","marked_at":1793035614.2551148,"reason":"detected_late","source":"federal_register","subject":"2026-21817"}
+{"answer":"7.45.0","marked_at":1793051241.3283472,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"5.57.3","marked_at":1793051241.3283472,"reason":"detected_late","source":"npm","subject":"svelte"}
+{"answer":"1.43.119","marked_at":1793051241.3283472,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"1.2.18","marked_at":1793051241.3283472,"reason":"detected_late","source":"pypi","subject":"langgraph"}
+{"answer":"3.39.0","marked_at":1793051241.3283472,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"5.21.0","marked_at":1793051241.3283472,"reason":"detected_late","source":"pypi","subject":"transformers"}
+{"answer":"1.2.18","marked_at":1793051241.3283472,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langgraph"}
+{"answer":"v5.21","marked_at":1793051241.3283472,"reason":"detected_late","source":"github_release","subject":"huggingface/transformers"}
