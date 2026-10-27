@@ -2626,3 +2626,9 @@
 {"answer":"0.42.1","marked_at":1793102611.8517673,"reason":"detected_late","source":"pypi","subject":"diffusers"}
 {"answer":"v13.2.5","marked_at":1793102611.8517673,"reason":"detected_late","source":"github_release","subject":"grafana/grafana"}
 {"answer":"0001633917-26-000086","marked_at":1793102611.8517673,"reason":"detected_late","source":"edgar","subject":"1633917:8-K"}
+{"answer":"12.3.2","marked_at":1793123802.7066534,"reason":"detected_late","source":"npm","subject":"@nestjs/core"}
+{"answer":"7.45.1","marked_at":1793123802.7066534,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"10.6.5","marked_at":1793123802.7066534,"reason":"detected_late","source":"npm","subject":"storybook"}
+{"answer":"4.154.0","marked_at":1793123802.7066534,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"3.40.0","marked_at":1793123802.7066534,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"@cloudflare/vitest-plugin@1.4.9","marked_at":1793123802.7066534,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
