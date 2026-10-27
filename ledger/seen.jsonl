@@ -2583,3 +2583,7 @@
 {"answer":"5.21.0","marked_at":1793051241.3283472,"reason":"detected_late","source":"pypi","subject":"transformers"}
 {"answer":"1.2.18","marked_at":1793051241.3283472,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langgraph"}
 {"answer":"v5.21","marked_at":1793051241.3283472,"reason":"detected_late","source":"github_release","subject":"huggingface/transformers"}
+{"answer":"0.12.11","marked_at":1793062482.8594625,"reason":"detected_late","source":"pypi","subject":"flax"}
+{"answer":"0.17.3","marked_at":1793062482.8594625,"reason":"detected_late","source":"pypi","subject":"ruff"}
+{"answer":"0.17.3","marked_at":1793062482.8594625,"reason":"detected_late","source":"github_release","subject":"astral-sh/ruff"}
+{"answer":"langchain-openai==1.7.3","marked_at":1793062482.8594625,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
