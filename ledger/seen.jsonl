@@ -2620,3 +2620,9 @@
 {"answer":"2610.35313","marked_at":1793080901.4215837,"reason":"detected_late","source":"arxiv","subject":"2610.35313"}
 {"answer":"2610.35155","marked_at":1793080901.4215837,"reason":"detected_late","source":"arxiv","subject":"2610.35155"}
 {"answer":"2610.34279","marked_at":1793080901.4215837,"reason":"detected_late","source":"arxiv","subject":"2610.34279"}
+{"answer":"12.3.1","marked_at":1793102611.8517673,"reason":"detected_late","source":"npm","subject":"@nestjs/core"}
+{"answer":"1.21.0","marked_at":1793102611.8517673,"reason":"detected_late","source":"npm","subject":"axios"}
+{"answer":"11.1.0","marked_at":1793102611.8517673,"reason":"detected_late","source":"npm","subject":"preact"}
+{"answer":"0.42.1","marked_at":1793102611.8517673,"reason":"detected_late","source":"pypi","subject":"diffusers"}
+{"answer":"v13.2.5","marked_at":1793102611.8517673,"reason":"detected_late","source":"github_release","subject":"grafana/grafana"}
+{"answer":"0001633917-26-000086","marked_at":1793102611.8517673,"reason":"detected_late","source":"edgar","subject":"1633917:8-K"}
