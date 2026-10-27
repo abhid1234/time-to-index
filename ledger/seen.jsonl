@@ -2632,3 +2632,12 @@
 {"answer":"4.154.0","marked_at":1793123802.7066534,"reason":"detected_late","source":"npm","subject":"wrangler"}
 {"answer":"3.40.0","marked_at":1793123802.7066534,"reason":"detected_late","source":"pypi","subject":"openai"}
 {"answer":"@cloudflare/vitest-plugin@1.4.9","marked_at":1793123802.7066534,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"45.1.0","marked_at":1793138246.4716344,"reason":"detected_late","source":"npm","subject":"electron"}
+{"answer":"1.43.120","marked_at":1793138246.4716344,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"1.106.5","marked_at":1793138246.4716344,"reason":"detected_late","source":"pypi","subject":"litellm"}
+{"answer":"1.6.3","marked_at":1793138246.4716344,"reason":"detected_late","source":"pypi","subject":"modal"}
+{"answer":"v0.40.12","marked_at":1793138246.4716344,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
+{"answer":"v1.106.5","marked_at":1793138246.4716344,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
+{"answer":"0001783879-26-000164","marked_at":1793138246.4716344,"reason":"detected_late","source":"edgar","subject":"1783879:8-K"}
+{"answer":"0001193125-26-434271","marked_at":1793138246.4716344,"reason":"detected_late","source":"edgar","subject":"1730168:8-K"}
+{"answer":"0001633917-26-000088","marked_at":1793138246.4716344,"reason":"detected_late","source":"edgar","subject":"1633917:10-Q"}
