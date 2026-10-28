@@ -2641,3 +2641,12 @@
 {"answer":"0001783879-26-000164","marked_at":1793138246.4716344,"reason":"detected_late","source":"edgar","subject":"1783879:8-K"}
 {"answer":"0001193125-26-434271","marked_at":1793138246.4716344,"reason":"detected_late","source":"edgar","subject":"1730168:8-K"}
 {"answer":"0001633917-26-000088","marked_at":1793138246.4716344,"reason":"detected_late","source":"edgar","subject":"1633917:10-Q"}
+{"answer":"langchain-anthropic==1.7.7","marked_at":1793149482.7369683,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"2610.36947","marked_at":1793149482.7369683,"reason":"detected_late","source":"arxiv","subject":"2610.36947"}
+{"answer":"2610.36907","marked_at":1793149482.7369683,"reason":"detected_late","source":"arxiv","subject":"2610.36907"}
+{"answer":"2610.36894","marked_at":1793149482.7369683,"reason":"detected_late","source":"arxiv","subject":"2610.36894"}
+{"answer":"2610.36623","marked_at":1793149482.7369683,"reason":"detected_late","source":"arxiv","subject":"2610.36623"}
+{"answer":"2610.36603","marked_at":1793149482.7369683,"reason":"detected_late","source":"arxiv","subject":"2610.36603"}
+{"answer":"2610.36833","marked_at":1793149482.7369683,"reason":"detected_late","source":"arxiv","subject":"2610.36833"}
+{"answer":"2610.36822","marked_at":1793149482.7369683,"reason":"detected_late","source":"arxiv","subject":"2610.36822"}
+{"answer":"2610.36418","marked_at":1793149482.7369683,"reason":"detected_late","source":"arxiv","subject":"2610.36418"}
