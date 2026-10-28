@@ -2692,3 +2692,14 @@
 {"answer":"2026-22011","marked_at":1793194607.0755007,"reason":"detected_late","source":"federal_register","subject":"2026-22011"}
 {"answer":"2026-22010","marked_at":1793194607.0755007,"reason":"detected_late","source":"federal_register","subject":"2026-22010"}
 {"answer":"2026-22009","marked_at":1793194607.0755007,"reason":"detected_late","source":"federal_register","subject":"2026-22009"}
+{"answer":"11.10.0","marked_at":1793214429.6330159,"reason":"detected_late","source":"npm","subject":"@sentry/node"}
+{"answer":"26.6.6","marked_at":1793214429.6330159,"reason":"detected_late","source":"npm","subject":"@types/node"}
+{"answer":"7.4.3","marked_at":1793214429.6330159,"reason":"detected_late","source":"npm","subject":"astro"}
+{"answer":"12.16.1","marked_at":1793214429.6330159,"reason":"detected_late","source":"npm","subject":"pnpm"}
+{"answer":"langchain-core==1.7.1","marked_at":1793214429.6330159,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"1.144.0","marked_at":1793214429.6330159,"reason":"detected_late","source":"github_release","subject":"microsoft/vscode"}
+{"answer":"@cloudflare/vite-plugin@1.66.0","marked_at":1793214429.6330159,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"v2.15.0","marked_at":1793214429.6330159,"reason":"detected_late","source":"github_release","subject":"pytorch/pytorch"}
+{"answer":"@astrojs/vercel@11.0.17","marked_at":1793214429.6330159,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
+{"answer":"v1.17.1","marked_at":1793214429.6330159,"reason":"detected_late","source":"github_release","subject":"hashicorp/terraform"}
+{"answer":"0001193125-26-435853","marked_at":1793214429.6330159,"reason":"detected_late","source":"edgar","subject":"1341439:8-K"}
