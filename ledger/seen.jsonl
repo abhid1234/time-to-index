@@ -2678,3 +2678,17 @@
 {"answer":"2610.37407","marked_at":1793170184.3086312,"reason":"detected_late","source":"arxiv","subject":"2610.37407"}
 {"answer":"2610.37256","marked_at":1793170184.3086312,"reason":"detected_late","source":"arxiv","subject":"2610.37256"}
 {"answer":"2610.37237","marked_at":1793170184.3086312,"reason":"detected_late","source":"arxiv","subject":"2610.37237"}
+{"answer":"v0.8.0","marked_at":1793194607.0755007,"reason":"detected_late","source":"github_release","subject":"ggml-org/llama.cpp"}
+{"answer":"0001783879-26-000167","marked_at":1793194607.0755007,"reason":"detected_late","source":"edgar","subject":"1783879:10-Q"}
+{"answer":"0001467623-26-000052","marked_at":1793194607.0755007,"reason":"detected_late","source":"edgar","subject":"1467623:8-K"}
+{"answer":"0001104659-26-119326","marked_at":1793194607.0755007,"reason":"detected_late","source":"edgar","subject":"1385157:8-K"}
+{"answer":"2026-22052","marked_at":1793194607.0755007,"reason":"detected_late","source":"federal_register","subject":"2026-22052"}
+{"answer":"2026-22051","marked_at":1793194607.0755007,"reason":"detected_late","source":"federal_register","subject":"2026-22051"}
+{"answer":"2026-22050","marked_at":1793194607.0755007,"reason":"detected_late","source":"federal_register","subject":"2026-22050"}
+{"answer":"2026-22049","marked_at":1793194607.0755007,"reason":"detected_late","source":"federal_register","subject":"2026-22049"}
+{"answer":"2026-22034","marked_at":1793194607.0755007,"reason":"detected_late","source":"federal_register","subject":"2026-22034"}
+{"answer":"2026-22013","marked_at":1793194607.0755007,"reason":"detected_late","source":"federal_register","subject":"2026-22013"}
+{"answer":"2026-22012","marked_at":1793194607.0755007,"reason":"detected_late","source":"federal_register","subject":"2026-22012"}
+{"answer":"2026-22011","marked_at":1793194607.0755007,"reason":"detected_late","source":"federal_register","subject":"2026-22011"}
+{"answer":"2026-22010","marked_at":1793194607.0755007,"reason":"detected_late","source":"federal_register","subject":"2026-22010"}
+{"answer":"2026-22009","marked_at":1793194607.0755007,"reason":"detected_late","source":"federal_register","subject":"2026-22009"}
