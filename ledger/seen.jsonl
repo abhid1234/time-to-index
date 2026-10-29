@@ -2715,3 +2715,7 @@
 {"answer":"0001652044-26-000080","marked_at":1793229044.5294604,"reason":"detected_late","source":"edgar","subject":"1652044:8-K"}
 {"answer":"0001193125-26-436149","marked_at":1793229044.5294604,"reason":"detected_late","source":"edgar","subject":"789019:8-K"}
 {"answer":"0001477449-26-000050","marked_at":1793229044.5294604,"reason":"detected_late","source":"edgar","subject":"1477449:8-K"}
+{"answer":"2.6.4","marked_at":1793241026.5925255,"reason":"detected_late","source":"npm","subject":"@biomejs/biome"}
+{"answer":"5.20261029.1","marked_at":1793241026.5925255,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"28.0.1","marked_at":1793241026.5925255,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"@biomejs/biome@2.6.4","marked_at":1793241026.5925255,"reason":"detected_late","source":"github_release","subject":"biomejs/biome"}
