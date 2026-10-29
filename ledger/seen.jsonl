@@ -2719,3 +2719,6 @@
 {"answer":"5.20261029.1","marked_at":1793241026.5925255,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"28.0.1","marked_at":1793241026.5925255,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
 {"answer":"@biomejs/biome@2.6.4","marked_at":1793241026.5925255,"reason":"detected_late","source":"github_release","subject":"biomejs/biome"}
+{"answer":"5.21.1","marked_at":1793263900.1396914,"reason":"detected_late","source":"pypi","subject":"transformers"}
+{"answer":"v0.40.13","marked_at":1793263900.1396914,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
+{"answer":"v5.21.1","marked_at":1793263900.1396914,"reason":"detected_late","source":"github_release","subject":"huggingface/transformers"}
