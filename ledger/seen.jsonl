@@ -2795,3 +2795,9 @@
 {"answer":"2026-22244","marked_at":1793366740.3634214,"reason":"detected_late","source":"federal_register","subject":"2026-22244"}
 {"answer":"2026-22243","marked_at":1793366740.3634214,"reason":"detected_late","source":"federal_register","subject":"2026-22243"}
 {"answer":"2026-22242","marked_at":1793366740.3634214,"reason":"detected_late","source":"federal_register","subject":"2026-22242"}
+{"answer":"10.14.0","marked_at":1793385991.598794,"reason":"detected_late","source":"npm","subject":"eslint"}
+{"answer":"1.49.0","marked_at":1793385991.598794,"reason":"detected_late","source":"npm","subject":"convex"}
+{"answer":"45.2.0","marked_at":1793385991.598794,"reason":"detected_late","source":"npm","subject":"electron"}
+{"answer":"4.67.2","marked_at":1793385991.598794,"reason":"detected_late","source":"npm","subject":"rollup"}
+{"answer":"1.13.28","marked_at":1793385991.598794,"reason":"detected_late","source":"pypi","subject":"dagster"}
+{"answer":"1.17.1","marked_at":1793385991.598794,"reason":"detected_late","source":"pypi","subject":"trl"}
