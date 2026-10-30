@@ -2781,3 +2781,17 @@
 {"answer":"2610.39641","marked_at":1793341702.2575943,"reason":"detected_late","source":"arxiv","subject":"2610.39641"}
 {"answer":"2610.39017","marked_at":1793341702.2575943,"reason":"detected_late","source":"arxiv","subject":"2610.39017"}
 {"answer":"2610.38605","marked_at":1793341702.2575943,"reason":"detected_late","source":"arxiv","subject":"2610.38605"}
+{"answer":"5.22.1","marked_at":1793366740.3634214,"reason":"detected_late","source":"pypi","subject":"transformers"}
+{"answer":"v5.22.1","marked_at":1793366740.3634214,"reason":"detected_late","source":"github_release","subject":"huggingface/transformers"}
+{"answer":"0001018724-26-000040","marked_at":1793366740.3634214,"reason":"detected_late","source":"edgar","subject":"1018724:10-Q"}
+{"answer":"0000050863-26-000191","marked_at":1793366740.3634214,"reason":"detected_late","source":"edgar","subject":"50863:10-Q"}
+{"answer":"2026-22292","marked_at":1793366740.3634214,"reason":"detected_late","source":"federal_register","subject":"2026-22292"}
+{"answer":"2026-22269","marked_at":1793366740.3634214,"reason":"detected_late","source":"federal_register","subject":"2026-22269"}
+{"answer":"2026-22254","marked_at":1793366740.3634214,"reason":"detected_late","source":"federal_register","subject":"2026-22254"}
+{"answer":"2026-22253","marked_at":1793366740.3634214,"reason":"detected_late","source":"federal_register","subject":"2026-22253"}
+{"answer":"2026-22252","marked_at":1793366740.3634214,"reason":"detected_late","source":"federal_register","subject":"2026-22252"}
+{"answer":"2026-22249","marked_at":1793366740.3634214,"reason":"detected_late","source":"federal_register","subject":"2026-22249"}
+{"answer":"2026-22245","marked_at":1793366740.3634214,"reason":"detected_late","source":"federal_register","subject":"2026-22245"}
+{"answer":"2026-22244","marked_at":1793366740.3634214,"reason":"detected_late","source":"federal_register","subject":"2026-22244"}
+{"answer":"2026-22243","marked_at":1793366740.3634214,"reason":"detected_late","source":"federal_register","subject":"2026-22243"}
+{"answer":"2026-22242","marked_at":1793366740.3634214,"reason":"detected_late","source":"federal_register","subject":"2026-22242"}
