@@ -2750,3 +2750,6 @@
 {"answer":"0001018724-26-000038","marked_at":1793307266.5775723,"reason":"detected_late","source":"edgar","subject":"1018724:8-K"}
 {"answer":"0000050863-26-000188","marked_at":1793307266.5775723,"reason":"detected_late","source":"edgar","subject":"50863:8-K"}
 {"answer":"0001679788-26-000122","marked_at":1793307266.5775723,"reason":"detected_late","source":"edgar","subject":"1679788:10-Q"}
+{"answer":"1.9.18","marked_at":1793320828.41154,"reason":"detected_late","source":"npm","subject":"solid-js"}
+{"answer":"langchain-core==1.7.3","marked_at":1793320828.41154,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"0001193125-26-438017","marked_at":1793320828.41154,"reason":"detected_late","source":"edgar","subject":"1326801:8-K"}
