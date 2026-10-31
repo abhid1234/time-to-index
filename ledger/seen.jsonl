@@ -2812,3 +2812,4 @@
 {"answer":"3.42.0","marked_at":1793411568.7975874,"reason":"detected_late","source":"pypi","subject":"openai"}
 {"answer":"7.47.0","marked_at":1793433836.8551977,"reason":"detected_late","source":"npm","subject":"openai"}
 {"answer":"11.1.1","marked_at":1793433836.8551977,"reason":"detected_late","source":"npm","subject":"preact"}
+{"answer":"6.44.1","marked_at":1793456994.897862,"reason":"detected_late","source":"npm","subject":"knip"}
