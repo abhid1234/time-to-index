@@ -2805,3 +2805,8 @@
 {"answer":"1.2.19","marked_at":1793400076.1482332,"reason":"detected_late","source":"pypi","subject":"langgraph"}
 {"answer":"3.9.1","marked_at":1793400076.1482332,"reason":"detected_late","source":"pypi","subject":"prefect"}
 {"answer":"1.2.19","marked_at":1793400076.1482332,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langgraph"}
+{"answer":"5.20261031.1","marked_at":1793411568.7975874,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"29.0.1","marked_at":1793411568.7975874,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"45.2.1","marked_at":1793411568.7975874,"reason":"detected_late","source":"npm","subject":"electron"}
+{"answer":"7.46.0","marked_at":1793411568.7975874,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"3.42.0","marked_at":1793411568.7975874,"reason":"detected_late","source":"pypi","subject":"openai"}
