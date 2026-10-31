@@ -2813,3 +2813,4 @@
 {"answer":"7.47.0","marked_at":1793433836.8551977,"reason":"detected_late","source":"npm","subject":"openai"}
 {"answer":"11.1.1","marked_at":1793433836.8551977,"reason":"detected_late","source":"npm","subject":"preact"}
 {"answer":"6.44.1","marked_at":1793456994.897862,"reason":"detected_late","source":"npm","subject":"knip"}
+{"answer":"4.67.3","marked_at":1793483769.2343118,"reason":"detected_late","source":"npm","subject":"rollup"}
