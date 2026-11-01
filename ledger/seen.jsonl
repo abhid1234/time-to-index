@@ -2814,3 +2814,5 @@
 {"answer":"11.1.1","marked_at":1793433836.8551977,"reason":"detected_late","source":"npm","subject":"preact"}
 {"answer":"6.44.1","marked_at":1793456994.897862,"reason":"detected_late","source":"npm","subject":"knip"}
 {"answer":"4.67.3","marked_at":1793483769.2343118,"reason":"detected_late","source":"npm","subject":"rollup"}
+{"answer":"5.20261101.1","marked_at":1793516091.1399493,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"4.13.16","marked_at":1793516091.1399493,"reason":"detected_late","source":"npm","subject":"hono"}
