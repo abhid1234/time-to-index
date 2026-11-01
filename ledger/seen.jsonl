@@ -2816,3 +2816,5 @@
 {"answer":"4.67.3","marked_at":1793483769.2343118,"reason":"detected_late","source":"npm","subject":"rollup"}
 {"answer":"5.20261101.1","marked_at":1793516091.1399493,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"4.13.16","marked_at":1793516091.1399493,"reason":"detected_late","source":"npm","subject":"hono"}
+{"answer":"5.105.1","marked_at":1793541947.1634064,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
+{"answer":"4.67.4","marked_at":1793541947.1634064,"reason":"detected_late","source":"npm","subject":"rollup"}
