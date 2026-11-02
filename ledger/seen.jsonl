@@ -2819,3 +2819,6 @@
 {"answer":"5.105.1","marked_at":1793541947.1634064,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
 {"answer":"4.67.4","marked_at":1793541947.1634064,"reason":"detected_late","source":"npm","subject":"rollup"}
 {"answer":"3.42.1","marked_at":1793572604.0222423,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"5.20261102.1","marked_at":1793584077.573353,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"4.156.1","marked_at":1793584077.573353,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"@cloudflare/vite-plugin@1.67.0","marked_at":1793584077.573353,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
