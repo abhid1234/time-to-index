@@ -2876,3 +2876,11 @@
 {"answer":"2026-22348","marked_at":1793644924.4670596,"reason":"detected_late","source":"federal_register","subject":"2026-22348"}
 {"answer":"2026-22347","marked_at":1793644924.4670596,"reason":"detected_late","source":"federal_register","subject":"2026-22347"}
 {"answer":"2026-22346","marked_at":1793644924.4670596,"reason":"detected_late","source":"federal_register","subject":"2026-22346"}
+{"answer":"1.4.0","marked_at":1793668815.5678205,"reason":"detected_late","source":"npm","subject":"@anthropic-ai/sdk"}
+{"answer":"5.20261103.1","marked_at":1793668815.5678205,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"5.105.3","marked_at":1793668815.5678205,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
+{"answer":"4.6.4","marked_at":1793668815.5678205,"reason":"detected_late","source":"npm","subject":"nuxt"}
+{"answer":"4.3.4","marked_at":1793668815.5678205,"reason":"detected_late","source":"npm","subject":"tailwindcss"}
+{"answer":"2.4.0","marked_at":1793668815.5678205,"reason":"detected_late","source":"pypi","subject":"anthropic"}
+{"answer":"langchain-anthropic==1.7.9","marked_at":1793668815.5678205,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"0000320193-26-000024","marked_at":1793668815.5678205,"reason":"detected_late","source":"edgar","subject":"320193:8-K"}
