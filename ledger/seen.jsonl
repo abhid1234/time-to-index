@@ -2934,3 +2934,10 @@
 {"answer":"2026-22432","marked_at":1793722199.5850828,"reason":"detected_late","source":"federal_register","subject":"2026-22432"}
 {"answer":"2026-22431","marked_at":1793722199.5850828,"reason":"detected_late","source":"federal_register","subject":"2026-22431"}
 {"answer":"2026-22430","marked_at":1793722199.5850828,"reason":"detected_late","source":"federal_register","subject":"2026-22430"}
+{"answer":"7.49.0","marked_at":1793742442.4794734,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"16.4.5","marked_at":1793742442.4794734,"reason":"detected_late","source":"npm","subject":"next"}
+{"answer":"3.44.0","marked_at":1793742442.4794734,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"sdk==0.4.12","marked_at":1793742442.4794734,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langgraph"}
+{"answer":"v16.4.5","marked_at":1793742442.4794734,"reason":"detected_late","source":"github_release","subject":"vercel/next.js"}
+{"answer":"0000002488-26-000188","marked_at":1793742442.4794734,"reason":"detected_late","source":"edgar","subject":"2488:8-K"}
+{"answer":"0001666700-26-000060","marked_at":1793742442.4794734,"reason":"detected_late","source":"edgar","subject":"1666700:10-Q"}
