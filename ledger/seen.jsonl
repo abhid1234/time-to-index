@@ -2941,3 +2941,6 @@
 {"answer":"v16.4.5","marked_at":1793742442.4794734,"reason":"detected_late","source":"github_release","subject":"vercel/next.js"}
 {"answer":"0000002488-26-000188","marked_at":1793742442.4794734,"reason":"detected_late","source":"edgar","subject":"2488:8-K"}
 {"answer":"0001666700-26-000060","marked_at":1793742442.4794734,"reason":"detected_late","source":"edgar","subject":"1666700:10-Q"}
+{"answer":"5.20261104.1","marked_at":1793756613.417394,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"3.18.0","marked_at":1793756613.417394,"reason":"detected_late","source":"pypi","subject":"mlflow"}
+{"answer":"langchain-typesafe==0.0.1","marked_at":1793756613.417394,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
