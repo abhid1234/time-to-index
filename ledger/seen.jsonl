@@ -2994,3 +2994,15 @@
 {"answer":"2026-22531","marked_at":1793809054.9062066,"reason":"detected_late","source":"federal_register","subject":"2026-22531"}
 {"answer":"2026-22530","marked_at":1793809054.9062066,"reason":"detected_late","source":"federal_register","subject":"2026-22530"}
 {"answer":"2026-22529","marked_at":1793809054.9062066,"reason":"detected_late","source":"federal_register","subject":"2026-22529"}
+{"answer":"1.5.0","marked_at":1793829543.5474343,"reason":"detected_late","source":"npm","subject":"@anthropic-ai/sdk"}
+{"answer":"5.106.0","marked_at":1793829543.5474343,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
+{"answer":"45.2.3","marked_at":1793829543.5474343,"reason":"detected_late","source":"npm","subject":"electron"}
+{"answer":"0.4.269","marked_at":1793829543.5474343,"reason":"detected_late","source":"npm","subject":"vike"}
+{"answer":"2.5.0","marked_at":1793829543.5474343,"reason":"detected_late","source":"pypi","subject":"anthropic"}
+{"answer":"1.43.124","marked_at":1793829543.5474343,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"1.4.9","marked_at":1793829543.5474343,"reason":"detected_late","source":"pypi","subject":"langchain"}
+{"answer":"v2.3.0","marked_at":1793829543.5474343,"reason":"detected_late","source":"github_release","subject":"modelcontextprotocol/servers"}
+{"answer":"langchain-fireworks==1.7.2","marked_at":1793829543.5474343,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"0001193125-26-447173","marked_at":1793829543.5474343,"reason":"detected_late","source":"edgar","subject":"789019:8-K"}
+{"answer":"0001543151-26-000041","marked_at":1793829543.5474343,"reason":"detected_late","source":"edgar","subject":"1543151:10-Q"}
+{"answer":"0001564408-26-000063","marked_at":1793829543.5474343,"reason":"detected_late","source":"edgar","subject":"1564408:8-K"}
