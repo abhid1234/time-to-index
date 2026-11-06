@@ -3172,3 +3172,10 @@
 {"answer":"2026-22726","marked_at":1793987800.0272002,"reason":"detected_late","source":"federal_register","subject":"2026-22726"}
 {"answer":"2026-22725","marked_at":1793987800.0272002,"reason":"detected_late","source":"federal_register","subject":"2026-22725"}
 {"answer":"2026-22724","marked_at":1793987800.0272002,"reason":"detected_late","source":"federal_register","subject":"2026-22724"}
+{"answer":"22.2.5","marked_at":1794005567.8080423,"reason":"detected_late","source":"npm","subject":"@angular/core"}
+{"answer":"5.107.0","marked_at":1794005567.8080423,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
+{"answer":"1.43.126","marked_at":1794005567.8080423,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"1.108.2","marked_at":1794005567.8080423,"reason":"detected_late","source":"pypi","subject":"litellm"}
+{"answer":"3.9.2","marked_at":1794005567.8080423,"reason":"detected_late","source":"pypi","subject":"prefect"}
+{"answer":"v1.108.2","marked_at":1794005567.8080423,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
+{"answer":"0001467623-26-000061","marked_at":1794005567.8080423,"reason":"detected_late","source":"edgar","subject":"1467623:10-Q"}
