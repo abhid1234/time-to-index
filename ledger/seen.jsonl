@@ -3185,3 +3185,5 @@
 {"answer":"4.13.17","marked_at":1794042833.1696353,"reason":"detected_late","source":"npm","subject":"hono"}
 {"answer":"1.6.3","marked_at":1794042833.1696353,"reason":"detected_late","source":"npm","subject":"langchain"}
 {"answer":"6.44.2","marked_at":1794066311.1841056,"reason":"detected_late","source":"npm","subject":"knip"}
+{"answer":"1.108.3","marked_at":1794092622.6895826,"reason":"detected_late","source":"pypi","subject":"litellm"}
+{"answer":"v1.108.3","marked_at":1794092622.6895826,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
