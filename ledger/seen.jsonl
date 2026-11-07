@@ -3182,3 +3182,5 @@
 {"answer":"5.20261107.1","marked_at":1794018857.998052,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"5.107.1","marked_at":1794018857.998052,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
 {"answer":"v0.165.0","marked_at":1794018857.998052,"reason":"detected_late","source":"github_release","subject":"open-telemetry/opentelemetry-collector"}
+{"answer":"4.13.17","marked_at":1794042833.1696353,"reason":"detected_late","source":"npm","subject":"hono"}
+{"answer":"1.6.3","marked_at":1794042833.1696353,"reason":"detected_late","source":"npm","subject":"langchain"}
