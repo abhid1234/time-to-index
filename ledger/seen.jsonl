@@ -3306,3 +3306,17 @@
 {"answer":"2026-22940","marked_at":1794325475.7061975,"reason":"detected_late","source":"federal_register","subject":"2026-22940"}
 {"answer":"2026-22939","marked_at":1794325475.7061975,"reason":"detected_late","source":"federal_register","subject":"2026-22939"}
 {"answer":"2026-22938","marked_at":1794325475.7061975,"reason":"detected_late","source":"federal_register","subject":"2026-22938"}
+{"answer":"1.8.0","marked_at":1794346047.170829,"reason":"detected_late","source":"npm","subject":"@anthropic-ai/sdk"}
+{"answer":"11.12.0","marked_at":1794346047.170829,"reason":"detected_late","source":"npm","subject":"@sentry/node"}
+{"answer":"45.3.0","marked_at":1794346047.170829,"reason":"detected_late","source":"npm","subject":"electron"}
+{"answer":"7.4.10","marked_at":1794346047.170829,"reason":"detected_late","source":"npm","subject":"astro"}
+{"answer":"1.6.4","marked_at":1794346047.170829,"reason":"detected_late","source":"npm","subject":"langchain"}
+{"answer":"2.8.0","marked_at":1794346047.170829,"reason":"detected_late","source":"pypi","subject":"anthropic"}
+{"answer":"3.5.0","marked_at":1794346047.170829,"reason":"detected_late","source":"pypi","subject":"dspy-ai"}
+{"answer":"0.162.4","marked_at":1794346047.170829,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"1.44.0","marked_at":1794346047.170829,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"1.4.10","marked_at":1794346047.170829,"reason":"detected_late","source":"pypi","subject":"langchain"}
+{"answer":"v1.104.9","marked_at":1794346047.170829,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
+{"answer":"langchain==1.4.10","marked_at":1794346047.170829,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"1.145.3","marked_at":1794346047.170829,"reason":"detected_late","source":"github_release","subject":"microsoft/vscode"}
+{"answer":"@astrojs/vue@7.1.4","marked_at":1794346047.170829,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
