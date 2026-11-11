@@ -3362,3 +3362,12 @@
 {"answer":"1.146.0","marked_at":1794413209.0080676,"reason":"detected_late","source":"github_release","subject":"microsoft/vscode"}
 {"answer":"@cloudflare/vite-plugin@1.69.0","marked_at":1794413209.0080676,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
 {"answer":"v1.17.2","marked_at":1794413209.0080676,"reason":"detected_late","source":"github_release","subject":"hashicorp/terraform"}
+{"answer":"2.6.7","marked_at":1794436806.5079277,"reason":"detected_late","source":"npm","subject":"@biomejs/biome"}
+{"answer":"7.4.11","marked_at":1794436806.5079277,"reason":"detected_late","source":"npm","subject":"astro"}
+{"answer":"13.3.0","marked_at":1794436806.5079277,"reason":"detected_late","source":"npm","subject":"firebase"}
+{"answer":"1.6.5","marked_at":1794436806.5079277,"reason":"detected_late","source":"npm","subject":"langchain"}
+{"answer":"2.11.11","marked_at":1794436806.5079277,"reason":"detected_late","source":"npm","subject":"turbo"}
+{"answer":"1.44.1","marked_at":1794436806.5079277,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"langchain-typesafe==0.1.0","marked_at":1794436806.5079277,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"@astrojs/vue@7.1.5","marked_at":1794436806.5079277,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
+{"answer":"@biomejs/biome@2.6.7","marked_at":1794436806.5079277,"reason":"detected_late","source":"github_release","subject":"biomejs/biome"}
