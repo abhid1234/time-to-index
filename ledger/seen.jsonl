@@ -3371,3 +3371,8 @@
 {"answer":"langchain-typesafe==0.1.0","marked_at":1794436806.5079277,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
 {"answer":"@astrojs/vue@7.1.5","marked_at":1794436806.5079277,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
 {"answer":"@biomejs/biome@2.6.7","marked_at":1794436806.5079277,"reason":"detected_late","source":"github_release","subject":"biomejs/biome"}
+{"answer":"5.20261112.1","marked_at":1794453818.9530413,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"22.2.6","marked_at":1794453818.9530413,"reason":"detected_late","source":"npm","subject":"@angular/core"}
+{"answer":"45.3.1","marked_at":1794453818.9530413,"reason":"detected_late","source":"npm","subject":"electron"}
+{"answer":"1.109.1","marked_at":1794453818.9530413,"reason":"detected_late","source":"pypi","subject":"litellm"}
+{"answer":"v1.109.1","marked_at":1794453818.9530413,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
