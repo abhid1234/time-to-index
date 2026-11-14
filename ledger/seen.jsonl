@@ -3464,3 +3464,8 @@
 {"answer":"langchain-openai==1.8.0","marked_at":1794605589.8051074,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
 {"answer":"@cloudflare/workers-auth@0.18.2","marked_at":1794605589.8051074,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
 {"answer":"@astrojs/vue@7.1.6","marked_at":1794605589.8051074,"reason":"detected_late","source":"github_release","subject":"withastro/astro"}
+{"answer":"5.20261114.1","marked_at":1794620703.2958632,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"31.0.0","marked_at":1794620703.2958632,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"10.15.0","marked_at":1794620703.2958632,"reason":"detected_late","source":"npm","subject":"eslint"}
+{"answer":"1.65.1","marked_at":1794620703.2958632,"reason":"detected_late","source":"npm","subject":"playwright"}
+{"answer":"v1.106.10","marked_at":1794620703.2958632,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
