@@ -3477,3 +3477,5 @@
 {"answer":"2.6.8","marked_at":1794764137.1398087,"reason":"detected_late","source":"npm","subject":"@biomejs/biome"}
 {"answer":"langchain-core==1.8.1","marked_at":1794764137.1398087,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
 {"answer":"@biomejs/biome@2.6.8","marked_at":1794764137.1398087,"reason":"detected_late","source":"github_release","subject":"biomejs/biome"}
+{"answer":"2.5.5","marked_at":1794780255.6769245,"reason":"detected_late","source":"pypi","subject":"numpy"}
+{"answer":"langchain-groq==1.2.0","marked_at":1794780255.6769245,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
