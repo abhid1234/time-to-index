@@ -3474,3 +3474,6 @@
 {"answer":"5.20261115.1","marked_at":1794712183.7244976,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"12.21.0","marked_at":1794712183.7244976,"reason":"detected_late","source":"npm","subject":"pnpm"}
 {"answer":"0.163.1","marked_at":1794739929.5015426,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"2.6.8","marked_at":1794764137.1398087,"reason":"detected_late","source":"npm","subject":"@biomejs/biome"}
+{"answer":"langchain-core==1.8.1","marked_at":1794764137.1398087,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"@biomejs/biome@2.6.8","marked_at":1794764137.1398087,"reason":"detected_late","source":"github_release","subject":"biomejs/biome"}
