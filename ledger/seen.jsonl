@@ -3473,3 +3473,4 @@
 {"answer":"v1.108.9","marked_at":1794699715.9234955,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
 {"answer":"5.20261115.1","marked_at":1794712183.7244976,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"12.21.0","marked_at":1794712183.7244976,"reason":"detected_late","source":"npm","subject":"pnpm"}
+{"answer":"0.163.1","marked_at":1794739929.5015426,"reason":"detected_late","source":"pypi","subject":"fastapi"}
