@@ -3682,3 +3682,12 @@
 {"answer":"2026-23519","marked_at":1795027895.6016142,"reason":"detected_late","source":"federal_register","subject":"2026-23519"}
 {"answer":"2026-23517","marked_at":1795027895.6016142,"reason":"detected_late","source":"federal_register","subject":"2026-23517"}
 {"answer":"2026-23515","marked_at":1795027895.6016142,"reason":"detected_late","source":"federal_register","subject":"2026-23515"}
+{"answer":"22.3.0","marked_at":1795049956.4751215,"reason":"detected_late","source":"npm","subject":"@angular/core"}
+{"answer":"6.46.1","marked_at":1795049956.4751215,"reason":"detected_late","source":"npm","subject":"knip"}
+{"answer":"1.6.7","marked_at":1795049956.4751215,"reason":"detected_late","source":"npm","subject":"langchain"}
+{"answer":"4.165.0","marked_at":1795049956.4751215,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"1.44.6","marked_at":1795049956.4751215,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"0.165.0","marked_at":1795049956.4751215,"reason":"detected_late","source":"pypi","subject":"fastapi"}
+{"answer":"1.5.2","marked_at":1795049956.4751215,"reason":"detected_late","source":"pypi","subject":"langchain"}
+{"answer":"langchain-openai==1.8.3","marked_at":1795049956.4751215,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"wrangler@4.165.0","marked_at":1795049956.4751215,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
