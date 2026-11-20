@@ -3822,3 +3822,12 @@
 {"answer":"2026-23725","marked_at":1795181300.3541975,"reason":"detected_late","source":"federal_register","subject":"2026-23725"}
 {"answer":"2026-23724","marked_at":1795181300.3541975,"reason":"detected_late","source":"federal_register","subject":"2026-23724"}
 {"answer":"2026-23723","marked_at":1795181300.3541975,"reason":"detected_late","source":"federal_register","subject":"2026-23723"}
+{"answer":"1.12.0","marked_at":1795210102.0683768,"reason":"detected_late","source":"npm","subject":"@anthropic-ai/sdk"}
+{"answer":"11.16.0","marked_at":1795210102.0683768,"reason":"detected_late","source":"npm","subject":"@sentry/node"}
+{"answer":"5.108.2","marked_at":1795210102.0683768,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
+{"answer":"5.59.1","marked_at":1795210102.0683768,"reason":"detected_late","source":"npm","subject":"svelte"}
+{"answer":"4.166.0","marked_at":1795210102.0683768,"reason":"detected_late","source":"npm","subject":"wrangler"}
+{"answer":"2.12.0","marked_at":1795210102.0683768,"reason":"detected_late","source":"pypi","subject":"anthropic"}
+{"answer":"1.44.8","marked_at":1795210102.0683768,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"v2.0.1","marked_at":1795210102.0683768,"reason":"detected_late","source":"github_release","subject":"duckdb/duckdb"}
+{"answer":"@cloudflare/vitest-plugin@1.9.0","marked_at":1795210102.0683768,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
