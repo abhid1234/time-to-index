@@ -3831,3 +3831,8 @@
 {"answer":"1.44.8","marked_at":1795210102.0683768,"reason":"detected_late","source":"pypi","subject":"boto3"}
 {"answer":"v2.0.1","marked_at":1795210102.0683768,"reason":"detected_late","source":"github_release","subject":"duckdb/duckdb"}
 {"answer":"@cloudflare/vitest-plugin@1.9.0","marked_at":1795210102.0683768,"reason":"detected_late","source":"github_release","subject":"cloudflare/workers-sdk"}
+{"answer":"5.20261121.1","marked_at":1795229069.493956,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"1.44.9","marked_at":1795229069.493956,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"0.31.2","marked_at":1795229069.493956,"reason":"detected_late","source":"pypi","subject":"wandb"}
+{"answer":"v1.108.14","marked_at":1795229069.493956,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
+{"answer":"0001193125-26-470351","marked_at":1795229069.493956,"reason":"detected_late","source":"edgar","subject":"1341439:8-K"}
