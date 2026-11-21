@@ -3840,3 +3840,4 @@
 {"answer":"v0.40.17","marked_at":1795256207.2181468,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
 {"answer":"5.24.0","marked_at":1795282727.0881307,"reason":"detected_late","source":"pypi","subject":"transformers"}
 {"answer":"v5.24.0","marked_at":1795282727.0881307,"reason":"detected_late","source":"github_release","subject":"huggingface/transformers"}
+{"answer":"v1.108.15","marked_at":1795299831.546701,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
