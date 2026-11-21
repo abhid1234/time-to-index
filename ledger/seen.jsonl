@@ -3836,3 +3836,5 @@
 {"answer":"0.31.2","marked_at":1795229069.493956,"reason":"detected_late","source":"pypi","subject":"wandb"}
 {"answer":"v1.108.14","marked_at":1795229069.493956,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
 {"answer":"0001193125-26-470351","marked_at":1795229069.493956,"reason":"detected_late","source":"edgar","subject":"1341439:8-K"}
+{"answer":"4.68.8","marked_at":1795256207.2181468,"reason":"detected_late","source":"npm","subject":"rollup"}
+{"answer":"v0.40.17","marked_at":1795256207.2181468,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
