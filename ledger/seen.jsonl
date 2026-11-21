@@ -3838,3 +3838,5 @@
 {"answer":"0001193125-26-470351","marked_at":1795229069.493956,"reason":"detected_late","source":"edgar","subject":"1341439:8-K"}
 {"answer":"4.68.8","marked_at":1795256207.2181468,"reason":"detected_late","source":"npm","subject":"rollup"}
 {"answer":"v0.40.17","marked_at":1795256207.2181468,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
+{"answer":"5.24.0","marked_at":1795282727.0881307,"reason":"detected_late","source":"pypi","subject":"transformers"}
+{"answer":"v5.24.0","marked_at":1795282727.0881307,"reason":"detected_late","source":"github_release","subject":"huggingface/transformers"}
