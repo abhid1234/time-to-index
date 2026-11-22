@@ -3842,3 +3842,4 @@
 {"answer":"v5.24.0","marked_at":1795282727.0881307,"reason":"detected_late","source":"github_release","subject":"huggingface/transformers"}
 {"answer":"v1.108.15","marked_at":1795299831.546701,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
 {"answer":"4.13.20","marked_at":1795342564.715785,"reason":"detected_late","source":"npm","subject":"hono"}
+{"answer":"8.12.0","marked_at":1795370019.6407835,"reason":"detected_late","source":"github_release","subject":"redis/redis"}
