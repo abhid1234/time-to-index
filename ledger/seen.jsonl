@@ -3846,3 +3846,14 @@
 {"answer":"5.20261122.2","marked_at":1795389559.8245494,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
 {"answer":"5.108.3","marked_at":1795389559.8245494,"reason":"detected_late","source":"npm","subject":"@tanstack/react-query"}
 {"answer":"6.48.0","marked_at":1795389559.8245494,"reason":"detected_late","source":"npm","subject":"knip"}
+{"answer":"5.20261123.1","marked_at":1795405847.4891355,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"2611.27192","marked_at":1795405847.4891355,"reason":"detected_late","source":"arxiv","subject":"2611.27192"}
+{"answer":"2611.27186","marked_at":1795405847.4891355,"reason":"detected_late","source":"arxiv","subject":"2611.27186"}
+{"answer":"2611.27156","marked_at":1795405847.4891355,"reason":"detected_late","source":"arxiv","subject":"2611.27156"}
+{"answer":"2611.27155","marked_at":1795405847.4891355,"reason":"detected_late","source":"arxiv","subject":"2611.27155"}
+{"answer":"2611.27139","marked_at":1795405847.4891355,"reason":"detected_late","source":"arxiv","subject":"2611.27139"}
+{"answer":"2611.27751","marked_at":1795405847.4891355,"reason":"detected_late","source":"arxiv","subject":"2611.27751"}
+{"answer":"2611.27726","marked_at":1795405847.4891355,"reason":"detected_late","source":"arxiv","subject":"2611.27726"}
+{"answer":"2611.27722","marked_at":1795405847.4891355,"reason":"detected_late","source":"arxiv","subject":"2611.27722"}
+{"answer":"2611.27721","marked_at":1795405847.4891355,"reason":"detected_late","source":"arxiv","subject":"2611.27721"}
+{"answer":"2611.27718","marked_at":1795405847.4891355,"reason":"detected_late","source":"arxiv","subject":"2611.27718"}
