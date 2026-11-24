@@ -1,6 +1,6 @@
 # Results
 
-_Generated 2026-11-24 01:16 UTC · 91 events · 185 provider probes graded · 51 control probes · $0.83 spent_
+_Generated 2026-11-24 11:06 UTC · 91 events · 185 provider probes graded · 51 control probes · $0.83 spent_
 
 | provider | median TTI | p90 | 24h recall | staleness | text/result | $/1k events | $/1k fresh answers | n |
 |---|---|---|---|---|---|---|---|---|
