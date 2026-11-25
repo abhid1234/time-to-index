@@ -4048,3 +4048,11 @@
 {"answer":"2026-24015","marked_at":1795616524.987982,"reason":"detected_late","source":"federal_register","subject":"2026-24015"}
 {"answer":"2026-24014","marked_at":1795616524.987982,"reason":"detected_late","source":"federal_register","subject":"2026-24014"}
 {"answer":"2026-24013","marked_at":1795616524.987982,"reason":"detected_late","source":"federal_register","subject":"2026-24013"}
+{"answer":"11.18.0","marked_at":1795648401.365687,"reason":"detected_late","source":"npm","subject":"@sentry/node"}
+{"answer":"33.0.0","marked_at":1795648401.365687,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"5.59.2","marked_at":1795648401.365687,"reason":"detected_late","source":"npm","subject":"svelte"}
+{"answer":"1.44.12","marked_at":1795648401.365687,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"1.19.0","marked_at":1795648401.365687,"reason":"detected_late","source":"pypi","subject":"trl"}
+{"answer":"v1.35.11","marked_at":1795648401.365687,"reason":"detected_late","source":"github_release","subject":"kubernetes/kubernetes"}
+{"answer":"langchain-core==1.8.5","marked_at":1795648401.365687,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langchain"}
+{"answer":"cli==0.4.44","marked_at":1795648401.365687,"reason":"detected_late","source":"github_release","subject":"langchain-ai/langgraph"}
