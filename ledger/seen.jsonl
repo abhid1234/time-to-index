@@ -4087,3 +4087,7 @@
 {"answer":"3.60.0","marked_at":1795706154.4557784,"reason":"detected_late","source":"pypi","subject":"openai"}
 {"answer":"0.29.3","marked_at":1795706154.4557784,"reason":"detected_late","source":"pypi","subject":"typer"}
 {"answer":"v1.1.0","marked_at":1795706154.4557784,"reason":"detected_late","source":"github_release","subject":"ggml-org/llama.cpp"}
+{"answer":"4.13.23","marked_at":1795737286.5513027,"reason":"detected_late","source":"npm","subject":"hono"}
+{"answer":"2.5.0","marked_at":1795737286.5513027,"reason":"detected_late","source":"pypi","subject":"huggingface-hub"}
+{"answer":"1.18.0","marked_at":1795737286.5513027,"reason":"detected_late","source":"pypi","subject":"instructor"}
+{"answer":"v1.108.19","marked_at":1795737286.5513027,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
