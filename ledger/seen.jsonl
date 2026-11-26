@@ -4080,3 +4080,10 @@
 {"answer":"2611.34649","marked_at":1795669805.7338064,"reason":"detected_late","source":"arxiv","subject":"2611.34649"}
 {"answer":"2611.34627","marked_at":1795669805.7338064,"reason":"detected_late","source":"arxiv","subject":"2611.34627"}
 {"answer":"2611.34363","marked_at":1795669805.7338064,"reason":"detected_late","source":"arxiv","subject":"2611.34363"}
+{"answer":"12.6.3","marked_at":1795706154.4557784,"reason":"detected_late","source":"npm","subject":"@nestjs/core"}
+{"answer":"11.19.0","marked_at":1795706154.4557784,"reason":"detected_late","source":"npm","subject":"@sentry/node"}
+{"answer":"7.65.0","marked_at":1795706154.4557784,"reason":"detected_late","source":"npm","subject":"openai"}
+{"answer":"8.4.0","marked_at":1795706154.4557784,"reason":"detected_late","source":"npm","subject":"vite"}
+{"answer":"3.60.0","marked_at":1795706154.4557784,"reason":"detected_late","source":"pypi","subject":"openai"}
+{"answer":"0.29.3","marked_at":1795706154.4557784,"reason":"detected_late","source":"pypi","subject":"typer"}
+{"answer":"v1.1.0","marked_at":1795706154.4557784,"reason":"detected_late","source":"github_release","subject":"ggml-org/llama.cpp"}
