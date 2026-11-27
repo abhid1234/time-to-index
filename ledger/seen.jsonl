@@ -4091,3 +4091,4 @@
 {"answer":"2.5.0","marked_at":1795737286.5513027,"reason":"detected_late","source":"pypi","subject":"huggingface-hub"}
 {"answer":"1.18.0","marked_at":1795737286.5513027,"reason":"detected_late","source":"pypi","subject":"instructor"}
 {"answer":"v1.108.19","marked_at":1795737286.5513027,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
+{"answer":"5.20261127.1","marked_at":1795763208.6105986,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
