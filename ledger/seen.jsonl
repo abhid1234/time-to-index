@@ -4108,3 +4108,10 @@
 {"answer":"2026-24159","marked_at":1795800352.6322606,"reason":"detected_late","source":"federal_register","subject":"2026-24159"}
 {"answer":"2026-24158","marked_at":1795800352.6322606,"reason":"detected_late","source":"federal_register","subject":"2026-24158"}
 {"answer":"2026-24157","marked_at":1795800352.6322606,"reason":"detected_late","source":"federal_register","subject":"2026-24157"}
+{"answer":"34.0.0","marked_at":1795826314.0934083,"reason":"detected_late","source":"npm","subject":"@vercel/node"}
+{"answer":"6.49.0","marked_at":1795826314.0934083,"reason":"detected_late","source":"npm","subject":"knip"}
+{"answer":"4.5.2","marked_at":1795826314.0934083,"reason":"detected_late","source":"pypi","subject":"dash"}
+{"answer":"1.44.13","marked_at":1795826314.0934083,"reason":"detected_late","source":"pypi","subject":"boto3"}
+{"answer":"v0.40.19","marked_at":1795826314.0934083,"reason":"detected_late","source":"github_release","subject":"ollama/ollama"}
+{"answer":"1.100.1","marked_at":1795826314.0934083,"reason":"detected_late","source":"github_release","subject":"rust-lang/rust"}
+{"answer":"v1.108.20","marked_at":1795826314.0934083,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
