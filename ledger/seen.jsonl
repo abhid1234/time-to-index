@@ -4116,3 +4116,4 @@
 {"answer":"1.100.1","marked_at":1795826314.0934083,"reason":"detected_late","source":"github_release","subject":"rust-lang/rust"}
 {"answer":"v1.108.20","marked_at":1795826314.0934083,"reason":"detected_late","source":"github_release","subject":"BerriAI/litellm"}
 {"answer":"5.20261128.1","marked_at":1795854440.55156,"reason":"detected_late","source":"npm","subject":"@cloudflare/workers-types"}
+{"answer":"0.55.0","marked_at":1795885643.2152834,"reason":"detected_late","source":"pypi","subject":"uvicorn"}
